@@ -1,9 +1,9 @@
-function App() {
+import BaseMap from "./components/map-component";
+
+export default function App() {
   return (
     <>
-      <header className="flex text-3xl justify-center">hi</header>
+      <BaseMap />
     </>
   );
 }
-
-export default App;
