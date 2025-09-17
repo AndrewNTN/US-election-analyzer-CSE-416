@@ -1,0 +1,27 @@
+{
+  "name": "us-election-analyzer-cse-416",
+  "version": "1.0.0",
+  "description": "See README in respective folders.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "node backend/db/loadStates.js",
+    "api": "node backend/api/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndrewNTN/US-election-analyzer-CSE-416.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AndrewNTN/US-election-analyzer-CSE-416/issues"
+  },
+  "homepage": "https://github.com/AndrewNTN/US-election-analyzer-CSE-416#readme",
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "mongodb": "^6.19.0"
+  }
+}
