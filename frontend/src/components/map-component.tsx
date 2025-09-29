@@ -4,6 +4,7 @@ import type { MapContainerProps } from "react-leaflet";
 import type { LatLngExpression } from "leaflet";
 import type { FeatureCollection, Geometry, Feature } from "geojson";
 import type { PathOptions, Layer, LeafletMouseEvent } from "leaflet";
+import "leaflet/dist/leaflet.css";
 import statesJSON from "../../data/us-states.json";
 
 type StateProps = { name: string; density: number };
@@ -91,11 +92,9 @@ export default function BaseMap({
   center = [39.8283, -98.5795], // Center of US
   zoom = 4,
   style = {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
+    width: "100%",
+    height: "100%",
+    zIndex: 0,
   },
   className = "",
   children,
