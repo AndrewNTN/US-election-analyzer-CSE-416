@@ -7,7 +7,7 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-} from "@/components/ui/drawer";
+} from "@/components/ui/drawer.tsx";
 
 interface AnalysisDrawerProps {
   open: boolean;
