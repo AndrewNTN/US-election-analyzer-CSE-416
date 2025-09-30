@@ -1,84 +1,8 @@
 import React, { type ReactNode, useEffect } from "react";
-import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import type { MapContainerProps } from "react-leaflet";
 import type { LatLngExpression } from "leaflet";
-import type { FeatureCollection, Geometry, Feature } from "geojson";
-import type { PathOptions, Layer, LeafletMouseEvent } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import statesJSON from "../../data/us-states.json";
-
-type StateProps = { name: string; density: number };
-
-const states = statesJSON as FeatureCollection<Geometry, StateProps>;
-
-// Color scale function
-const getColor = (density: number): string => {
-  const colors = [
-    "#f7fbff",
-    "#deebf7",
-    "#c6dbef",
-    "#9ecae1",
-    "#6baed6",
-    "#4292c6",
-    "#2171b5",
-    "#08306b",
-  ];
-
-  // Define quantile breaks - you can adjust these based on your data
-  const breaks = [0, 10, 20, 50, 100, 200, 500, 1000];
-
-  for (let i = 0; i < breaks.length; i++) {
-    if (density <= breaks[i]) {
-      return colors[i];
-    }
-  }
-  return colors[colors.length - 1];
-};
-
-// Style function for GeoJSON features
-const getFeatureStyle = (
-  feature?: Feature<Geometry, StateProps>,
-): PathOptions => {
-  const density = feature?.properties?.density || 0;
-
-  return {
-    fillColor: getColor(density),
-    weight: 0.5,
-    opacity: 0.8,
-    color: "#9d9595",
-    fillOpacity: 0.7,
-  };
-};
-
-// Optional: Add interaction handlers
-const onEachFeature = (
-  feature: Feature<Geometry, StateProps>,
-  layer: Layer,
-) => {
-  if (feature.properties) {
-    layer.bindPopup(`
-      <div>
-        <h3>${feature.properties.name}</h3>
-        <p>Density: ${feature.properties.density}</p>
-      </div>
-    `);
-
-    layer.on({
-      mouseover: (e: LeafletMouseEvent) => {
-        const targetLayer = e.target;
-        targetLayer.setStyle({
-          weight: 3,
-          color: "#666",
-          fillOpacity: 0.8,
-        });
-      },
-      mouseout: (e: LeafletMouseEvent) => {
-        const targetLayer = e.target;
-        targetLayer.setStyle(getFeatureStyle(feature));
-      },
-    });
-  }
-};
 
 const CustomPanes = () => {
   const map = useMap();
@@ -157,12 +81,6 @@ export default function BaseMap({
         attribution="©OpenStreetMap, ©CartoDB"
         maxZoom={18}
         pane="baseTiles"
-      />
-
-      <GeoJSON
-        data={states}
-        style={getFeatureStyle}
-        onEachFeature={onEachFeature}
       />
 
       {/* Labels layer on top */}

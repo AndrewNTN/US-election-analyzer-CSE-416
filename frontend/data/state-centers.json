@@ -1,0 +1,202 @@
+{
+  "alabama": {
+    "center": [32.806671, -86.79113],
+    "zoom": 7
+  },
+  "alaska": {
+    "center": [61.370716, -152.404419],
+    "zoom": 4
+  },
+  "arizona": {
+    "center": [33.729759, -111.431221],
+    "zoom": 6
+  },
+  "arkansas": {
+    "center": [34.969704, -92.373123],
+    "zoom": 7
+  },
+  "california": {
+    "center": [36.116203, -119.681564],
+    "zoom": 6
+  },
+  "colorado": {
+    "center": [39.059811, -105.311104],
+    "zoom": 7
+  },
+  "connecticut": {
+    "center": [41.597782, -72.755371],
+    "zoom": 8
+  },
+  "delaware": {
+    "center": [39.318523, -75.507141],
+    "zoom": 9
+  },
+  "florida": {
+    "center": [27.766279, -83.5],
+    "zoom": 7
+  },
+  "georgia": {
+    "center": [33.040619, -83.643074],
+    "zoom": 7
+  },
+  "hawaii": {
+    "center": [21.094318, -157.498337],
+    "zoom": 7
+  },
+  "idaho": {
+    "center": [44.240459, -114.478828],
+    "zoom": 6
+  },
+  "illinois": {
+    "center": [39.5, -88.986137],
+    "zoom": 7
+  },
+  "indiana": {
+    "center": [39.849426, -86.258278],
+    "zoom": 7
+  },
+  "iowa": {
+    "center": [42.011539, -93.210526],
+    "zoom": 7
+  },
+  "kansas": {
+    "center": [38.5266, -98.5],
+    "zoom": 7
+  },
+  "kentucky": {
+    "center": [37.66814, -84.670067],
+    "zoom": 7
+  },
+  "louisiana": {
+    "center": [31.169546, -91.867805],
+    "zoom": 7
+  },
+  "maine": {
+    "center": [44.693947, -69.381927],
+    "zoom": 7
+  },
+  "maryland": {
+    "center": [39.063946, -76.802101],
+    "zoom": 8
+  },
+  "massachusetts": {
+    "center": [42.230171, -71.530106],
+    "zoom": 8
+  },
+  "michigan": {
+    "center": [43.326618, -84.536095],
+    "zoom": 7
+  },
+  "minnesota": {
+    "center": [45.694454, -93.900192],
+    "zoom": 7
+  },
+  "mississippi": {
+    "center": [32.741646, -89.678696],
+    "zoom": 7
+  },
+  "missouri": {
+    "center": [38.456085, -92.288368],
+    "zoom": 7
+  },
+  "montana": {
+    "center": [47.012973, -110.362105],
+    "zoom": 6
+  },
+  "nebraska": {
+    "center": [41.12537, -98.268082],
+    "zoom": 7
+  },
+  "nevada": {
+    "center": [38.313515, -117.055374],
+    "zoom": 6
+  },
+  "new-hampshire": {
+    "center": [43.452492, -71.563896],
+    "zoom": 8
+  },
+  "new-jersey": {
+    "center": [40.298904, -74.521011],
+    "zoom": 8
+  },
+  "new-mexico": {
+    "center": [34.840515, -106.248482],
+    "zoom": 7
+  },
+  "new-york": {
+    "center": [42.165726, -74.948051],
+    "zoom": 7
+  },
+  "north-carolina": {
+    "center": [35.630066, -79.806419],
+    "zoom": 7
+  },
+  "north-dakota": {
+    "center": [47.528912, -99.784012],
+    "zoom": 7
+  },
+  "ohio": {
+    "center": [40.388783, -82.764915],
+    "zoom": 7
+  },
+  "oklahoma": {
+    "center": [35.565342, -96.928917],
+    "zoom": 7
+  },
+  "oregon": {
+    "center": [43.572021, -120.6],
+    "zoom": 7
+  },
+  "pennsylvania": {
+    "center": [40.590752, -77.209755],
+    "zoom": 7
+  },
+  "rhode-island": {
+    "center": [41.680893, -71.51178],
+    "zoom": 9
+  },
+  "south-carolina": {
+    "center": [33.856892, -80.945007],
+    "zoom": 7
+  },
+  "south-dakota": {
+    "center": [44.299782, -99.438828],
+    "zoom": 7
+  },
+  "tennessee": {
+    "center": [35.747845, -86.692345],
+    "zoom": 7
+  },
+  "texas": {
+    "center": [31.054487, -97.563461],
+    "zoom": 6
+  },
+  "utah": {
+    "center": [39, -111.862434],
+    "zoom": 7
+  },
+  "vermont": {
+    "center": [44.045876, -72.710686],
+    "zoom": 8
+  },
+  "virginia": {
+    "center": [37.769337, -78.169968],
+    "zoom": 7
+  },
+  "washington": {
+    "center": [47.400902, -121.490494],
+    "zoom": 7
+  },
+  "west-virginia": {
+    "center": [38.491226, -80.954453],
+    "zoom": 8
+  },
+  "wisconsin": {
+    "center": [44.268543, -89.616508],
+    "zoom": 7
+  },
+  "wyoming": {
+    "center": [42.755966, -107.30249],
+    "zoom": 7
+  }
+}
