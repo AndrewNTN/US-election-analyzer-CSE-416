@@ -1,10 +1,36 @@
 import { Link } from "@tanstack/react-router";
 import BaseMap from "@/components/map/base-map.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ArrowLeft } from "lucide-react";
 import stateCentersData from "../../data/state-centers.json";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const AnalysisType = {
+  PROVISIONAL_BALLOT_CHART: "prov-ballot-bchart",
+  PROVISIONAL_BALLOT_TABLE: "prob-ballot-table",
+  ACTIVE_VOTERS_2024: "active-voters-2024",
+  POLLBOOK_DELETIONS_2024: "pb-deletions-2024",
+  MAIL_BALLOTS_REJECTED: "mail-ballots-rejected",
+  STATE_EQUIPMENT_SUMMARY: "state-equip-summary",
+} as const;
+
+type AnalysisTypeValue = (typeof AnalysisType)[keyof typeof AnalysisType];
+
+const analysisTypeLabels: Record<AnalysisTypeValue, string> = {
+  [AnalysisType.PROVISIONAL_BALLOT_CHART]: "Provisional Ballot Bar Chart",
+  [AnalysisType.PROVISIONAL_BALLOT_TABLE]: "Provisional Ballot Table",
+  [AnalysisType.ACTIVE_VOTERS_2024]: "2024 EAVS Active Voters",
+  [AnalysisType.POLLBOOK_DELETIONS_2024]: "2024 EAVS Pollbook Deletions",
+  [AnalysisType.MAIL_BALLOTS_REJECTED]: "Mail Ballots Rejected",
+  [AnalysisType.STATE_EQUIPMENT_SUMMARY]: "State Equipment Summary",
+};
 
 interface StateAnalysisProps {
   stateName: string;
@@ -99,14 +125,21 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
 
           <div className="space-y-6">
             <div className="justify-self-center">
-              <ToggleGroup type="single" variant="outline" defaultValue="a">
-                <ToggleGroupItem value="a">Voter Registration</ToggleGroupItem>
-                <ToggleGroupItem value="b">Voting Equipment</ToggleGroupItem>
-                <ToggleGroupItem value="c">Chart</ToggleGroupItem>
-              </ToggleGroup>
+              <Select defaultValue={AnalysisType.PROVISIONAL_BALLOT_CHART}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(AnalysisType).map((analysisType) => (
+                    <SelectItem key={analysisType} value={analysisType}>
+                      {analysisTypeLabels[analysisType]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="bg-white rounded-lg shadow-sm p-6 flex justify-center">
-              {/* TODO: add graphs here */}
+              {/* TODO: add graphs here, i think we can use https://ui.shadcn.com/docs/components/data-table imo*/}
             </div>
           </div>
         </div>
