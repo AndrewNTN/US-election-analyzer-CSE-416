@@ -1,21 +1,33 @@
 import { createFileRoute } from "@tanstack/react-router";
+
+import BaseMap from "@/components/base-map.tsx";
+import AnalysisDrawer from "@/components/analysis-drawer.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import BaseMap from "@/components/map-component.tsx";
+import { useState } from "react";
+import { IconChartBar } from "@tabler/icons-react";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="relative min-h-screen">
-      {/* Content overlay */}
-      <div className="relative z-10 p-5 bg-white/90 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-lg mb-6">This is the index page.</p>
-          <Button>Button Text</Button>
+      {/* White background overlay */}
+      <div className="relative z-10 bg-white/75 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center h-16">
+            <Button variant="outline" onClick={() => setOpen(true)}>
+              <IconChartBar /> Edit Analysis
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* Analysis drawer */}
+      <AnalysisDrawer open={open} onOpenChange={setOpen} />
 
       {/* Map in background */}
       <div className="absolute inset-0 z-0">
