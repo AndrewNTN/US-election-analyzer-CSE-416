@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import BaseMap from "@/components/map/base-map.tsx";
 import { Button } from "@/components/ui/button.tsx";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ArrowLeft } from "lucide-react";
 import stateCentersData from "../../data/state-centers.json";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
@@ -97,16 +98,15 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
           </h1>
 
           <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                Election Analysis
-              </h2>
-              <p className="text-gray-600 leading-relaxed">
-                This is placeholder content for the election analysis of{" "}
-                {stateName}. Here you would display detailed voting data,
-                demographic information, and various analytical insights about
-                this state's election patterns.
-              </p>
+            <div className="justify-self-center">
+              <ToggleGroup type="single" variant="outline" defaultValue="a">
+                <ToggleGroupItem value="a">Voter Registration</ToggleGroupItem>
+                <ToggleGroupItem value="b">Voting Equipment</ToggleGroupItem>
+                <ToggleGroupItem value="c">Chart</ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm p-6 flex justify-center">
+              {/* TODO: add graphs here */}
             </div>
           </div>
         </div>
