@@ -77,7 +77,7 @@ export default function BaseMap({
 
       {/* Base layer without labels */}
       <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png"
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
         attribution="©OpenStreetMap, ©CartoDB"
         maxZoom={18}
         pane="baseTiles"
