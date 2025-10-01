@@ -67,6 +67,17 @@ const CustomPanes = () => {
   return null;
 };
 
+// Component to update map minZoom dynamically
+function UpdateMinZoom({ minZoom }: { minZoom: number }) {
+  const map = useMap();
+
+  useEffect(() => {
+    map.setMinZoom(minZoom);
+  }, [map, minZoom]);
+
+  return null;
+}
+
 interface BaseMapProps<T = Record<string, unknown>>
   extends Omit<MapContainerProps, "center" | "zoom"> {
   center?: LatLngExpression;
@@ -87,7 +98,7 @@ export default function BaseMap<T = Record<string, unknown>>({
   },
   className = "",
   children,
-  fitToGeoJSON, // New prop
+  fitToGeoJSON,
   ...mapProps
 }: BaseMapProps<T>) {
   const [minZoom, setMinZoom] = useState(4);
@@ -118,7 +129,7 @@ export default function BaseMap<T = Record<string, unknown>>({
       maxZoom={8}
       maxBounds={[
         [15, -140],
-        [60, -50],
+        [56, -54],
       ]} // Constrain view to roughly continental US area
       maxBoundsViscosity={0.95}
       style={style}
@@ -128,6 +139,7 @@ export default function BaseMap<T = Record<string, unknown>>({
       {...mapProps}
     >
       <CustomPanes />
+      <UpdateMinZoom minZoom={minZoom} />
 
       {/* Auto-fit bounds if GeoJSON data is provided */}
       {fitToGeoJSON && <FitBoundsToGeoJSON geoJsonData={fitToGeoJSON} />}
