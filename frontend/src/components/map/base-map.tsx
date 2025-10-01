@@ -52,8 +52,8 @@ interface BaseMapProps extends Omit<MapContainerProps, "center" | "zoom"> {
 }
 
 export default function BaseMap({
-  center = [38, -97.9], // Center of US
-  zoom = 5,
+  center = [38.5, -99.0],
+  zoom = 4,
   style = {
     width: "100%",
     height: "100%",
@@ -67,10 +67,18 @@ export default function BaseMap({
     <MapContainer
       center={center}
       zoom={zoom}
-      minZoom={4}
+      zoomSnap={0.5}
+      minZoom={3}
+      maxZoom={8}
+      maxBounds={[
+        [15, -140],
+        [60, -50],
+      ]} // Constrain view to roughly continental US area
+      maxBoundsViscosity={0.95}
       style={style}
       className={className}
       scrollWheelZoom={true}
+      doubleClickZoom={true}
       {...mapProps}
     >
       <CustomPanes />
