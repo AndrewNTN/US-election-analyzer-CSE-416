@@ -68,7 +68,7 @@ export default function BaseMap({
       center={center}
       zoom={zoom}
       zoomSnap={0.5}
-      minZoom={3}
+      minZoom={5}
       maxZoom={8}
       maxBounds={[
         [15, -140],

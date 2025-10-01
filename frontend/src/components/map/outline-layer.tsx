@@ -3,6 +3,8 @@ import type { FeatureCollection, Geometry, Feature } from "geojson";
 import type { PathOptions, Layer, LeafletMouseEvent } from "leaflet";
 import statesJSON from "../../../data/us-states.json";
 import { useRouter } from "@tanstack/react-router";
+import { DETAILED_STATES } from "@/constants/states.ts";
+import { formatStateNameForUrl } from "@/lib/utils";
 
 type StateProps = { name: string; density: number };
 
@@ -21,20 +23,29 @@ interface OutlineLayerProps {
 export default function OutlineLayer({
   data = states,
   onFeatureClick,
-  outlineColor = "#9d9595",
+  outlineColor = "#5d5656",
   outlineWeight = 0.5,
   hoverColor = "#666",
   hoverWeight = 3,
 }: OutlineLayerProps) {
   const router = useRouter();
 
-  const getFeatureStyle = (): PathOptions => {
+  const getFeatureStyle = (
+    feature?: Feature<Geometry, StateProps>,
+  ): PathOptions => {
+    // Check if this state is in our detailed states
+    const isDetailedState =
+      feature?.properties?.name &&
+      Object.keys(DETAILED_STATES).includes(
+        formatStateNameForUrl(feature.properties.name),
+      );
+
     return {
       fillColor: "transparent",
       fillOpacity: 0,
-      weight: outlineWeight,
-      opacity: 0.8,
-      color: outlineColor,
+      weight: isDetailedState ? outlineWeight * 6.5 : outlineWeight,
+      opacity: 1,
+      color: isDetailedState ? "#5c5555" : outlineColor,
     };
   };
 
@@ -53,15 +64,12 @@ export default function OutlineLayer({
         },
         mouseout: (e: LeafletMouseEvent) => {
           const targetLayer = e.target;
-          targetLayer.setStyle(getFeatureStyle());
+          targetLayer.setStyle(getFeatureStyle(feature));
         },
         click: () => {
           if (feature.properties.name) {
             // Convert state name to URL-friendly format
-            const stateName = feature.properties.name
-              .toLowerCase()
-              .replace(/\s+/g, "-")
-              .replace(/[^a-z0-9-]/g, "");
+            const stateName = formatStateNameForUrl(feature.properties.name);
             router.navigate({ to: `/state/${stateName}` });
           }
 
@@ -76,7 +84,7 @@ export default function OutlineLayer({
   return (
     <GeoJSON
       data={data}
-      style={getFeatureStyle}
+      style={(feature) => getFeatureStyle(feature)}
       onEachFeature={onEachFeature}
     />
   );
