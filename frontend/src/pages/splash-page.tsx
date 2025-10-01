@@ -17,21 +17,20 @@ import {
 import statesJSON from "../../data/us-states.json";
 import type { StateProps } from "@/types/map.ts";
 import {
-  CHOROPLETH_OPTIONS,
-  CHOROPLETH_LABELS,
-  type ChoroplethOption,
+  SPLASH_CHOROPLETH_OPTIONS,
+  SPLASH_CHOROPLETH_LABELS,
+  type SplashChoroplethOption,
 } from "@/constants/choropleth.ts";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 
 export default function SplashPage() {
   const [open, setOpen] = useState(false);
-  const [choroplethOption, setChoroplethOption] = useState<ChoroplethOption>(
-    CHOROPLETH_OPTIONS.POLITICAL,
-  );
+  const [choroplethOption, setChoroplethOption] =
+    useState<SplashChoroplethOption>(SPLASH_CHOROPLETH_OPTIONS.POLITICAL);
 
   const handleChoroplethChange = (value: string) => {
-    setChoroplethOption(value as ChoroplethOption);
+    setChoroplethOption(value as SplashChoroplethOption);
   };
 
   return (
@@ -57,9 +56,9 @@ export default function SplashPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.values(CHOROPLETH_OPTIONS).map((option) => (
+                    {Object.values(SPLASH_CHOROPLETH_OPTIONS).map((option) => (
                       <SelectItem key={option} value={option}>
-                        {CHOROPLETH_LABELS[option]}
+                        {SPLASH_CHOROPLETH_LABELS[option]}
                       </SelectItem>
                     ))}
                   </SelectContent>

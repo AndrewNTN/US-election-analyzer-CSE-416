@@ -3,13 +3,13 @@ import OutlineLayer from "@/components/map/outline-layer.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
 import type { StateProps, CountyProps } from "@/types/map.ts";
-import type { ChoroplethOption } from "@/constants/choropleth.ts";
+import type { StateChoroplethOption } from "@/constants/choropleth.ts";
 
 interface StateMapProps {
   currentStateData: FeatureCollection<Geometry, StateProps>;
   currentCountiesData: FeatureCollection<Geometry, CountyProps> | null;
   isDetailedState: boolean;
-  choroplethOption?: ChoroplethOption;
+  choroplethOption?: StateChoroplethOption;
 }
 
 export default function StateMap({
