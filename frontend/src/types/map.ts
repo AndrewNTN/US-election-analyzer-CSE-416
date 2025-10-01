@@ -12,6 +12,7 @@ export interface StateProps extends BaseMapProps {
 
 export interface CountyProps extends BaseMapProps {
   STATEFP: string;
+  DENSITY?: number;
   // Mock political data - would be replaced with real data
   REPUBLICAN_PCT?: number;
   DEMOCRATIC_PCT?: number;

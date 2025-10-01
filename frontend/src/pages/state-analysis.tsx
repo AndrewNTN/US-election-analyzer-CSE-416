@@ -1,8 +1,10 @@
+import { useState } from "react";
 import statesJSON from "../../data/us-states.json";
 import countiesJSON from "../../data/counties.geojson.json";
 import type { StateProps, CountyProps } from "@/types/map.ts";
 import { DETAILED_STATES } from "@/constants/states.ts";
 import { getStateFipsCode } from "@/constants/stateFips.ts";
+import { Button } from "@/components/ui/button.tsx";
 import {
   Select,
   SelectContent,
@@ -10,6 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.tsx";
+import {
+  CHOROPLETH_OPTIONS,
+  CHOROPLETH_LABELS,
+  type ChoroplethOption,
+} from "@/constants/choropleth.ts";
 import StateMap from "@/components/map/state-map.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
 
@@ -41,6 +48,18 @@ interface StateAnalysisProps {
 }
 
 export default function StateAnalysis({ stateName }: StateAnalysisProps) {
+  const [choroplethOption, setChoroplethOption] = useState<ChoroplethOption>(
+    CHOROPLETH_OPTIONS.OFF,
+  );
+
+  const handleChoroplethChange = (value: string) => {
+    setChoroplethOption(value as ChoroplethOption);
+  };
+
+  const handleBackToMainMap = () => {
+    window.history.back();
+  };
+
   const formatStateName = (stateName: string): string => {
     if (
       stateName === stateName.toLowerCase() ||
@@ -115,12 +134,53 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left side - Map */}
-      <StateMap
-        currentStateData={currentStateData}
-        currentCountiesData={currentCountiesData}
-        isDetailedState={detailedState}
-      />
+      {/* Left side - Map with subheader overlay */}
+      <div className="w-1/2 relative">
+        {/* White subheader overlay */}
+        <div className="absolute top-0 left-0 right-0 z-10 bg-white/75 backdrop-blur-sm">
+          <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center gap-7">
+                <Button variant="outline" onClick={handleBackToMainMap}>
+                  ← Back to Main Map
+                </Button>
+
+                {detailedState && (
+                  <div className="flex items-center space-x-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Choropleth:
+                    </label>
+                    <Select
+                      value={choroplethOption}
+                      onValueChange={handleChoroplethChange}
+                    >
+                      <SelectTrigger className="w-48 bg-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(CHOROPLETH_OPTIONS).map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {CHOROPLETH_LABELS[option]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Map */}
+        <StateMap
+          currentStateData={currentStateData}
+          currentCountiesData={currentCountiesData}
+          isDetailedState={detailedState}
+          choroplethOption={choroplethOption}
+        />
+      </div>
+
       {/* Right side - Content */}
       <div className="w-1/2 bg-gray-50 p-8 overflow-y-auto">
         <div className="max-w-2xl mx-auto">
