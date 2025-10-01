@@ -1,54 +1,71 @@
 import { GeoJSON } from "react-leaflet";
 import type { FeatureCollection, Geometry, Feature } from "geojson";
 import type { PathOptions, Layer, LeafletMouseEvent } from "leaflet";
-import statesJSON from "../../../data/us-states.json";
+import type { BaseMapProps, MapFeatureProps } from "@/types/map";
+import {
+  defaultGrayTint,
+  getDensityColor,
+  getPoliticalColor,
+} from "@/lib/colors";
+import {
+  CHOROPLETH_OPTIONS,
+  type ChoroplethOption,
+} from "@/constants/choropleth";
 
-// TODO: make the layer more generic to support different datasets
-
-type StateProps = { name: string; density: number };
-
-const states = statesJSON as FeatureCollection<Geometry, StateProps>;
-
-// Color scale function
-const getColor = (density: number): string => {
-  const colors = [
-    "#f7fbff",
-    "#deebf7",
-    "#c6dbef",
-    "#9ecae1",
-    "#6baed6",
-    "#4292c6",
-    "#2171b5",
-    "#08306b",
-  ];
-
-  // Define quantile breaks - you can adjust these based on your data
-  const breaks = [0, 10, 20, 50, 100, 200, 500, 1000];
-
-  for (let i = 0; i < breaks.length; i++) {
-    if (density <= breaks[i]) {
-      return colors[i];
-    }
-  }
-  return colors[colors.length - 1];
-};
-
-interface ChoroplethLayerProps {
-  data?: FeatureCollection<Geometry, StateProps>;
-  colorFunction?: (density: number) => string;
+interface ChoroplethLayerProps<T extends BaseMapProps = MapFeatureProps> {
+  data: FeatureCollection<Geometry, T>;
+  choroplethOption?: ChoroplethOption;
+  stateView?: boolean;
 }
 
-export default function ChoroplethLayer({
-  data = states,
-  colorFunction = getColor,
-}: ChoroplethLayerProps) {
-  const getFeatureStyle = (
-    feature?: Feature<Geometry, StateProps>,
-  ): PathOptions => {
-    const density = feature?.properties?.density || 0;
+export default function ChoroplethLayer<
+  T extends BaseMapProps = MapFeatureProps,
+>({
+  data,
+  choroplethOption = CHOROPLETH_OPTIONS.OFF,
+  stateView = false,
+}: ChoroplethLayerProps<T>) {
+  const getFeatureStyle = (feature?: Feature<Geometry, T>): PathOptions => {
+    if (choroplethOption === CHOROPLETH_OPTIONS.OFF) {
+      return {
+        fillColor: defaultGrayTint(),
+        weight: 0,
+        opacity: 0,
+        color: "transparent",
+        fillOpacity: 0.7,
+      };
+    }
+
+    let fillColor = defaultGrayTint();
+
+    if (feature?.properties) {
+      const props = feature.properties as Record<string, unknown>;
+
+      switch (choroplethOption) {
+        case CHOROPLETH_OPTIONS.DENSITY: {
+          const density =
+            "DENSITY" in props ? (props.DENSITY as number) || 0 : 0;
+          fillColor = getDensityColor(density);
+          break;
+        }
+
+        case CHOROPLETH_OPTIONS.POLITICAL: {
+          const republicanPct =
+            "REPUBLICAN_PCT" in props
+              ? (props.REPUBLICAN_PCT as number) || 0
+              : 0;
+          const democraticPct =
+            "DEMOCRATIC_PCT" in props
+              ? (props.DEMOCRATIC_PCT as number) || 0
+              : 0;
+          fillColor = getPoliticalColor(republicanPct, democraticPct);
+          break;
+        }
+      }
+    }
 
     return {
-      fillColor: colorFunction(density),
+      fillColor,
       weight: 0,
       opacity: 0,
       color: "transparent",
@@ -56,23 +73,21 @@ export default function ChoroplethLayer({
     };
   };
 
-  const onEachFeature = (
-    feature: Feature<Geometry, StateProps>,
-    layer: Layer,
-  ) => {
-    if (feature.properties) {
-      layer.on({
-        mouseover: (e: LeafletMouseEvent) => {
-          const targetLayer = e.target;
-          targetLayer.setStyle({
-            fillOpacity: 0.8,
-          });
-        },
-        mouseout: (e: LeafletMouseEvent) => {
-          const targetLayer = e.target;
-          targetLayer.setStyle(getFeatureStyle(feature));
-        },
-      });
+  const onEachFeature = (feature: Feature<Geometry, T>, layer: Layer) => {
+    if (feature.properties && choroplethOption !== "off") {
+      if (!stateView)
+        layer.on({
+          mouseover: (e: LeafletMouseEvent) => {
+            const targetLayer = e.target;
+            targetLayer.setStyle({
+              fillOpacity: 0.8,
+            });
+          },
+          mouseout: (e: LeafletMouseEvent) => {
+            const targetLayer = e.target;
+            targetLayer.setStyle(getFeatureStyle(feature));
+          },
+        });
     }
   };
 

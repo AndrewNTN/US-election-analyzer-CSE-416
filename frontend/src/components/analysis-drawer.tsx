@@ -24,12 +24,22 @@ export default function AnalysisDrawer({
         <DrawerHeader className="text-left">
           <DrawerTitle>Analysis</DrawerTitle>
           <DrawerDescription>
-            Choose what data to analyze on the map.
+            Additional analysis tools and options.
           </DrawerDescription>
         </DrawerHeader>
+
+        <div className="px-4 pb-4">
+          <div className="space-y-4">
+            {/* Future analysis options can go here */}
+            <div className="text-center text-gray-500 py-8">
+              Additional analysis tools will be available here.
+            </div>
+          </div>
+        </div>
+
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">Close</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
