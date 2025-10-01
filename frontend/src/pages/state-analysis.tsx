@@ -154,7 +154,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                       value={choroplethOption}
                       onValueChange={handleChoroplethChange}
                     >
-                      <SelectTrigger className="w-48 bg-white">
+                      <SelectTrigger className="w-auto bg-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
