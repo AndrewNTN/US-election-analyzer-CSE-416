@@ -36,7 +36,7 @@ export default function SplashPage() {
   return (
     <div className="relative min-h-screen">
       {/* White background overlay */}
-      <div className="relative z-10 bg-white/75 backdrop-blur-sm">
+      <div className="relative z-10 bg-white/70 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-20">
