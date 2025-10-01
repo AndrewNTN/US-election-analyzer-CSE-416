@@ -86,6 +86,9 @@ export default function AnalysisDrawer({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
+      {/*
+      TODO: functionality for tables and graphs here, use https://ui.shadcn.com/docs/components/data-table imo and then chart js
+      TODO: for the rest, generate the mock data, table/chart labels should be in the use cases */}
       <DrawerContent className="h-[85vh]">
         <DrawerHeader className="text-left border-b">
           <DrawerTitle>Election Analysis Tools</DrawerTitle>
