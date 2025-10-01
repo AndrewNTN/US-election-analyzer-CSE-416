@@ -1,4 +1,4 @@
-import React, { type ReactNode, useEffect } from "react";
+import React, { type ReactNode, useEffect, useState } from "react";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import type { MapContainerProps } from "react-leaflet";
 import type { LatLngExpression } from "leaflet";
@@ -90,12 +90,31 @@ export default function BaseMap<T = Record<string, unknown>>({
   fitToGeoJSON, // New prop
   ...mapProps
 }: BaseMapProps<T>) {
+  const [minZoom, setMinZoom] = useState(4);
+
+  useEffect(() => {
+    const updateMinZoom = () => {
+      // Consider screens 1366px and below as laptop/small screens
+      const isSmallScreen = window.innerWidth <= 1366;
+      setMinZoom(isSmallScreen ? 4 : 5);
+    };
+
+    // Set initial value
+    updateMinZoom();
+
+    // Listen for window resize
+    window.addEventListener("resize", updateMinZoom);
+
+    // Cleanup listener
+    return () => window.removeEventListener("resize", updateMinZoom);
+  }, []);
+
   return (
     <MapContainer
       center={center}
       zoom={zoom}
       zoomSnap={0.5}
-      minZoom={5}
+      minZoom={minZoom}
       maxZoom={8}
       maxBounds={[
         [15, -140],
