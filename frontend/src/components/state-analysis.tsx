@@ -1,9 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import BaseMap from "@/components/map/base-map.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { ArrowLeft } from "lucide-react";
+import type { FeatureCollection, Geometry } from "geojson";
+
+import BaseMap from "@/components/map/base-map.tsx";
 import stateCentersData from "../../data/state-centers.json";
-import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
+import statesJSON from "../../data/us-states.json";
+import countiesJSON from "../../data/counties.geojson.json";
+import type { StateProps, CountyProps } from "@/types/map";
+import { DETAILED_STATES } from "@/constants/states";
+import { getStateFipsCode } from "@/constants/stateFips";
 import {
   Select,
   SelectContent,
@@ -11,6 +17,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import OutlineLayer from "@/components/map/outline-layer.tsx";
+import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
+
+const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
+const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
 
 const AnalysisType = {
   PROVISIONAL_BALLOT_CHART: "prov-ballot-bchart",
@@ -83,7 +94,55 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
       .trim();
   };
 
+  // Filter states data to only include the current state
+  const getCurrentStateData = (): FeatureCollection<Geometry, StateProps> => {
+    const formattedStateName = formatStateName(stateName);
+
+    const filteredFeatures = statesData.features.filter(
+      (feature) => feature.properties?.NAME === formattedStateName,
+    );
+
+    return {
+      ...statesData,
+      features: filteredFeatures,
+    };
+  };
+
+  // Check if current state is a detailed state
+  const isDetailedState = (): boolean => {
+    const urlStateName = stateName.toLowerCase().replace(/\s+/g, "-");
+    return Object.keys(DETAILED_STATES).includes(urlStateName);
+  };
+
+  // Filter counties data for the current state (only for detailed states)
+  const getCurrentCountiesData = (): FeatureCollection<
+    Geometry,
+    CountyProps
+  > | null => {
+    if (!isDetailedState()) {
+      return null;
+    }
+
+    const formattedStateName = formatStateName(stateName);
+    const stateFips = getStateFipsCode(formattedStateName);
+
+    if (!stateFips) {
+      return null;
+    }
+
+    const filteredFeatures = countiesData.features.filter(
+      (feature) => feature.properties?.STATEFP === stateFips,
+    );
+
+    return {
+      ...countiesData,
+      features: filteredFeatures,
+    };
+  };
+
   const stateBounds = getStateBounds(stateName);
+  const currentStateData = getCurrentStateData();
+  const currentCountiesData = getCurrentCountiesData();
 
   return (
     <div className="min-h-screen flex">
@@ -111,7 +170,13 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
             zoom={stateBounds.zoom}
             style={{ width: "100%", height: "100%", zIndex: 0 }}
           >
-            <ChoroplethLayer />
+            <ChoroplethLayer data={currentStateData} stateView={true} />
+
+            {isDetailedState() && currentCountiesData ? (
+              <OutlineLayer data={currentCountiesData} stateView={true} />
+            ) : (
+              <OutlineLayer data={currentStateData} stateView={true} />
+            )}
           </BaseMap>
         </div>
       </div>
@@ -139,7 +204,8 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
               </Select>
             </div>
             <div className="bg-white rounded-lg shadow-sm p-6 flex justify-center">
-              {/* TODO: add graphs here, i think we can use https://ui.shadcn.com/docs/components/data-table imo*/}
+              {/* TODO: add graphs here, i think we can use https://ui.shadcn.com/docs/components/data-table imo and then chart js for the rest*/}
+              {/* Placeholder content, make separate components */}
             </div>
           </div>
         </div>
