@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import StateAnalysis from "@/components/state-analysis.tsx";
+import StateAnalysis from "@/pages/state-analysis.tsx";
 
 export const Route = createFileRoute("/state/$stateName")({
   params: {

@@ -2,7 +2,31 @@ import React, { type ReactNode, useEffect } from "react";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import type { MapContainerProps } from "react-leaflet";
 import type { LatLngExpression } from "leaflet";
+import type { FeatureCollection, Geometry } from "geojson";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+
+// FitBoundsToGeoJSON component to automatically zoom to fit the GeoJSON data
+function FitBoundsToGeoJSON<T = Record<string, unknown>>({
+  geoJsonData,
+}: {
+  geoJsonData?: FeatureCollection<Geometry, T>;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (geoJsonData && geoJsonData.features.length > 0) {
+      const group = L.geoJSON(geoJsonData);
+      const bounds = group.getBounds();
+
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [75, 75] });
+      }
+    }
+  }, [map, geoJsonData]);
+
+  return null;
+}
 
 const CustomPanes = () => {
   const map = useMap();
@@ -43,15 +67,17 @@ const CustomPanes = () => {
   return null;
 };
 
-interface BaseMapProps extends Omit<MapContainerProps, "center" | "zoom"> {
+interface BaseMapProps<T = Record<string, unknown>>
+  extends Omit<MapContainerProps, "center" | "zoom"> {
   center?: LatLngExpression;
   zoom?: number;
   style?: React.CSSProperties;
   className?: string;
   children?: ReactNode;
+  fitToGeoJSON?: FeatureCollection<Geometry, T>;
 }
 
-export default function BaseMap({
+export default function BaseMap<T = Record<string, unknown>>({
   center = [38.5, -99.0],
   zoom = 4,
   style = {
@@ -61,8 +87,9 @@ export default function BaseMap({
   },
   className = "",
   children,
+  fitToGeoJSON, // New prop
   ...mapProps
-}: BaseMapProps) {
+}: BaseMapProps<T>) {
   return (
     <MapContainer
       center={center}
@@ -82,6 +109,9 @@ export default function BaseMap({
       {...mapProps}
     >
       <CustomPanes />
+
+      {/* Auto-fit bounds if GeoJSON data is provided */}
+      {fitToGeoJSON && <FitBoundsToGeoJSON geoJsonData={fitToGeoJSON} />}
 
       {/* Base layer without labels */}
       <TileLayer

@@ -1,24 +1,17 @@
-import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button.tsx";
-import { ArrowLeft } from "lucide-react";
-import type { FeatureCollection, Geometry } from "geojson";
-
-import BaseMap from "@/components/map/base-map.tsx";
-import stateCentersData from "../../data/state-centers.json";
 import statesJSON from "../../data/us-states.json";
 import countiesJSON from "../../data/counties.geojson.json";
-import type { StateProps, CountyProps } from "@/types/map";
-import { DETAILED_STATES } from "@/constants/states";
-import { getStateFipsCode } from "@/constants/stateFips";
+import type { StateProps, CountyProps } from "@/types/map.ts";
+import { DETAILED_STATES } from "@/constants/states.ts";
+import { getStateFipsCode } from "@/constants/stateFips.ts";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import OutlineLayer from "@/components/map/outline-layer.tsx";
-import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
+} from "@/components/ui/select.tsx";
+import StateMap from "@/components/map/state-map.tsx";
+import type { FeatureCollection, Geometry } from "geojson";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
@@ -47,31 +40,7 @@ interface StateAnalysisProps {
   stateName: string;
 }
 
-interface StateBounds {
-  center: number[];
-  zoom: number;
-}
-
-const stateCenters: Record<string, StateBounds> = stateCentersData as Record<
-  string,
-  StateBounds
->;
-
 export default function StateAnalysis({ stateName }: StateAnalysisProps) {
-  const getStateBounds = (state: string): StateBounds => {
-    const stateKey = state.toLowerCase().replace(/\s+/g, "-");
-    const stateData = stateCenters[stateKey];
-
-    if (stateData) {
-      return {
-        center: [stateData.center[0], stateData.center[1]] as [number, number],
-        zoom: stateData.zoom,
-      };
-    }
-
-    return { center: [39, -97.9], zoom: 5 };
-  };
-
   const formatStateName = (stateName: string): string => {
     if (
       stateName === stateName.toLowerCase() ||
@@ -140,47 +109,18 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     };
   };
 
-  const stateBounds = getStateBounds(stateName);
   const currentStateData = getCurrentStateData();
   const currentCountiesData = getCurrentCountiesData();
+  const detailedState = isDetailedState();
 
   return (
     <div className="min-h-screen flex">
       {/* Left side - Map */}
-      <div className="w-1/2 relative overflow-hidden">
-        {/* Back button overlay */}
-        <div className="absolute top-4 left-4 z-10">
-          <Button
-            variant="outline"
-            size="sm"
-            asChild
-            className="bg-white/90 backdrop-blur-sm"
-          >
-            <Link to="/">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Map
-            </Link>
-          </Button>
-        </div>
-
-        {/* State map */}
-        <div className="w-full h-screen">
-          <BaseMap
-            center={stateBounds.center as [number, number]}
-            zoom={stateBounds.zoom}
-            style={{ width: "100%", height: "100%", zIndex: 0 }}
-          >
-            <ChoroplethLayer data={currentStateData} stateView={true} />
-
-            {isDetailedState() && currentCountiesData ? (
-              <OutlineLayer data={currentCountiesData} stateView={true} />
-            ) : (
-              <OutlineLayer data={currentStateData} stateView={true} />
-            )}
-          </BaseMap>
-        </div>
-      </div>
-
+      <StateMap
+        currentStateData={currentStateData}
+        currentCountiesData={currentCountiesData}
+        isDetailedState={detailedState}
+      />
       {/* Right side - Content */}
       <div className="w-1/2 bg-gray-50 p-8 overflow-y-auto">
         <div className="max-w-2xl mx-auto">

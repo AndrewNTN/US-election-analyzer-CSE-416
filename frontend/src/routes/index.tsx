@@ -1,93 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { IconChartBar } from "@tabler/icons-react";
-import type { FeatureCollection, Geometry } from "geojson";
-
-import BaseMap from "@/components/map/base-map.tsx";
-import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
-import OutlineLayer from "@/components/map/outline-layer.tsx";
-import AnalysisDrawer from "@/components/analysis-drawer.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import statesJSON from "../../data/us-states.json";
-import type { StateProps } from "@/types/map";
-import {
-  CHOROPLETH_OPTIONS,
-  CHOROPLETH_LABELS,
-  type ChoroplethOption,
-} from "@/constants/choropleth";
-
-const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
+import SplashPage from "@/pages/splash-page.tsx";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const [open, setOpen] = useState(false);
-  const [choroplethOption, setChoroplethOption] = useState<ChoroplethOption>(
-    CHOROPLETH_OPTIONS.POLITICAL,
-  );
-
-  const handleChoroplethChange = (value: string) => {
-    setChoroplethOption(value as ChoroplethOption);
-  };
-
-  return (
-    <div className="relative min-h-screen">
-      {/* White background overlay */}
-      <div className="relative z-10 bg-white/75 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-20">
-              <Button variant="outline" onClick={() => setOpen(true)}>
-                <IconChartBar /> More Analysis
-              </Button>
-
-              <div className="flex items-center space-x-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Choropleth:
-                </label>
-                <Select
-                  value={choroplethOption}
-                  onValueChange={handleChoroplethChange}
-                >
-                  <SelectTrigger className="w-48 bg-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(CHOROPLETH_OPTIONS).map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {CHOROPLETH_LABELS[option]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Analysis drawer */}
-      <AnalysisDrawer open={open} onOpenChange={setOpen} />
-
-      {/* Map in background */}
-      <div className="absolute inset-0 z-0">
-        <BaseMap style={{ width: "100%", height: "100vh", zIndex: 0 }}>
-          <ChoroplethLayer
-            data={statesData}
-            choroplethOption={choroplethOption}
-          />
-          <OutlineLayer data={statesData} />
-        </BaseMap>
-      </div>
-    </div>
-  );
+  return <SplashPage />;
 }
