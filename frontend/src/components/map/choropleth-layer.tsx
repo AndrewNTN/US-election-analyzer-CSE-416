@@ -6,9 +6,16 @@ import {
   defaultGrayTint,
   getDensityColor,
   getPoliticalColor,
+  getEquipmentAgeColor,
+  getProvisionalBallotsColor,
+  getActiveVotersColor,
+  getPollbookDeletionsColor,
+  getMailBallotsRejectedColor,
+  getVoterRegistrationColor,
 } from "@/lib/colors";
 import {
-  CHOROPLETH_OPTIONS,
+  SPLASH_CHOROPLETH_OPTIONS,
+  STATE_CHOROPLETH_OPTIONS,
   type ChoroplethOption,
 } from "@/constants/choropleth";
 
@@ -22,11 +29,11 @@ export default function ChoroplethLayer<
   T extends BaseMapProps = MapFeatureProps,
 >({
   data,
-  choroplethOption = CHOROPLETH_OPTIONS.OFF,
+  choroplethOption = STATE_CHOROPLETH_OPTIONS.OFF,
   stateView = false,
 }: ChoroplethLayerProps<T>) {
   const getFeatureStyle = (feature?: Feature<Geometry, T>): PathOptions => {
-    if (choroplethOption === CHOROPLETH_OPTIONS.OFF) {
+    if (choroplethOption === "off") {
       return {
         fillColor: defaultGrayTint(),
         weight: 0,
@@ -42,14 +49,15 @@ export default function ChoroplethLayer<
       const props = feature.properties as Record<string, unknown>;
 
       switch (choroplethOption) {
-        case CHOROPLETH_OPTIONS.DENSITY: {
+        // Splash page choropleth options
+        case SPLASH_CHOROPLETH_OPTIONS.DENSITY: {
           const density =
             "DENSITY" in props ? (props.DENSITY as number) || 0 : 0;
           fillColor = getDensityColor(density);
           break;
         }
 
-        case CHOROPLETH_OPTIONS.POLITICAL: {
+        case SPLASH_CHOROPLETH_OPTIONS.POLITICAL: {
           const republicanPct =
             "REPUBLICAN_PCT" in props
               ? (props.REPUBLICAN_PCT as number) || 0
@@ -59,6 +67,59 @@ export default function ChoroplethLayer<
               ? (props.DEMOCRATIC_PCT as number) || 0
               : 0;
           fillColor = getPoliticalColor(republicanPct, democraticPct);
+          break;
+        }
+
+        case SPLASH_CHOROPLETH_OPTIONS.EQUIPMENT_AGE: {
+          const equipmentAge =
+            "EQUIPMENT_AGE" in props ? (props.EQUIPMENT_AGE as number) || 0 : 0;
+          fillColor = getEquipmentAgeColor(equipmentAge);
+          break;
+        }
+
+        // State page choropleth options
+        case STATE_CHOROPLETH_OPTIONS.PROVISIONAL_BALLOTS: {
+          const provisionalBallotsPct =
+            "PROVISIONAL_BALLOTS_PCT" in props
+              ? (props.PROVISIONAL_BALLOTS_PCT as number) || 0
+              : 0;
+          fillColor = getProvisionalBallotsColor(provisionalBallotsPct);
+          break;
+        }
+
+        case STATE_CHOROPLETH_OPTIONS.ACTIVE_VOTERS: {
+          const activeVotersPct =
+            "ACTIVE_VOTERS_PCT" in props
+              ? (props.ACTIVE_VOTERS_PCT as number) || 0
+              : 0;
+          fillColor = getActiveVotersColor(activeVotersPct);
+          break;
+        }
+
+        case STATE_CHOROPLETH_OPTIONS.POLLBOOK_DELETIONS: {
+          const pollbookDeletionsPct =
+            "POLLBOOK_DELETIONS_PCT" in props
+              ? (props.POLLBOOK_DELETIONS_PCT as number) || 0
+              : 0;
+          fillColor = getPollbookDeletionsColor(pollbookDeletionsPct);
+          break;
+        }
+
+        case STATE_CHOROPLETH_OPTIONS.MAIL_BALLOTS_REJECTED: {
+          const mailBallotsRejectedPct =
+            "MAIL_BALLOTS_REJECTED_PCT" in props
+              ? (props.MAIL_BALLOTS_REJECTED_PCT as number) || 0
+              : 0;
+          fillColor = getMailBallotsRejectedColor(mailBallotsRejectedPct);
+          break;
+        }
+
+        case STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION: {
+          const voterRegistrationPct =
+            "VOTER_REGISTRATION_PCT" in props
+              ? (props.VOTER_REGISTRATION_PCT as number) || 0
+              : 0;
+          fillColor = getVoterRegistrationColor(voterRegistrationPct);
           break;
         }
       }

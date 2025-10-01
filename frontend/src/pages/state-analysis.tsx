@@ -1,8 +1,8 @@
 import { useState } from "react";
 import statesJSON from "../../data/us-states.json";
 import countiesJSON from "../../data/counties.geojson.json";
-import type { StateProps, CountyProps } from "@/types/map.ts";
-import { DETAILED_STATES } from "@/constants/states.ts";
+import type { CountyProps, StateProps } from "@/types/map.ts";
+import { DETAILED_STATES, hasDetailedVoterData } from "@/constants/states.ts";
 import { getStateFipsCode } from "@/constants/stateFips.ts";
 import { Button } from "@/components/ui/button.tsx";
 import {
@@ -13,9 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select.tsx";
 import {
-  CHOROPLETH_OPTIONS,
-  CHOROPLETH_LABELS,
-  type ChoroplethOption,
+  STATE_CHOROPLETH_OPTIONS,
+  type StateChoroplethOption,
 } from "@/constants/choropleth.ts";
 import StateMap from "@/components/map/state-map.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
@@ -29,18 +28,39 @@ const AnalysisType = {
   ACTIVE_VOTERS_2024: "active-voters-2024",
   POLLBOOK_DELETIONS_2024: "pb-deletions-2024",
   MAIL_BALLOTS_REJECTED: "mail-ballots-rejected",
+  VOTER_REGISTRATION: "voter-registration",
   STATE_EQUIPMENT_SUMMARY: "state-equip-summary",
 } as const;
 
 type AnalysisTypeValue = (typeof AnalysisType)[keyof typeof AnalysisType];
 
 const analysisTypeLabels: Record<AnalysisTypeValue, string> = {
-  [AnalysisType.PROVISIONAL_BALLOT_CHART]: "Provisional Ballot Bar Chart",
+  [AnalysisType.PROVISIONAL_BALLOT_CHART]: "Provisional Ballot Chart",
   [AnalysisType.PROVISIONAL_BALLOT_TABLE]: "Provisional Ballot Table",
   [AnalysisType.ACTIVE_VOTERS_2024]: "2024 EAVS Active Voters",
   [AnalysisType.POLLBOOK_DELETIONS_2024]: "2024 EAVS Pollbook Deletions",
   [AnalysisType.MAIL_BALLOTS_REJECTED]: "Mail Ballots Rejected",
+  [AnalysisType.VOTER_REGISTRATION]: "Voter Registration",
   [AnalysisType.STATE_EQUIPMENT_SUMMARY]: "State Equipment Summary",
+};
+
+// Map analysis types to choropleth options
+const analysisToChoroplethMap: Record<
+  AnalysisTypeValue,
+  StateChoroplethOption
+> = {
+  [AnalysisType.PROVISIONAL_BALLOT_CHART]:
+    STATE_CHOROPLETH_OPTIONS.PROVISIONAL_BALLOTS,
+  [AnalysisType.PROVISIONAL_BALLOT_TABLE]:
+    STATE_CHOROPLETH_OPTIONS.PROVISIONAL_BALLOTS,
+  [AnalysisType.ACTIVE_VOTERS_2024]: STATE_CHOROPLETH_OPTIONS.ACTIVE_VOTERS,
+  [AnalysisType.POLLBOOK_DELETIONS_2024]:
+    STATE_CHOROPLETH_OPTIONS.POLLBOOK_DELETIONS,
+  [AnalysisType.MAIL_BALLOTS_REJECTED]:
+    STATE_CHOROPLETH_OPTIONS.MAIL_BALLOTS_REJECTED,
+  [AnalysisType.VOTER_REGISTRATION]:
+    STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION,
+  [AnalysisType.STATE_EQUIPMENT_SUMMARY]: STATE_CHOROPLETH_OPTIONS.OFF,
 };
 
 interface StateAnalysisProps {
@@ -48,16 +68,39 @@ interface StateAnalysisProps {
 }
 
 export default function StateAnalysis({ stateName }: StateAnalysisProps) {
-  const [choroplethOption, setChoroplethOption] = useState<ChoroplethOption>(
-    CHOROPLETH_OPTIONS.OFF,
+  const [selectedDataset, setSelectedDataset] = useState<AnalysisTypeValue>(
+    AnalysisType.PROVISIONAL_BALLOT_CHART,
   );
 
-  const handleChoroplethChange = (value: string) => {
-    setChoroplethOption(value as ChoroplethOption);
+  // Check if current state is a detailed state
+  const isDetailedState = (): boolean => {
+    const urlStateName = stateName.toLowerCase().replace(/\s+/g, "-");
+    return Object.keys(DETAILED_STATES).includes(urlStateName);
+  };
+
+  // Set choropleth option based on selected dataset, but only for detailed states
+  const choroplethOption = isDetailedState()
+    ? analysisToChoroplethMap[selectedDataset]
+    : STATE_CHOROPLETH_OPTIONS.OFF;
+
+  const handleDatasetChange = (value: string) => {
+    setSelectedDataset(value as AnalysisTypeValue);
   };
 
   const handleBackToMainMap = () => {
     window.history.back();
+  };
+
+  // Get available analysis options based on state capabilities
+  const getAvailableAnalysisOptions = (): AnalysisTypeValue[] => {
+    return Object.values(AnalysisType).filter((option) => {
+      // Exclude voter registration if this state doesn't have detailed voter data
+      if (option === AnalysisType.VOTER_REGISTRATION) {
+        const urlStateName = stateName.toLowerCase().replace(/\s+/g, "-");
+        return hasDetailedVoterData(urlStateName);
+      }
+      return true;
+    });
   };
 
   const formatStateName = (stateName: string): string => {
@@ -96,12 +139,6 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     };
   };
 
-  // Check if current state is a detailed state
-  const isDetailedState = (): boolean => {
-    const urlStateName = stateName.toLowerCase().replace(/\s+/g, "-");
-    return Object.keys(DETAILED_STATES).includes(urlStateName);
-  };
-
   // Filter counties data for the current state (only for detailed states)
   const getCurrentCountiesData = (): FeatureCollection<
     Geometry,
@@ -134,42 +171,13 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left side - Map with subheader overlay */}
+      {/* Left side - Map */}
       <div className="w-1/2 relative">
-        {/* White subheader overlay */}
-        <div className="absolute top-0 left-0 right-0 z-10 bg-white/75 backdrop-blur-sm">
-          <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-7">
-                <Button variant="outline" onClick={handleBackToMainMap}>
-                  ← Back to Main Map
-                </Button>
-
-                {detailedState && (
-                  <div className="flex items-center space-x-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      Choropleth:
-                    </label>
-                    <Select
-                      value={choroplethOption}
-                      onValueChange={handleChoroplethChange}
-                    >
-                      <SelectTrigger className="w-auto bg-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.values(CHOROPLETH_OPTIONS).map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {CHOROPLETH_LABELS[option]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+        {/* Floating back button */}
+        <div className="absolute top-4 left-4 z-10">
+          <Button variant="outline" onClick={handleBackToMainMap}>
+            ← Back to Main Map
+          </Button>
         </div>
 
         {/* Map */}
@@ -189,13 +197,20 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
           </h1>
 
           <div className="space-y-6">
-            <div className="justify-self-center">
-              <Select defaultValue={AnalysisType.PROVISIONAL_BALLOT_CHART}>
+            <div className="flex items-center space-x-2 justify-center">
+              <label className="text-sm font-medium text-gray-700">
+                Dataset:
+              </label>
+              <Select
+                value={selectedDataset}
+                onValueChange={handleDatasetChange}
+                defaultValue={AnalysisType.PROVISIONAL_BALLOT_CHART}
+              >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.values(AnalysisType).map((analysisType) => (
+                  {getAvailableAnalysisOptions().map((analysisType) => (
                     <SelectItem key={analysisType} value={analysisType}>
                       {analysisTypeLabels[analysisType]}
                     </SelectItem>
@@ -204,7 +219,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
               </Select>
             </div>
             <div className="bg-white rounded-lg shadow-sm p-6 flex justify-center">
-              {/* TODO: add graphs here, i think we can use https://ui.shadcn.com/docs/components/data-table imo and then chart js for the rest*/}
+              {/* TODO: add graphs here, use https://ui.shadcn.com/docs/components/data-table imo and then chart js for the rest*/}
               {/* Placeholder content, make separate components */}
             </div>
           </div>
