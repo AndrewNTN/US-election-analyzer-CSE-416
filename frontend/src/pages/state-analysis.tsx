@@ -19,8 +19,14 @@ import {
 import StateMap from "@/components/map/state-map.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
 
+//table imports
+import { columns } from "../components/table/columns"
+import { DataTable } from "../components/table/data-table"
+import type {Voter} from "../components/table/columns"
+
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
+
 
 const AnalysisType = {
   PROVISIONAL_BALLOT_CHART: "prov-ballot-bchart",
@@ -65,9 +71,10 @@ const analysisToChoroplethMap: Record<
 
 interface StateAnalysisProps {
   stateName: string;
+  tableData: Voter[]; // modify based on how data is stored
 }
 
-export default function StateAnalysis({ stateName }: StateAnalysisProps) {
+export default function StateAnalysis({ stateName, tableData }: StateAnalysisProps) {
   const [selectedDataset, setSelectedDataset] = useState<AnalysisTypeValue>(
     AnalysisType.PROVISIONAL_BALLOT_CHART,
   );
@@ -219,6 +226,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
               </Select>
             </div>
             <div className="bg-white rounded-lg shadow-sm p-6 flex justify-center">
+              <DataTable columns={columns} data={tableData} />
               {/* TODO: add graphs here, use https://ui.shadcn.com/docs/components/data-table imo and then chart js for the rest*/}
               {/* Placeholder content, make separate components */}
             </div>
