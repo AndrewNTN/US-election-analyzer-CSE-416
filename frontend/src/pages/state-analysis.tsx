@@ -24,6 +24,9 @@ import { columns } from "../components/table/columns"
 import { DataTable } from "../components/table/data-table"
 import type {Voter} from "../components/table/columns"
 
+//chart imports 
+import { DataBarChart } from "../components/chart/bar-chart"
+
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
 
@@ -71,10 +74,10 @@ const analysisToChoroplethMap: Record<
 
 interface StateAnalysisProps {
   stateName: string;
-  tableData: Voter[]; // modify based on how data is stored
+  mockData: Voter[]; // modify based on how data is stored
 }
 
-export default function StateAnalysis({ stateName, tableData }: StateAnalysisProps) {
+export default function StateAnalysis({ stateName, mockData }: StateAnalysisProps) {
   const [selectedDataset, setSelectedDataset] = useState<AnalysisTypeValue>(
     AnalysisType.PROVISIONAL_BALLOT_CHART,
   );
@@ -225,10 +228,9 @@ export default function StateAnalysis({ stateName, tableData }: StateAnalysisPro
                 </SelectContent>
               </Select>
             </div>
-            <div className="bg-white rounded-lg shadow-sm p-6 flex justify-center">
-              <DataTable columns={columns} data={tableData} />
-              {/* TODO: add graphs here, use https://ui.shadcn.com/docs/components/data-table imo and then chart js for the rest*/}
-              {/* Placeholder content, make separate components */}
+            <div className="bg-white rounded-lg shadow-sm p-6 flex justify-center" style={{display: "flex", flexDirection: "column", alignItems: "center", gap: "50px"}}>
+              <DataTable columns={columns} data={mockData} />
+              <DataBarChart stateName = {stateName} barData={mockData}/>
             </div>
           </div>
         </div>

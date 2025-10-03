@@ -1,16 +1,16 @@
 "use client"
- 
+
 import type { ColumnDef } from "@tanstack/react-table"
- 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
+
 export type Voter = {
   id: string
   name: string
   registered: "true" | "false" | "unknown"
   email: string
+  mailInVote: boolean
+  zip: string
 }
- 
+
 export const columns: ColumnDef<Voter>[] = [
   {
     accessorKey: "name",
@@ -23,5 +23,14 @@ export const columns: ColumnDef<Voter>[] = [
   {
     accessorKey: "registered",
     header: "Registered",
+  },
+  {
+    accessorKey: "mailInVote",
+    header: "Mail-in Vote",
+    cell: ({ row }) => (row.original.mailInVote ? "Yes" : "No"),
+  },
+  {
+    accessorKey: "zip",
+    header: "Zip Code",
   },
 ]

@@ -1,0 +1,26 @@
+{
+  "florida": [
+    { "id": "728ed52f", "name": "John Doe", "email": "m@example.com", "registered": "true",  "mailInVote": true,  "zip": "MIA" },
+    { "id": "f1b3a62c", "name": "Emily Davis", "email": "emily.davis@example.com", "registered": "true",  "mailInVote": false, "zip": "ORL" },
+    { "id": "a94b82f0", "name": "David Brown", "email": "david.brown@example.com", "registered": "true",  "mailInVote": true,  "zip": "TPA" },
+    { "id": "3c7e12f9", "name": "Sarah Wilson", "email": "sarah.wilson@example.com", "registered": "false", "mailInVote": false, "zip": "JAX" },
+    { "id": "d91a54c8", "name": "Chris Lee", "email": "chris.lee@example.com", "registered": "true",  "mailInVote": true,  "zip": "SRQ" },
+    { "id": "f7a2c18d", "name": "Noah Perez", "email": "noah.perez@example.com", "registered": "true",  "mailInVote": false, "zip": "FLL" },
+    { "id": "2b84e7c1", "name": "Ava Nguyen", "email": "ava.nguyen@example.com", "registered": "false", "mailInVote": true,  "zip": "PNS" },
+    { "id": "91d3a0bf", "name": "William King", "email": "william.king@example.com", "registered": "true",  "mailInVote": true,  "zip": "DAB" },
+    { "id": "6e21b9a4", "name": "Isabella Scott", "email": "isabella.scott@example.com", "registered": "true",  "mailInVote": false, "zip": "TLH" },
+    { "id": "0c8f4a3e", "name": "Lucas Adams", "email": "lucas.adams@example.com", "registered": "false", "mailInVote": false, "zip": "VRB" }
+    ],
+  "california": [
+    { "id": "ef23a79d", "name": "Jessica Taylor", "email": "jessica.taylor@example.com", "registered": "true",  "mailInVote": true,  "zip": "LAX" },
+    { "id": "45b8e20c", "name": "Daniel Martinez", "email": "dan.martinez@example.com", "registered": "false", "mailInVote": false, "zip": "SFO" },
+    { "id": "76fa19b3", "name": "Laura Anderson", "email": "laura.anderson@example.com", "registered": "true",  "mailInVote": true,  "zip": "SJC" },
+    { "id": "b92cd48e", "name": "James Thomas", "email": "james.thomas@example.com", "registered": "true",  "mailInVote": false, "zip": "OAK" },
+    { "id": "e83a05df", "name": "Olivia Garcia", "email": "olivia.garcia@example.com", "registered": "false", "mailInVote": true,  "zip": "BUR" },
+    { "id": "59fcd71a", "name": "Matthew Rodriguez", "email": "matt.rodriguez@example.com", "registered": "true",  "mailInVote": false, "zip": "LGB" },
+    { "id": "aa37b2d5", "name": "Sophia Hernandez", "email": "sophia.hernandez@example.com", "registered": "true",  "mailInVote": true,  "zip": "ONT" },
+    { "id": "1d4e8f6c", "name": "Ethan Clark", "email": "ethan.clark@example.com", "registered": "false", "mailInVote": false, "zip": "SAC" },
+    { "id": "8a9f34b2", "name": "Jane Smith", "email": "jane.smith@example.com", "registered": "true",  "mailInVote": true,  "zip": "SNA" },
+    { "id": "c4d7e91a", "name": "Michael Johnson", "email": "m.johnson@example.com", "registered": "false", "mailInVote": false, "zip": "FAT" }
+  ]
+}
