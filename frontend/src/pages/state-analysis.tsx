@@ -20,16 +20,18 @@ import StateMap from "@/components/map/state-map.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
 
 //table imports
-import { columns } from "../components/table/columns"
-import { DataTable } from "../components/table/data-table"
-import type {Voter} from "../components/table/columns"
+import { columns } from "../components/table/columns";
+import { DataTable } from "../components/table/data-table";
+import type { Voter } from "../components/table/columns";
 
-//chart imports 
-import { DataBarChart } from "../components/chart/bar-chart"
+//chart imports
+import { DataBarChart } from "../components/chart/bar-chart";
+
+//tabs imports
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
-
 
 const AnalysisType = {
   PROVISIONAL_BALLOT_CHART: "prov-ballot-bchart",
@@ -77,7 +79,10 @@ interface StateAnalysisProps {
   mockData: Voter[]; // modify based on how data is stored
 }
 
-export default function StateAnalysis({ stateName, mockData }: StateAnalysisProps) {
+export default function StateAnalysis({
+  stateName,
+  mockData,
+}: StateAnalysisProps) {
   const [selectedDataset, setSelectedDataset] = useState<AnalysisTypeValue>(
     AnalysisType.PROVISIONAL_BALLOT_CHART,
   );
@@ -206,33 +211,45 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
             {formatStateName(stateName)}
           </h1>
 
-          <div className="space-y-6">
-            <div className="flex items-center space-x-2 justify-center">
-              <label className="text-sm font-medium text-gray-700">
-                Dataset:
-              </label>
-              <Select
-                value={selectedDataset}
-                onValueChange={handleDatasetChange}
-                defaultValue={AnalysisType.PROVISIONAL_BALLOT_CHART}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {getAvailableAnalysisOptions().map((analysisType) => (
-                    <SelectItem key={analysisType} value={analysisType}>
-                      {analysisTypeLabels[analysisType]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col justify-center">
+          <Tabs defaultValue="view-dataset" className="w-[400px]">
+            <TabsList>
+              <TabsTrigger value="view-dataset">View Dataset</TabsTrigger>
+              <TabsTrigger value="voter-data">Voter Data</TabsTrigger>
+              <TabsTrigger value="equipment-data">Equipment Data</TabsTrigger>
+            </TabsList>
+            <TabsContent value="view-dataset">
+              <div className="space-y-6">
+                <div className="flex items-center space-x-2 justify-center">
+                  <label className="text-sm font-medium text-gray-700">
+                    Dataset:
+                  </label>
+                  <Select
+                    value={selectedDataset}
+                    onValueChange={handleDatasetChange}
+                    defaultValue={AnalysisType.PROVISIONAL_BALLOT_CHART}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getAvailableAnalysisOptions().map((analysisType) => (
+                        <SelectItem key={analysisType} value={analysisType}>
+                          {analysisTypeLabels[analysisType]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col justify-center">
+                  {/* Add more content here */}
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="voter-data">
               <DataTable columns={columns} data={mockData} />
-              <DataBarChart stateName = {stateName} barData={mockData}/>
-            </div>
-          </div>
+              <DataBarChart stateName={stateName} barData={mockData} />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
