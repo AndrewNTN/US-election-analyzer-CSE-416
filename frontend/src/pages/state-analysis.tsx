@@ -228,7 +228,7 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
                 </SelectContent>
               </Select>
             </div>
-            <div className="bg-white rounded-lg shadow-sm p-6 flex justify-center" style={{display: "flex", flexDirection: "column", alignItems: "center", gap: "50px"}}>
+            <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col justify-center">
               <DataTable columns={columns} data={mockData} />
               <DataBarChart stateName = {stateName} barData={mockData}/>
             </div>
