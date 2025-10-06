@@ -470,18 +470,18 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
       {/* Main content */}
       <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Left - Dataset Selector */}
-        <div className="w-56 bg-gray-50 border-r p-3 overflow-y-auto flex-shrink-0">
-          <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+        <div className="w-64 bg-gray-50 border-r p-4 overflow-y-auto flex-shrink-0">
+          <p className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
             Select Dataset
           </p>
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             {getAvailableAnalysisOptions().map((analysisType) => (
               <Button
                 key={analysisType}
                 variant={
                   selectedDataset === analysisType ? "default" : "outline"
                 }
-                className="w-full justify-start text-xs h-8 font-normal"
+                className="w-full justify-start text-sm h-10 font-normal"
                 onClick={() => setSelectedDataset(analysisType)}
               >
                 {analysisTypeLabels[analysisType]}
