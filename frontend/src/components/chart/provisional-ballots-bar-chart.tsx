@@ -27,8 +27,17 @@ export interface ProvisionalBallotsBarChartProps {
   barData: ProvisionBallotsData[];
 }
 
-const METRIC_KEYS = ["E2a","E2b","E2c","E2d","E2e","E2f","E2g","E2h"] as const;
-type MetricKey = typeof METRIC_KEYS[number];
+const METRIC_KEYS = [
+  "E2a",
+  "E2b",
+  "E2c",
+  "E2d",
+  "E2e",
+  "E2f",
+  "E2g",
+  "E2h",
+] as const;
+type MetricKey = (typeof METRIC_KEYS)[number];
 
 const METRIC_LABELS: Record<MetricKey, string> = {
   E2a: "E2a – Issued",
@@ -53,11 +62,17 @@ const BAR_COLORS = [
   "#10b981", // emerald
 ];
 
-export function ProvisionalBallotsBarChart({ stateName, barData }: ProvisionalBallotsBarChartProps) {
-  const totals = METRIC_KEYS.reduce((acc, key) => {
-    acc[key] = barData.reduce((sum, row) => sum + (row[key] ?? 0), 0);
-    return acc;
-  }, {} as Record<MetricKey, number>);
+export function ProvisionalBallotsBarChart({
+  stateName,
+  barData,
+}: ProvisionalBallotsBarChartProps) {
+  const totals = METRIC_KEYS.reduce(
+    (acc, key) => {
+      acc[key] = barData.reduce((sum, row) => sum + (row[key] ?? 0), 0);
+      return acc;
+    },
+    {} as Record<MetricKey, number>,
+  );
 
   const data = METRIC_KEYS.map((key) => ({
     code: key,
@@ -68,15 +83,27 @@ export function ProvisionalBallotsBarChart({ stateName, barData }: ProvisionalBa
   return (
     <div className="w-full h-64">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+        <BarChart
+          data={data}
+          margin={{ top: 8, right: 16, left: 8, bottom: 8 }}
+        >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" interval={0} angle={-15} textAnchor="end" height={60} />
+          <XAxis
+            dataKey="name"
+            interval={0}
+            angle={-15}
+            textAnchor="end"
+            height={60}
+          />
           <YAxis />
           <Tooltip />
           <Legend />
           <Bar dataKey="value" name={stateName}>
             {data.map((_, index) => (
-              <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
+              <Cell
+                key={`cell-${index}`}
+                fill={BAR_COLORS[index % BAR_COLORS.length]}
+              />
             ))}
           </Bar>
         </BarChart>
