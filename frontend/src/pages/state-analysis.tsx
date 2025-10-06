@@ -26,6 +26,8 @@ import { ProvisionBallotsTable } from "../components/table/provisional-ballot-ta
 import provisionalBallotsDataJson from "../../data/provisionalBallotsData.json" with { type: "json" };
 import { ActiveVotersTable } from "../components/table/active-voters-table";
 import activeVotersDataJson from "../../data/activeVotersData.json" with { type: "json" };
+import activeVotersDataCaliforniaJson from "../../data/activeVotersData-california.json" with { type: "json" };
+import activeVotersDataFloridaJson from "../../data/activeVotersData-florida.json" with { type: "json" };
 import { PollbookDeletionsTable } from "../components/table/pollbook-deletions-table";
 import pollbookDeletionsDataJson from "../../data/pollbookDeletionsData.json" with { type: "json" };
 import { MailBallotsRejectedTable } from "../components/table/mail-ballots-rejected-table";
@@ -311,6 +313,20 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     };
   };
 
+  // Get active voters data based on the state
+  const getActiveVotersData = () => {
+    const normalizedStateName = urlStateName.toLowerCase();
+
+    if (normalizedStateName === "california") {
+      return activeVotersDataCaliforniaJson;
+    } else if (normalizedStateName === "florida") {
+      return activeVotersDataFloridaJson;
+    }
+
+    // Default data for other states
+    return activeVotersDataJson;
+  };
+
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
@@ -391,10 +407,10 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                 </div>
               ) : selectedDataset === AnalysisType.ACTIVE_VOTERS_2024 ? (
                 <div className="text-xs text-muted-foreground text-center py-8">
-                  <ActiveVotersTable data={activeVotersDataJson} />
+                  <ActiveVotersTable data={getActiveVotersData()} />
                   <ActiveVotersBarChart
                     stateName={formatStateName(stateName)}
-                    barData={activeVotersDataJson}
+                    barData={getActiveVotersData()}
                   />
                 </div>
               ) : selectedDataset === AnalysisType.DROP_BOX_VOTING ? (
