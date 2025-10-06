@@ -50,13 +50,13 @@ const METRIC_LABELS: Record<MetricKey, string> = {
 
 // 🎨 Custom color palette
 const BAR_COLORS = [
-  "#ef4444", // red
-  "#f59e0b", // amber
-  "#8b5cf6", // violet
-  "#0ea5e9", // sky blue
-  "#10b981", // emerald
-  "#f97316", // orange
-  "#4f46e5", // indigo
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
 ];
 
 export function PollbookDeletionsBarChart({
