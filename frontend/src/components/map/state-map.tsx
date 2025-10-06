@@ -273,6 +273,8 @@ export default function StateMap({
     votingEquipmentData.length > 0;
 
   const [selectedCounty, setSelectedCounty] = useState<SafeCounty | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const pageSize = 5;
 
   const transparentStyle = useMemo(
     () => ({ color: "#000000", weight: 0, opacity: 0, fillOpacity: 0 }),
@@ -284,6 +286,35 @@ export default function StateMap({
     if (!selectedCounty?.geoid) return null;
     return generateDummyVoters(selectedCounty.geoid);
   }, [selectedCounty?.geoid]);
+
+  // Reset pagination when county changes
+  const handleCountyChange = (county: SafeCounty | null) => {
+    setSelectedCounty(county);
+    setCurrentPage(0);
+  };
+
+  // Calculate pagination for sample voters
+  const totalPages = voterData
+    ? Math.ceil(voterData.votersSample.length / pageSize)
+    : 0;
+  const paginatedVoters = voterData
+    ? voterData.votersSample.slice(
+        currentPage * pageSize,
+        (currentPage + 1) * pageSize,
+      )
+    : [];
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   return (
     <div className="relative overflow-hidden h-screen">
@@ -314,7 +345,7 @@ export default function StateMap({
                       e?.layer?.feature?.properties ??
                       e?.target?.feature?.properties ??
                       null;
-                    setSelectedCounty(props ? toSafeCounty(props) : null);
+                    handleCountyChange(props ? toSafeCounty(props) : null);
                   },
                 }}
               />
@@ -344,7 +375,7 @@ export default function StateMap({
       {/* Modal */}
       <Dialog
         open={!!selectedCounty}
-        onOpenChange={(open) => !open && setSelectedCounty(null)}
+        onOpenChange={(open) => !open && handleCountyChange(null)}
       >
         <DialogContent className="sm:max-w-3xl">
           <DialogHeader>
@@ -394,7 +425,16 @@ export default function StateMap({
 
           {/* Sample voters */}
           <div className="mt-6">
-            <h3 className="text-sm font-semibold mb-2">Sample Voters (12)</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold">
+                Sample Voters ({voterData?.votersSample.length ?? 0})
+              </h3>
+              {voterData && totalPages > 1 && (
+                <div className="text-xs text-muted-foreground">
+                  Page {currentPage + 1} of {totalPages}
+                </div>
+              )}
+            </div>
             <div className="overflow-x-auto rounded-2xl border">
               <table className="min-w-full text-sm">
                 <thead className="bg-muted/50">
@@ -408,7 +448,7 @@ export default function StateMap({
                   </tr>
                 </thead>
                 <tbody>
-                  {voterData?.votersSample.map((v) => (
+                  {paginatedVoters.map((v) => (
                     <tr key={v.id} className="border-t">
                       <td className="px-3 py-2">{v.name}</td>
                       <td className="px-3 py-2">{v.email}</td>
@@ -435,6 +475,38 @@ export default function StateMap({
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination controls */}
+            {voterData && totalPages > 1 && (
+              <div className="flex items-center justify-between mt-3">
+                <div className="text-xs text-muted-foreground">
+                  Showing {currentPage * pageSize + 1}-
+                  {Math.min(
+                    (currentPage + 1) * pageSize,
+                    voterData.votersSample.length,
+                  )}{" "}
+                  of {voterData.votersSample.length} voters
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 0}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleNextPage}
+                    disabled={currentPage >= totalPages - 1}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
           <DialogFooter className="mt-4">
