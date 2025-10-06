@@ -7,8 +7,7 @@ import {
 } from "@/components/ui/dialog.tsx";
 import { VotingEquipmentTable } from "@/components/table/voting-equipment-table.tsx";
 import type { VotingEquipment } from "@/components/table/voting-equipment-columns.tsx";
-import { EquipmentSummaryTable } from "@/components/table/equipment-summary-table.tsx";
-import type { EquipmentSummary } from "@/components/table/equipment-summary-columns.tsx";
+import { EquipmentSummaryCards } from "@/components/equipment/equipment-summary-cards.tsx";
 import { StateComparisonTable } from "@/components/table/state-comparison-table.tsx";
 import { OptInOptOutTable } from "@/components/table/opt-in-opt-out-table.tsx";
 import { EarlyVotingTable } from "@/components/table/early-voting-table.tsx";
@@ -32,6 +31,7 @@ import {
 } from "@/lib/early-voting-data.ts";
 
 import type { AnalysisItem } from "./analysis-drawer";
+import type { EquipmentSummary } from "@/components/equipment/equipment-cards-base.tsx";
 
 const votingEquipmentData: VotingEquipment[] =
   votingEquipmentDataJson as VotingEquipment[];
@@ -67,7 +67,7 @@ export default function AnalysisModal({
       case AnalysisOption.US_VOTING_EQUIPMENT:
         return <VotingEquipmentTable data={votingEquipmentData} />;
       case AnalysisOption.EQUIPMENT_SUMMARY:
-        return <EquipmentSummaryTable data={equipmentSummaryData} />;
+        return <EquipmentSummaryCards data={equipmentSummaryData} />;
       case AnalysisOption.REPUBLICAN_VS_DEMOCRATIC:
         return (
           <StateComparisonTable
