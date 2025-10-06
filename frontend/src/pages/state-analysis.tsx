@@ -30,6 +30,8 @@ import { PollbookDeletionsTable } from "../components/table/pollbook-deletions-t
 import pollbookDeletionsDataJson from "../../data/pollbookDeletionsData.json" with { type: "json" };
 import { MailBallotsRejectedTable } from "../components/table/mail-ballots-rejected-table";
 import mailBallotsRejectedDataJson from "../../data/mailBallotsRejectedData.json" with { type: "json" };
+import { StateEquipmentSummaryCards } from "../components/equipment/state-equipment-summary-cards";
+import stateEquipmentSummaryJson from "../../data/stateEquipmentSummary.json" with { type: "json" };
 
 //chart imports
 import { VoterRegistrationLineChart } from "../components/chart/voter-registration-line-chart";
@@ -374,8 +376,10 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                   <VoterRegistrationTable data={eavsRegionVoterData} />
                 </div>
               ) : selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY ? (
-                <div className="text-xs text-muted-foreground text-center py-8">
-                  Equipment data will be displayed here.
+                <div className="h-full">
+                  <StateEquipmentSummaryCards
+                    data={stateEquipmentSummaryJson}
+                  />
                 </div>
               ) : selectedDataset === AnalysisType.PROVISIONAL_BALLOT ? (
                 <div className="text-xs text-muted-foreground text-center py-8">
