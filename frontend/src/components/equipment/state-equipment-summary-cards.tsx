@@ -1,10 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EquipmentCardsBase, type BaseEquipment } from "./equipment-cards-base";
-import {
-  getCertificationBadge,
-  getReliabilityColor,
-} from "./equipment-helpers";
+import { getCertificationBadge } from "./equipment-helpers";
 
 export type StateEquipmentSummary = BaseEquipment & {
   make: string;
@@ -103,11 +100,7 @@ export function StateEquipmentSummaryCards({
           </div>
           <div className="text-center">
             <div className="text-muted-foreground text-[10px]">Reliability</div>
-            <div
-              className={`font-semibold ${getReliabilityColor(item.reliability)}`}
-            >
-              {item.reliability.toFixed(1)}%
-            </div>
+            <div className="font-semibold">{item.reliability.toFixed(1)}%</div>
           </div>
         </div>
       </CardContent>
