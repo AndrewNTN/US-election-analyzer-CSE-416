@@ -52,14 +52,14 @@ const METRIC_LABELS: Record<MetricKey, string> = {
 
 // 🎨 Custom color palette
 const BAR_COLORS = [
-  "#4f46e5", // indigo
-  "#16a34a", // green
-  "#f59e0b", // amber
-  "#ef4444", // red
-  "#0ea5e9", // sky blue
-  "#8b5cf6", // violet
-  "#f97316", // orange
-  "#10b981", // emerald
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
 ];
 
 export function ProvisionalBallotsBarChart({

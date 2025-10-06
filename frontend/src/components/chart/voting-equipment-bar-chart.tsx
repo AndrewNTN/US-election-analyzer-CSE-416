@@ -7,7 +7,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { VOTING_EQUIPMENT_COLORS } from "@/lib/colors";
 
 interface VotingEquipmentBarChartProps {
   stateName: string;
@@ -28,22 +27,22 @@ export function VotingEquipmentBarChart({
     {
       key: "dreNoVVPAT",
       label: "DRE (No VVPAT)",
-      color: VOTING_EQUIPMENT_COLORS.dre_no_vvpat,
+      color: "#8e51ff",
     },
     {
       key: "dreWithVVPAT",
       label: "DRE (With VVPAT)",
-      color: VOTING_EQUIPMENT_COLORS.dre_with_vvpat,
+      color: "#8e51ff",
     },
     {
       key: "ballotMarkingDevice",
       label: "Ballot Marking Device",
-      color: VOTING_EQUIPMENT_COLORS.ballot_marking_device,
+      color: "#8e51ff",
     },
     {
       key: "scanner",
       label: "Scanner",
-      color: VOTING_EQUIPMENT_COLORS.scanner,
+      color: "#8e51ff",
     },
   ];
 

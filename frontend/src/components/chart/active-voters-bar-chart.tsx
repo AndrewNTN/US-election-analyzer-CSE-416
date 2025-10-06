@@ -34,9 +34,9 @@ const METRIC_LABELS: Record<MetricKey, string> = {
 
 // 🎨 Custom color palette
 const BAR_COLORS = [
-  "#16a34a", // green for active
-  "#4f46e5", // indigo for total
-  "#f59e0b", // amber for inactive
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
 ];
 
 export function ActiveVotersBarChart({

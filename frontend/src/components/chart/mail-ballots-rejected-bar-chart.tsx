@@ -77,22 +77,22 @@ const METRIC_LABELS: Record<MetricKey, string> = {
 
 // 🎨 Custom color palette
 const BAR_COLORS = [
-  "#ef4444", // red
-  "#f59e0b", // amber
-  "#8b5cf6", // violet
-  "#0ea5e9", // sky blue
-  "#10b981", // emerald
-  "#f97316", // orange
-  "#4f46e5", // indigo
-  "#ec4899", // pink
-  "#14b8a6", // teal
-  "#f43f5e", // rose
-  "#06b6d4", // cyan
-  "#84cc16", // lime
-  "#a855f7", // purple
-  "#eab308", // yellow
-  "#6366f1", // indigo-500
-  "#22c55e", // green
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
+  "#8e51ff", // purple
 ];
 
 export function MailBallotsRejectedBarChart({
