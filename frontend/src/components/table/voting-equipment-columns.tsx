@@ -18,34 +18,34 @@ export const votingEquipmentColumns: ColumnDef<VotingEquipment>[] = [
   },
   {
     accessorKey: "dreNoVVPAT",
-    header: "DRE (No VVPAT)",
+    header: () => <div className="text-right">DRE (No VVPAT)</div>,
     cell: ({ row }) => {
       const value = row.getValue("dreNoVVPAT") as number;
-      return <div>{value.toLocaleString()}</div>;
+      return <div className="text-right">{value.toLocaleString()}</div>;
     },
   },
   {
     accessorKey: "dreWithVVPAT",
-    header: "DRE (With VVPAT)",
+    header: () => <div className="text-right">DRE (With VVPAT)</div>,
     cell: ({ row }) => {
       const value = row.getValue("dreWithVVPAT") as number;
-      return <div>{value.toLocaleString()}</div>;
+      return <div className="text-right">{value.toLocaleString()}</div>;
     },
   },
   {
     accessorKey: "ballotMarkingDevice",
-    header: "Ballot Marking Device",
+    header: () => <div className="text-right">Ballot Marking Device</div>,
     cell: ({ row }) => {
       const value = row.getValue("ballotMarkingDevice") as number;
-      return <div>{value.toLocaleString()}</div>;
+      return <div className="text-right">{value.toLocaleString()}</div>;
     },
   },
   {
     accessorKey: "scanner",
-    header: "Scanner",
+    header: () => <div className="text-right">Scanner</div>,
     cell: ({ row }) => {
       const value = row.getValue("scanner") as number;
-      return <div>{value.toLocaleString()}</div>;
+      return <div className="text-right">{value.toLocaleString()}</div>;
     },
   },
 ];

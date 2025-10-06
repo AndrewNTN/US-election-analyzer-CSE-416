@@ -28,18 +28,18 @@ export const equipmentSummaryColumns: ColumnDef<EquipmentSummary>[] = [
   },
   {
     accessorKey: "quantity",
-    header: "Quantity",
+    header: () => <div className="text-right">Quantity</div>,
     cell: ({ row }) => {
       const value = row.getValue("quantity") as number;
-      return <div>{value.toLocaleString()}</div>;
+      return <div className="text-right">{value.toLocaleString()}</div>;
     },
   },
   {
     accessorKey: "age",
-    header: "Age (Years)",
+    header: () => <div className="text-right">Age (Years)</div>,
     cell: ({ row }) => {
       const value = row.getValue("age") as number;
-      return <div>{value}</div>;
+      return <div className="text-right">{value}</div>;
     },
   },
   {
@@ -54,26 +54,26 @@ export const equipmentSummaryColumns: ColumnDef<EquipmentSummary>[] = [
   },
   {
     accessorKey: "scanRate",
-    header: "Scan Rate (%)",
+    header: () => <div className="text-center">Scan Rate (%)</div>,
     cell: ({ row }) => {
       const value = row.getValue("scanRate") as number;
-      return <div>{value.toFixed(1)}%</div>;
+      return <div className="text-center">{value.toFixed(1)}%</div>;
     },
   },
   {
     accessorKey: "errorRate",
-    header: "Error Rate (%)",
+    header: () => <div className="text-center">Error Rate (%)</div>,
     cell: ({ row }) => {
       const value = row.getValue("errorRate") as number;
-      return <div>{value.toFixed(1)}%</div>;
+      return <div className="text-center">{value.toFixed(1)}%</div>;
     },
   },
   {
     accessorKey: "reliability",
-    header: "Reliability (%)",
+    header: () => <div className="text-center">Reliability (%)</div>,
     cell: ({ row }) => {
       const value = row.getValue("reliability") as number;
-      return <div>{value.toFixed(1)}%</div>;
+      return <div className="text-center">{value.toFixed(1)}%</div>;
     },
   },
   {

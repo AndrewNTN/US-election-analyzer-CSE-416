@@ -286,7 +286,8 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                   <ProvisionBallotsTable data={provisionalBallotsData} />
                   <ProvisionalBallotsBarChart
                     stateName={formatStateName(stateName)}
-                    barData={provisionalBallotsData} ></ProvisionalBallotsBarChart>
+                    barData={provisionalBallotsData}
+                  ></ProvisionalBallotsBarChart>
                 </div>
               ) : (
                 <p className="text-xs text-muted-foreground text-center py-8">
