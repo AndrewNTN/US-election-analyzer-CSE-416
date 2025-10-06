@@ -12,6 +12,8 @@ import {
   getPollbookDeletionsColor,
   getMailBallotsRejectedColor,
   getVoterRegistrationColor,
+  getVotingEquipmentTypeColor,
+  type VotingEquipmentType,
 } from "@/lib/colors";
 import {
   SPLASH_CHOROPLETH_OPTIONS,
@@ -120,6 +122,15 @@ export default function ChoroplethLayer<
               ? (props.VOTER_REGISTRATION_PCT as number) || 0
               : 0;
           fillColor = getVoterRegistrationColor(voterRegistrationPct);
+          break;
+        }
+
+        case STATE_CHOROPLETH_OPTIONS.VOTING_EQUIPMENT_TYPE: {
+          const equipmentType =
+            "VOTING_EQUIPMENT_TYPE" in props
+              ? (props.VOTING_EQUIPMENT_TYPE as VotingEquipmentType)
+              : "scanner";
+          fillColor = getVotingEquipmentTypeColor(equipmentType);
           break;
         }
       }

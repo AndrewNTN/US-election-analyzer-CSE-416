@@ -7,6 +7,8 @@ import BubbleChartLayer, {
 import type { FeatureCollection, Geometry } from "geojson";
 import type { StateProps, CountyProps } from "@/types/map.ts";
 import type { StateChoroplethOption } from "@/constants/choropleth.ts";
+import { STATE_CHOROPLETH_OPTIONS } from "@/constants/choropleth.ts";
+import { VotingEquipmentLegend } from "@/components/voting-equipment-legend.tsx";
 
 interface StateMapProps {
   currentStateData: FeatureCollection<Geometry, StateProps>;
@@ -15,6 +17,11 @@ interface StateMapProps {
   choroplethOption?: StateChoroplethOption;
   censusBlockData?: CensusBlockData[];
   showBubbleChart?: boolean;
+  votingEquipmentData?: Array<{
+    eavsRegion: string;
+    equipmentTypes: string[];
+    primaryEquipment: string;
+  }>;
 }
 
 export default function StateMap({
@@ -24,7 +31,12 @@ export default function StateMap({
   choroplethOption,
   censusBlockData = [],
   showBubbleChart = false,
+  votingEquipmentData = [],
 }: StateMapProps) {
+  const showEquipmentLegend =
+    choroplethOption === STATE_CHOROPLETH_OPTIONS.VOTING_EQUIPMENT_TYPE &&
+    votingEquipmentData.length > 0;
+
   return (
     <div className="relative overflow-hidden h-screen">
       {/* State map */}
@@ -59,6 +71,13 @@ export default function StateMap({
           {/* Bubble chart overlay for political party dominance - rendered last to be on top */}
           <BubbleChartLayer data={censusBlockData} visible={showBubbleChart} />
         </BaseMap>
+
+        {/* Voting Equipment Legend - positioned on the map */}
+        {showEquipmentLegend && (
+          <div className="absolute bottom-4 left-4 z-10 max-w-xs">
+            <VotingEquipmentLegend data={votingEquipmentData} />
+          </div>
+        )}
       </div>
     </div>
   );
