@@ -24,7 +24,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
   },
   {
     accessorKey: "totalRegisteredVoters",
-    header: "Total",
+    header: () => <div className="text-right">Total</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("totalRegisteredVoters"));
       return (
@@ -36,7 +36,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
   },
   {
     accessorKey: "democraticVoters",
-    header: "Dem",
+    header: () => <div className="text-right">Dem</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("democraticVoters"));
       const total = parseFloat(row.getValue("totalRegisteredVoters"));
@@ -51,7 +51,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
   },
   {
     accessorKey: "republicanVoters",
-    header: "Rep",
+    header: () => <div className="text-right">Rep</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("republicanVoters"));
       const total = parseFloat(row.getValue("totalRegisteredVoters"));
@@ -66,7 +66,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
   },
   {
     accessorKey: "unaffiliatedVoters",
-    header: "Unaffiliated",
+    header: () => <div className="text-right">Unaffiliated</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("unaffiliatedVoters"));
       const total = parseFloat(row.getValue("totalRegisteredVoters"));
@@ -81,7 +81,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
   },
   {
     accessorKey: "registrationRate",
-    header: "Rate",
+    header: () => <div className="text-right">Rate</div>,
     cell: ({ row }) => {
       const rate = parseFloat(row.getValue("registrationRate"));
       return <div className="text-right font-medium text-xs">{rate}%</div>;
