@@ -24,11 +24,20 @@ import { VoterRegistrationTable } from "../components/table/voter-registration-t
 import eavsRegionVoterDataJson from "../../data/eavsRegionVoterData.json" with { type: "json" };
 import { ProvisionBallotsTable } from "../components/table/provisional-ballot-table";
 import provisionalBallotsDataJson from "../../data/provisionalBallotsData.json" with { type: "json" };
+import { ActiveVotersTable } from "../components/table/active-voters-table";
+import activeVotersDataJson from "../../data/activeVotersData.json" with { type: "json" };
+import { PollbookDeletionsTable } from "../components/table/pollbook-deletions-table";
+import pollbookDeletionsDataJson from "../../data/pollbookDeletionsData.json" with { type: "json" };
+import { MailBallotsRejectedTable } from "../components/table/mail-ballots-rejected-table";
+import mailBallotsRejectedDataJson from "../../data/mailBallotsRejectedData.json" with { type: "json" };
 
 //chart imports
 import { VoterRegistrationLineChart } from "../components/chart/voter-registration-line-chart";
 import voterRegistrationDataJson from "../../data/voterRegistrationChanges.json" with { type: "json" };
 import { ProvisionalBallotsBarChart } from "../components/chart/provisional-ballots-bar-chart";
+import { ActiveVotersBarChart } from "../components/chart/active-voters-bar-chart";
+import { PollbookDeletionsBarChart } from "../components/chart/pollbook-deletions-bar-chart";
+import { MailBallotsRejectedBarChart } from "../components/chart/mail-ballots-rejected-bar-chart";
 import { DropBoxVotingBubbleChart } from "../components/chart/drop-box-voting-bubble-chart";
 import dropBoxVotingDataJson from "../../data/dropBoxVotingData.json" with { type: "json" };
 import { EquipmentQualityBubbleChart } from "../components/chart/equipment-quality-bubble-chart";
@@ -70,6 +79,28 @@ const provisionalBallotsData = provisionalBallotsDataJson as {
   E2g: number; // Rejection: missing signature / ID
   E2h: number; // Rejection: other reasons
   E2i: string; // Notes / remarks
+}[];
+
+// Mail Ballots Rejected Data
+const mailBallotsRejectedData = mailBallotsRejectedDataJson as {
+  eavsRegion: string;
+  C9b: number;
+  C9c: number;
+  C9d: number;
+  C9e: number;
+  C9f: number;
+  C9g: number;
+  C9h: number;
+  C9i: number;
+  C9j: number;
+  C9k: number;
+  C9l: number;
+  C9m: number;
+  C9n: number;
+  C9o: number;
+  C9p: number;
+  C9q: number;
+  notes: string;
 }[];
 
 // Drop box voting data type
@@ -354,6 +385,14 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                     barData={provisionalBallotsData}
                   ></ProvisionalBallotsBarChart>
                 </div>
+              ) : selectedDataset === AnalysisType.ACTIVE_VOTERS_2024 ? (
+                <div className="text-xs text-muted-foreground text-center py-8">
+                  <ActiveVotersTable data={activeVotersDataJson} />
+                  <ActiveVotersBarChart
+                    stateName={formatStateName(stateName)}
+                    barData={activeVotersDataJson}
+                  />
+                </div>
               ) : selectedDataset === AnalysisType.DROP_BOX_VOTING ? (
                 <div className="h-[600px]">
                   <DropBoxVotingBubbleChart
@@ -370,6 +409,22 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                     regressionCoefficients={
                       getEquipmentQualityData().regressionCoefficients
                     }
+                  />
+                </div>
+              ) : selectedDataset === AnalysisType.POLLBOOK_DELETIONS_2024 ? (
+                <div className="text-xs text-muted-foreground text-center py-8">
+                  <PollbookDeletionsTable data={pollbookDeletionsDataJson} />
+                  <PollbookDeletionsBarChart
+                    stateName={formatStateName(stateName)}
+                    barData={pollbookDeletionsDataJson}
+                  />
+                </div>
+              ) : selectedDataset === AnalysisType.MAIL_BALLOTS_REJECTED ? (
+                <div className="text-xs text-muted-foreground text-center py-8">
+                  <MailBallotsRejectedTable data={mailBallotsRejectedData} />
+                  <MailBallotsRejectedBarChart
+                    stateName={formatStateName(stateName)}
+                    barData={mailBallotsRejectedData}
                   />
                 </div>
               ) : (
