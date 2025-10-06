@@ -6,6 +6,7 @@ import BaseMap from "@/components/map/base-map.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
 import OutlineLayer from "@/components/map/outline-layer.tsx";
 import AnalysisDrawer from "@/components/analysis-drawer.tsx";
+import { ChoroplethLegend } from "@/components/choropleth-legend.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Select,
@@ -81,6 +82,13 @@ export default function SplashPage() {
           />
           <OutlineLayer data={statesData} />
         </BaseMap>
+
+        {/* Choropleth Legend */}
+        {choroplethOption && choroplethOption !== "off" && (
+          <div className="absolute bottom-32 left-4 z-10 max-w-xs">
+            <ChoroplethLegend choroplethOption={choroplethOption} />
+          </div>
+        )}
       </div>
     </div>
   );

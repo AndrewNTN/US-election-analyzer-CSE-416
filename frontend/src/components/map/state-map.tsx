@@ -9,8 +9,7 @@ import BubbleChartLayer, {
 import type { FeatureCollection, Geometry } from "geojson";
 import type { StateProps, CountyProps } from "@/types/map.ts";
 import type { StateChoroplethOption } from "@/constants/choropleth.ts";
-import { STATE_CHOROPLETH_OPTIONS } from "@/constants/choropleth.ts";
-import { VotingEquipmentLegend } from "@/components/voting-equipment-legend.tsx";
+import { ChoroplethLegend } from "@/components/choropleth-legend.tsx";
 import {
   Dialog,
   DialogContent,
@@ -268,10 +267,6 @@ export default function StateMap({
   showBubbleChart = false,
   votingEquipmentData = [],
 }: StateMapProps) {
-  const showEquipmentLegend =
-    choroplethOption === STATE_CHOROPLETH_OPTIONS.VOTING_EQUIPMENT_TYPE &&
-    votingEquipmentData.length > 0;
-
   const [selectedCounty, setSelectedCounty] = useState<SafeCounty | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const pageSize = 5;
@@ -364,10 +359,13 @@ export default function StateMap({
           <BubbleChartLayer data={censusBlockData} visible={showBubbleChart} />
         </BaseMap>
 
-        {/* Voting Equipment Legend - positioned on the map */}
-        {showEquipmentLegend && (
-          <div className="absolute bottom-4 left-4 z-10 max-w-xs">
-            <VotingEquipmentLegend data={votingEquipmentData} />
+        {/* Choropleth Legend - positioned on the map */}
+        {choroplethOption && choroplethOption !== "off" && (
+          <div className="absolute bottom-32 left-4 z-10 max-w-xs">
+            <ChoroplethLegend
+              choroplethOption={choroplethOption}
+              votingEquipmentData={votingEquipmentData}
+            />
           </div>
         )}
       </div>

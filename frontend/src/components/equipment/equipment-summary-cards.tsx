@@ -11,7 +11,6 @@ import {
 } from "@/components/equipment/equipment-cards-base.tsx";
 import {
   getCertificationBadge,
-  getQualityBadge,
 } from "@/components/equipment/equipment-helpers.tsx";
 
 interface EquipmentSummaryTableProps {
@@ -49,7 +48,7 @@ export function EquipmentSummaryCards({ data }: EquipmentSummaryTableProps) {
             </div>
           </div>
           <Badge variant="secondary" className="ml-2 text-xs shrink-0">
-            Qty: {item.quantity.toLocaleString()}
+            Quantity: {item.quantity.toLocaleString()}
           </Badge>
         </CardTitle>
       </CardHeader>
@@ -71,7 +70,7 @@ export function EquipmentSummaryCards({ data }: EquipmentSummaryTableProps) {
         </div>
         <div className="flex items-center justify-between">
           {getCertificationBadge(item.certification)}
-          {getQualityBadge(item.qualityMeasure)}
+          Quality: {item.qualityMeasure}
         </div>
         <div className="grid grid-cols-3 gap-2 pt-1 border-t text-xs">
           <div className="text-center">
