@@ -41,8 +41,9 @@ export function DataTable<TData, TValue>({
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} 
-              className = "text-xs"> {/*styling for headers*/}
+              <TableRow key={headerGroup.id} className="text-xs">
+                {" "}
+                {/*styling for headers*/}
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
@@ -64,7 +65,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className = "text-[10px]" //styling for rows
+                  className="text-[10px]" //styling for rows
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
