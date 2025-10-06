@@ -24,6 +24,7 @@ import provisionalBallotsDataJson from "../../data/provisionalBallotsData.json" 
 //chart imports
 import { VoterRegistrationLineChart } from "../components/chart/voter-registration-line-chart";
 import voterRegistrationDataJson from "../../data/voterRegistrationChanges.json" with { type: "json" };
+import { ProvisionalBallotsBarChart } from "../components/chart/provisional-ballots-bar-chart";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
@@ -283,6 +284,9 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
               ) : selectedDataset === AnalysisType.PROVISIONAL_BALLOT ? (
                 <div className="text-xs text-muted-foreground text-center py-8">
                   <ProvisionBallotsTable data={provisionalBallotsData} />
+                  <ProvisionalBallotsBarChart
+                    stateName={formatStateName(stateName)}
+                    barData={provisionalBallotsData} ></ProvisionalBallotsBarChart>
                 </div>
               ) : (
                 <p className="text-xs text-muted-foreground text-center py-8">
