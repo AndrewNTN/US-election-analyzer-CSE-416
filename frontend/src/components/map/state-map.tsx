@@ -3,13 +3,23 @@ import { GeoJSON } from "react-leaflet";
 import BaseMap from "@/components/map/base-map.tsx";
 import OutlineLayer from "@/components/map/outline-layer.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
-import BubbleChartLayer, { type CensusBlockData } from "@/components/map/bubble-chart-layer.tsx";
+import BubbleChartLayer, {
+  type CensusBlockData,
+} from "@/components/map/bubble-chart-layer.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
 import type { StateProps, CountyProps } from "@/types/map.ts";
 import type { StateChoroplethOption } from "@/constants/choropleth.ts";
 import { STATE_CHOROPLETH_OPTIONS } from "@/constants/choropleth.ts";
 import { VotingEquipmentLegend } from "@/components/voting-equipment-legend.tsx";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 /** ---------- Types ---------- */
@@ -29,9 +39,9 @@ interface StateMapProps {
 
 type SafeCounty = {
   name: string;
-  statefp: string;   // e.g., "01"
-  countyfp: string;  // e.g., "001"
-  geoid: string;     // e.g., "01001"
+  statefp: string; // e.g., "01"
+  countyfp: string; // e.g., "001"
+  geoid: string; // e.g., "01001"
 };
 
 type Party = "Democrat" | "Republican" | "Other";
@@ -71,10 +81,12 @@ function toSafeCounty(props: unknown): SafeCounty {
   };
 
   return {
-    name:     pick("NAME", "name") || "Unknown County",
-    statefp:  pick("STATEFP", "state", "STATE", "state_code") || "N/A",
+    name: pick("NAME", "name") || "Unknown County",
+    statefp: pick("STATEFP", "state", "STATE", "state_code") || "N/A",
     countyfp: pick("COUNTYFP", "county_code") || "N/A",
-    geoid:    pick("GEOID", "FIPS", "fips", "id") || `FAKE-${Math.floor(Math.random()*10000)}`,
+    geoid:
+      pick("GEOID", "FIPS", "fips", "id") ||
+      `FAKE-${Math.floor(Math.random() * 10000)}`,
   };
 }
 
@@ -92,7 +104,7 @@ function hash32(s: string): number {
 function mulberry32(seed: number) {
   let t = seed >>> 0;
   return function rand() {
-    t += 0x6D2B79F5;
+    t += 0x6d2b79f5;
     let x = Math.imul(t ^ (t >>> 15), 1 | t);
     x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
     return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
@@ -100,41 +112,96 @@ function mulberry32(seed: number) {
 }
 
 const FIRST_NAMES = [
-  "Alex","Taylor","Jordan","Casey","Riley","Morgan","Avery","Sam","Jamie","Cameron",
-  "Devin","Quinn","Parker","Drew","Reese","Rowan","Elliot","Kyle","Logan","Harper"
+  "Alex",
+  "Taylor",
+  "Jordan",
+  "Casey",
+  "Riley",
+  "Morgan",
+  "Avery",
+  "Sam",
+  "Jamie",
+  "Cameron",
+  "Devin",
+  "Quinn",
+  "Parker",
+  "Drew",
+  "Reese",
+  "Rowan",
+  "Elliot",
+  "Kyle",
+  "Logan",
+  "Harper",
 ];
 const LAST_NAMES = [
-  "Smith","Johnson","Brown","Taylor","Anderson","Thomas","Jackson","White","Harris","Martin",
-  "Thompson","Garcia","Martinez","Robinson","Clark","Rodriguez","Lewis","Lee","Walker","Hall"
+  "Smith",
+  "Johnson",
+  "Brown",
+  "Taylor",
+  "Anderson",
+  "Thomas",
+  "Jackson",
+  "White",
+  "Harris",
+  "Martin",
+  "Thompson",
+  "Garcia",
+  "Martinez",
+  "Robinson",
+  "Clark",
+  "Rodriguez",
+  "Lewis",
+  "Lee",
+  "Walker",
+  "Hall",
 ];
 
 // Random-ish 3-letter “ZIP” token for demo
-const ZIPS = ["MIA","LAX","NYC","SEA","DAL","ATL","PHL","BOS","DEN","PHX","MSP","DTW","CLT","HOU","SFO"];
+const ZIPS = [
+  "MIA",
+  "LAX",
+  "NYC",
+  "SEA",
+  "DAL",
+  "ATL",
+  "PHL",
+  "BOS",
+  "DEN",
+  "PHX",
+  "MSP",
+  "DTW",
+  "CLT",
+  "HOU",
+  "SFO",
+];
 
 function pickOne<T>(arr: T[], r: () => number): T {
   return arr[Math.floor(r() * arr.length)];
 }
 
 function makeEmail(name: string, r: () => number): string {
-  const providers = ["example.com","mail.com","inbox.com","post.com"];
-  const handle = name.toLowerCase().replace(/\s+/g, ".") + Math.floor(r() * 100);
+  const providers = ["example.com", "mail.com", "inbox.com", "post.com"];
+  const handle =
+    name.toLowerCase().replace(/\s+/g, ".") + Math.floor(r() * 100);
   return `${handle}@${pickOne(providers, r)}`;
 }
 
-// Given a seed, produce stable party distribution that still “looks random”
+// Given a seed, produce stable party distribution that still "looks random"
 function partyMix(rand: () => number): [number, number, number] {
   // Draw two points on simplex and normalize to 100
-  let d = rand() * 0.6 + 0.2;  // 20–80%
-  let r = rand() * (1 - d);
-  let o = 1 - d - r;
-  // randomize which party is “strong”
+  const d = rand() * 0.6 + 0.2; // 20–80%
+  const r = rand() * (1 - d);
+  const o = 1 - d - r;
+  // randomize which party is "strong"
   const roll = rand();
-  let dem = d, rep = r, oth = o;
+  let dem = d,
+    rep = r,
+    oth = o;
   if (roll < 0.33) [dem, rep] = [rep, dem];
   else if (roll < 0.66) [dem, oth] = [oth, dem];
   // percentages as integers that sum to 100
-  let D = Math.max(5, Math.round(dem * 100));
-  let R = Math.max(5, Math.round(rep * 100));
+  const D = Math.max(5, Math.round(dem * 100));
+  const R = Math.max(5, Math.round(rep * 100));
   let O = Math.max(2, 100 - D - R);
   // re-balance if rounding pushed sum off
   const diff = 100 - (D + R + O);
@@ -152,18 +219,20 @@ function generateDummyVoters(geoid: string, countHint = 180): DummyVoterData {
   const [demPct, repPct, othPct] = partyMix(r);
   const demCount = Math.round((demPct / 100) * total);
   const repCount = Math.round((repPct / 100) * total);
-  let othCount = total - demCount - repCount;
+  const othCount = total - demCount - repCount;
 
   const voters: Voter[] = [];
   const mkVoter = (party: Party): Voter => {
     const name = `${pickOne(FIRST_NAMES, r)} ${pickOne(LAST_NAMES, r)}`;
     return {
-      id: Math.floor(r() * 0xffffffff).toString(16).padStart(8, "0"),
+      id: Math.floor(r() * 0xffffffff)
+        .toString(16)
+        .padStart(8, "0"),
       name,
       email: makeEmail(name, r),
       party,
-      registered: r() > 0.05,           // ~95% registered
-      mailInVote: r() > 0.7,            // ~30% mail-in
+      registered: r() > 0.05, // ~95% registered
+      mailInVote: r() > 0.7, // ~30% mail-in
       zip: pickOne(ZIPS, r),
     };
   };
@@ -181,9 +250,9 @@ function generateDummyVoters(geoid: string, countHint = 180): DummyVoterData {
   const sample = voters.slice(0, 12); // keep modal light
 
   const byParty: PartyStats[] = [
-    { party: "Democrat",   count: demCount, pct: demPct },
+    { party: "Democrat", count: demCount, pct: demPct },
     { party: "Republican", count: repCount, pct: repPct },
-    { party: "Other",      count: othCount, pct: othPct },
+    { party: "Other", count: othCount, pct: othPct },
   ];
 
   return { geoid, total, byParty, votersSample: sample };
@@ -207,7 +276,7 @@ export default function StateMap({
 
   const transparentStyle = useMemo(
     () => ({ color: "#000000", weight: 0, opacity: 0, fillOpacity: 0 }),
-    []
+    [],
   );
 
   // Generate dummy voter data whenever county changes
@@ -227,15 +296,19 @@ export default function StateMap({
         >
           {isDetailedState && currentCountiesData ? (
             <>
-              <ChoroplethLayer data={currentCountiesData} choroplethOption={choroplethOption} stateView />
+              <ChoroplethLayer
+                data={currentCountiesData}
+                choroplethOption={choroplethOption}
+                stateView
+              />
               <OutlineLayer data={currentCountiesData} stateView />
 
               {/* Click-only overlay */}
               <GeoJSON
-                data={currentCountiesData as any}
+                data={currentCountiesData}
                 style={() => transparentStyle}
                 eventHandlers={{
-                  click: (e: any) => {
+                  click: (e) => {
                     const props =
                       e?.sourceTarget?.feature?.properties ??
                       e?.layer?.feature?.properties ??
@@ -248,7 +321,11 @@ export default function StateMap({
             </>
           ) : (
             <>
-              <ChoroplethLayer data={currentStateData} choroplethOption={choroplethOption} stateView />
+              <ChoroplethLayer
+                data={currentStateData}
+                choroplethOption={choroplethOption}
+                stateView
+              />
               <OutlineLayer data={currentStateData} stateView />
             </>
           )}
@@ -265,12 +342,19 @@ export default function StateMap({
       </div>
 
       {/* Modal */}
-      <Dialog open={!!selectedCounty} onOpenChange={(open) => !open && setSelectedCounty(null)}>
+      <Dialog
+        open={!!selectedCounty}
+        onOpenChange={(open) => !open && setSelectedCounty(null)}
+      >
         <DialogContent className="sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>{selectedCounty?.name ?? "County Details"}</DialogTitle>
+            <DialogTitle>
+              {selectedCounty?.name ?? "County Details"}
+            </DialogTitle>
             <DialogDescription>
-              GEOID: {selectedCounty?.geoid ?? "N/A"} • StateFP: {selectedCounty?.statefp ?? "N/A"} • CountyFP: {selectedCounty?.countyfp ?? "N/A"}
+              GEOID: {selectedCounty?.geoid ?? "N/A"} • StateFP:{" "}
+              {selectedCounty?.statefp ?? "N/A"} • CountyFP:{" "}
+              {selectedCounty?.countyfp ?? "N/A"}
             </DialogDescription>
           </DialogHeader>
 
@@ -290,13 +374,17 @@ export default function StateMap({
                   {voterData?.byParty.map((row) => (
                     <tr key={row.party} className="border-t">
                       <td className="px-3 py-2">{row.party}</td>
-                      <td className="px-3 py-2 text-right">{row.count.toLocaleString()}</td>
+                      <td className="px-3 py-2 text-right">
+                        {row.count.toLocaleString()}
+                      </td>
                       <td className="px-3 py-2 text-right">{row.pct}%</td>
                     </tr>
                   ))}
                   <tr className="border-t font-semibold">
                     <td className="px-3 py-2">Total</td>
-                    <td className="px-3 py-2 text-right">{voterData?.total.toLocaleString() ?? "—"}</td>
+                    <td className="px-3 py-2 text-right">
+                      {voterData?.total.toLocaleString() ?? "—"}
+                    </td>
                     <td className="px-3 py-2 text-right">100%</td>
                   </tr>
                 </tbody>
@@ -326,13 +414,20 @@ export default function StateMap({
                       <td className="px-3 py-2">{v.email}</td>
                       <td className="px-3 py-2">{v.party}</td>
                       <td className="px-3 py-2">{v.zip}</td>
-                      <td className="px-3 py-2">{v.registered ? "Yes" : "No"}</td>
-                      <td className="px-3 py-2">{v.mailInVote ? "Yes" : "No"}</td>
+                      <td className="px-3 py-2">
+                        {v.registered ? "Yes" : "No"}
+                      </td>
+                      <td className="px-3 py-2">
+                        {v.mailInVote ? "Yes" : "No"}
+                      </td>
                     </tr>
                   ))}
                   {!voterData && (
                     <tr>
-                      <td className="px-3 py-6 text-center text-muted-foreground" colSpan={6}>
+                      <td
+                        className="px-3 py-6 text-center text-muted-foreground"
+                        colSpan={6}
+                      >
                         Click a county to generate sample voters.
                       </td>
                     </tr>
