@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import type { ColumnDef } from "@tanstack/react-table"
+import type { ColumnDef } from "@tanstack/react-table";
 
 export type Voter = {
-  id: string
-  name: string
-  registered: "true" | "false" | "unknown"
-  email: string
-  mailInVote: boolean
-  zip: string
-}
+  id: string;
+  name: string;
+  registered: "true" | "false" | "unknown";
+  email: string;
+  mailInVote: boolean;
+  zip: string;
+};
 
 export const columns: ColumnDef<Voter>[] = [
   {
@@ -33,4 +33,4 @@ export const columns: ColumnDef<Voter>[] = [
     accessorKey: "zip",
     header: "Zip Code",
   },
-]
+];

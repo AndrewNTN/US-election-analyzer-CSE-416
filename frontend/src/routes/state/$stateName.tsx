@@ -1,9 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import StateAnalysis from "@/pages/state-analysis.tsx";
-import mockData from "../../../data/mockData.json"
+import mockData from "../../../data/mockData.json";
 
-// Table imports 
-import type {Voter} from "../../components/table/columns"
+// Table imports
+import type { Voter } from "../../components/table/columns";
+
+// Type for raw mock data entries before normalization
+type RawVoterEntry = {
+  id?: string | number;
+  name?: string;
+  email?: string;
+  registered?: boolean | string;
+  mailInVote?: boolean | string;
+  zip?: string;
+};
 
 export const Route = createFileRoute("/state/$stateName")({
   params: {
@@ -17,7 +27,7 @@ export const Route = createFileRoute("/state/$stateName")({
 // Function to get mock data
 function getData(stateName: string): Voter[] {
   // Convert raw JSON entries into typed Voter[] with safe defaults.
-  const raw = (mockData as Record<string, any[]>)[stateName] || [];
+  const raw = (mockData as Record<string, RawVoterEntry[]>)[stateName] || [];
 
   return raw.map((entry): Voter => {
     const id = entry?.id ? String(entry.id) : "";
@@ -48,7 +58,7 @@ function getData(stateName: string): Voter[] {
 
 function State() {
   const { stateName } = Route.useParams();
-  const data = getData(stateName)
+  const data = getData(stateName);
 
-  return <StateAnalysis stateName={stateName} mockData = {data}/>;
+  return <StateAnalysis stateName={stateName} mockData={data} />;
 }
