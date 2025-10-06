@@ -26,12 +26,22 @@ import type { Voter } from "../components/table/columns";
 
 //chart imports
 import { DataBarChart } from "../components/chart/bar-chart";
+import { VoterRegistrationLineChart } from "../components/chart/voter-registration-line-chart";
+import voterRegistrationDataJson from "../../data/voterRegistrationChanges.json" with { type: "json" };
 
 //tabs imports
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
+
+// Voter registration data - already sorted by 2024 registered voters in ascending order
+const voterRegistrationData = voterRegistrationDataJson as {
+  jurisdiction: string;
+  registeredVoters2016: number;
+  registeredVoters2020: number;
+  registeredVoters2024: number;
+}[];
 
 const AnalysisType = {
   PROVISIONAL_BALLOT_CHART: "prov-ballot-bchart",
@@ -40,6 +50,7 @@ const AnalysisType = {
   POLLBOOK_DELETIONS_2024: "pb-deletions-2024",
   MAIL_BALLOTS_REJECTED: "mail-ballots-rejected",
   VOTER_REGISTRATION: "voter-registration",
+  VOTER_REGISTRATION_CHANGES: "voter-registration-changes",
   STATE_EQUIPMENT_SUMMARY: "state-equip-summary",
 } as const;
 
@@ -52,6 +63,7 @@ const analysisTypeLabels: Record<AnalysisTypeValue, string> = {
   [AnalysisType.POLLBOOK_DELETIONS_2024]: "2024 EAVS Pollbook Deletions",
   [AnalysisType.MAIL_BALLOTS_REJECTED]: "Mail Ballots Rejected",
   [AnalysisType.VOTER_REGISTRATION]: "Voter Registration",
+  [AnalysisType.VOTER_REGISTRATION_CHANGES]: "Voter Registration Changes",
   [AnalysisType.STATE_EQUIPMENT_SUMMARY]: "State Equipment Summary",
 };
 
@@ -70,6 +82,8 @@ const analysisToChoroplethMap: Record<
   [AnalysisType.MAIL_BALLOTS_REJECTED]:
     STATE_CHOROPLETH_OPTIONS.MAIL_BALLOTS_REJECTED,
   [AnalysisType.VOTER_REGISTRATION]:
+    STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION,
+  [AnalysisType.VOTER_REGISTRATION_CHANGES]:
     STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION,
   [AnalysisType.STATE_EQUIPMENT_SUMMARY]: STATE_CHOROPLETH_OPTIONS.OFF,
 };
@@ -241,7 +255,19 @@ export default function StateAnalysis({
                   </Select>
                 </div>
                 <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col justify-center">
-                  {/* Add more content here */}
+                  {selectedDataset ===
+                  AnalysisType.VOTER_REGISTRATION_CHANGES ? (
+                    <div className="h-[500px]">
+                      <VoterRegistrationLineChart
+                        data={voterRegistrationData}
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center">
+                      {analysisTypeLabels[selectedDataset]} visualization will
+                      be displayed here.
+                    </p>
+                  )}
                 </div>
               </div>
             </TabsContent>
