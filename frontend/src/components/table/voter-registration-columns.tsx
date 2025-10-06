@@ -28,9 +28,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("totalRegisteredVoters"));
       return (
-        <div className="text-right font-medium text-xs">
-          {amount.toLocaleString()}
-        </div>
+        <div className="text-right text-xs">{amount.toLocaleString()}</div>
       );
     },
   },
@@ -43,7 +41,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
       const percentage = ((amount / total) * 100).toFixed(0);
       return (
         <div className="text-right text-xs">
-          <div className="font-medium">{amount.toLocaleString()}</div>
+          <div>{amount.toLocaleString()}</div>
           <div className="text-gray-500">({percentage}%)</div>
         </div>
       );
@@ -58,7 +56,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
       const percentage = ((amount / total) * 100).toFixed(0);
       return (
         <div className="text-right text-xs">
-          <div className="font-medium">{amount.toLocaleString()}</div>
+          <div>{amount.toLocaleString()}</div>
           <div className="text-gray-500">({percentage}%)</div>
         </div>
       );
@@ -73,7 +71,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
       const percentage = ((amount / total) * 100).toFixed(0);
       return (
         <div className="text-right text-xs">
-          <div className="font-medium">{amount.toLocaleString()}</div>
+          <div>{amount.toLocaleString()}</div>
           <div className="text-gray-500">({percentage}%)</div>
         </div>
       );
@@ -84,7 +82,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
     header: () => <div className="text-right">Rate</div>,
     cell: ({ row }) => {
       const rate = parseFloat(row.getValue("registrationRate"));
-      return <div className="text-right font-medium text-xs">{rate}%</div>;
+      return <div className="text-right text-xs">{rate}%</div>;
     },
   },
 ];

@@ -14,13 +14,20 @@ export interface ProvisionBallotsData {
 }
 
 export const provisionalBallotsColumns: ColumnDef<ProvisionBallotsData>[] = [
-  ...(
-    ["E2a", "E2b", "E2c", "E2d", "E2e", "E2f", "E2g", "E2h", "E2i"] as const
-  ).map((key) => ({
-    accessorKey: key,
-    header: key.toUpperCase(),
+  ...(["E2a", "E2b", "E2c", "E2d", "E2e", "E2f", "E2g", "E2h"] as const).map(
+    (key) => ({
+      accessorKey: key,
+      header: () => <div className="text-right">{key.toUpperCase()}</div>,
+      cell: ({ row }: { row: Row<ProvisionBallotsData> }) => (
+        <div className="text-xs text-right text-black">{row.getValue(key)}</div>
+      ),
+    }),
+  ),
+  {
+    accessorKey: "E2i",
+    header: () => <div className="text-left">E2I</div>,
     cell: ({ row }: { row: Row<ProvisionBallotsData> }) => (
-      <div className="font-medium text-xs">{row.getValue(key)}</div>
+      <div className="text-xs text-left text-black">{row.getValue("E2i")}</div>
     ),
-  })),
+  },
 ];
