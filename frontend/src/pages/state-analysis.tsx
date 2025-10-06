@@ -1,39 +1,31 @@
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import statesJSON from "../../data/us-states.json";
 import countiesJSON from "../../data/counties.geojson.json";
+import censusBlockDataJSON from "../../data/censusBlockData.json";
 import type { CountyProps, StateProps } from "@/types/map.ts";
 import { DETAILED_STATES, hasDetailedVoterData } from "@/constants/states.ts";
 import { getStateFipsCode } from "@/constants/stateFips.ts";
 import { Button } from "@/components/ui/button.tsx";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select.tsx";
 import {
   STATE_CHOROPLETH_OPTIONS,
   type StateChoroplethOption,
 } from "@/constants/choropleth.ts";
 import StateMap from "@/components/map/state-map.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
+import type { CensusBlockData } from "@/components/map/bubble-chart-layer.tsx";
 
 //table imports
-import { columns } from "../components/table/columns";
-import { DataTable } from "../components/table/data-table";
-import type { Voter } from "../components/table/columns";
+import { VoterRegistrationTable } from "../components/table/voter-registration-table";
+import eavsRegionVoterDataJson from "../../data/eavsRegionVoterData.json" with { type: "json" };
 
 //chart imports
-import { DataBarChart } from "../components/chart/bar-chart";
 import { VoterRegistrationLineChart } from "../components/chart/voter-registration-line-chart";
 import voterRegistrationDataJson from "../../data/voterRegistrationChanges.json" with { type: "json" };
 
-//tabs imports
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
+const censusBlockData = censusBlockDataJSON as CensusBlockData[];
 
 // Voter registration data - already sorted by 2024 registered voters in ascending order
 const voterRegistrationData = voterRegistrationDataJson as {
@@ -43,12 +35,25 @@ const voterRegistrationData = voterRegistrationDataJson as {
   registeredVoters2024: number;
 }[];
 
+// EAVS region voter data for Florida counties
+const eavsRegionVoterData = eavsRegionVoterDataJson as {
+  eavsRegion: string;
+  totalRegisteredVoters: number;
+  democraticVoters: number;
+  republicanVoters: number;
+  unaffiliatedVoters: number;
+  otherPartyVoters: number;
+  registrationRate: number;
+  activeVoters: number;
+  inactiveVoters: number;
+}[];
+
 const AnalysisType = {
   PROVISIONAL_BALLOT_CHART: "prov-ballot-bchart",
   PROVISIONAL_BALLOT_TABLE: "prob-ballot-table",
   ACTIVE_VOTERS_2024: "active-voters-2024",
   POLLBOOK_DELETIONS_2024: "pb-deletions-2024",
-  MAIL_BALLOTS_REJECTED: "mail-ballots-rejected",
+  MAIL_BALLOTS_REJECTED: "mail-balots-rejected",
   VOTER_REGISTRATION: "voter-registration",
   VOTER_REGISTRATION_CHANGES: "voter-registration-changes",
   STATE_EQUIPMENT_SUMMARY: "state-equip-summary",
@@ -90,13 +95,10 @@ const analysisToChoroplethMap: Record<
 
 interface StateAnalysisProps {
   stateName: string;
-  mockData: Voter[]; // modify based on how data is stored
 }
 
-export default function StateAnalysis({
-  stateName,
-  mockData,
-}: StateAnalysisProps) {
+export default function StateAnalysis({ stateName }: StateAnalysisProps) {
+  const navigate = useNavigate();
   const [selectedDataset, setSelectedDataset] = useState<AnalysisTypeValue>(
     AnalysisType.PROVISIONAL_BALLOT_CHART,
   );
@@ -112,12 +114,8 @@ export default function StateAnalysis({
     ? analysisToChoroplethMap[selectedDataset]
     : STATE_CHOROPLETH_OPTIONS.OFF;
 
-  const handleDatasetChange = (value: string) => {
-    setSelectedDataset(value as AnalysisTypeValue);
-  };
-
   const handleBackToMainMap = () => {
-    window.history.back();
+    navigate({ to: "/" });
   };
 
   // Get available analysis options based on state capabilities
@@ -198,84 +196,87 @@ export default function StateAnalysis({
   const currentCountiesData = getCurrentCountiesData();
   const detailedState = isDetailedState();
 
+  const urlStateName = stateName.toLowerCase().replace(/\s+/g, "-");
+  const showBubbleChart =
+    selectedDataset === AnalysisType.VOTER_REGISTRATION &&
+    hasDetailedVoterData(urlStateName);
+
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Map */}
-      <div className="w-1/2 relative">
-        {/* Floating back button */}
-        <div className="absolute top-4 left-4 z-10">
-          <Button variant="outline" onClick={handleBackToMainMap}>
-            ← Back to Main Map
+    <div className="h-screen flex flex-col">
+      {/* Header */}
+      <div className="bg-white border-b px-6 py-2.5 flex items-center justify-between flex-shrink-0 z-50">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" onClick={handleBackToMainMap}>
+            ← Back
           </Button>
-        </div>
-
-        {/* Map */}
-        <StateMap
-          currentStateData={currentStateData}
-          currentCountiesData={currentCountiesData}
-          isDetailedState={detailedState}
-          choroplethOption={choroplethOption}
-        />
-      </div>
-
-      {/* Right side - Content */}
-      <div className="w-1/2 bg-gray-50 p-8 overflow-y-auto">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">
+          <h1 className="text-lg font-bold text-gray-900">
             {formatStateName(stateName)}
           </h1>
+        </div>
+      </div>
 
-          <Tabs defaultValue="view-dataset" className="w-full">
-            <TabsList>
-              <TabsTrigger value="view-dataset">View Dataset</TabsTrigger>
-              <TabsTrigger value="voter-data">Voter Data</TabsTrigger>
-              <TabsTrigger value="equipment-data">Equipment Data</TabsTrigger>
-            </TabsList>
-            <TabsContent value="view-dataset">
-              <div className="space-y-6">
-                <div className="flex items-center space-x-2 justify-center">
-                  <label className="text-sm font-medium text-gray-700">
-                    Dataset:
-                  </label>
-                  <Select
-                    value={selectedDataset}
-                    onValueChange={handleDatasetChange}
-                    defaultValue={AnalysisType.PROVISIONAL_BALLOT_CHART}
-                  >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {getAvailableAnalysisOptions().map((analysisType) => (
-                        <SelectItem key={analysisType} value={analysisType}>
-                          {analysisTypeLabels[analysisType]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+      {/* Main content */}
+      <div className="flex-1 flex overflow-hidden min-h-0">
+        {/* Left - Dataset Selector */}
+        <div className="w-56 bg-gray-50 border-r p-3 overflow-y-auto flex-shrink-0">
+          <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+            Select Dataset
+          </p>
+          <div className="space-y-1">
+            {getAvailableAnalysisOptions().map((analysisType) => (
+              <Button
+                key={analysisType}
+                variant={
+                  selectedDataset === analysisType ? "default" : "outline"
+                }
+                className="w-full justify-start text-xs h-8 font-normal"
+                onClick={() => setSelectedDataset(analysisType)}
+              >
+                {analysisTypeLabels[analysisType]}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Middle - Map */}
+        <div className="w-[35%] relative flex-shrink-0">
+          <StateMap
+            currentStateData={currentStateData}
+            currentCountiesData={currentCountiesData}
+            isDetailedState={detailedState}
+            choroplethOption={choroplethOption}
+            censusBlockData={censusBlockData}
+            showBubbleChart={showBubbleChart}
+          />
+        </div>
+
+        {/* Right - Analysis Content */}
+        <div className="flex-1 bg-white border-l overflow-y-auto min-w-0">
+          <div className="p-3">
+            <h2 className="text-sm font-semibold text-gray-900 mb-2">
+              {analysisTypeLabels[selectedDataset]}
+            </h2>
+            <div className="bg-gray-50 rounded-lg p-3">
+              {selectedDataset === AnalysisType.VOTER_REGISTRATION_CHANGES ? (
+                <div className="h-[400px]">
+                  <VoterRegistrationLineChart data={voterRegistrationData} />
                 </div>
-                <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col justify-center">
-                  {selectedDataset ===
-                  AnalysisType.VOTER_REGISTRATION_CHANGES ? (
-                    <div className="h-[500px]">
-                      <VoterRegistrationLineChart
-                        data={voterRegistrationData}
-                      />
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground text-center">
-                      {analysisTypeLabels[selectedDataset]} visualization will
-                      be displayed here.
-                    </p>
-                  )}
+              ) : selectedDataset === AnalysisType.VOTER_REGISTRATION ? (
+                <div className="overflow-y-auto">
+                  <VoterRegistrationTable data={eavsRegionVoterData} />
                 </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="voter-data">
-              <DataTable columns={columns} data={mockData} />
-              <DataBarChart stateName={stateName} barData={mockData} />
-            </TabsContent>
-          </Tabs>
+              ) : selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY ? (
+                <div className="text-xs text-muted-foreground text-center py-8">
+                  Equipment data will be displayed here.
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground text-center py-8">
+                  {analysisTypeLabels[selectedDataset]} visualization will be
+                  displayed here.
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
