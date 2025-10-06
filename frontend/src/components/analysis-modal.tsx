@@ -10,6 +10,8 @@ import type { VotingEquipment } from "@/components/table/voting-equipment-column
 import { EquipmentSummaryTable } from "@/components/table/equipment-summary-table.tsx";
 import type { EquipmentSummary } from "@/components/table/equipment-summary-columns.tsx";
 import { StateComparisonTable } from "@/components/table/state-comparison-table.tsx";
+import { OptInOptOutTable } from "@/components/table/opt-in-opt-out-table.tsx";
+import { EarlyVotingTable } from "@/components/table/early-voting-table.tsx";
 import votingEquipmentDataJson from "../../data/votingEquipment.json" with { type: "json" };
 import equipmentSummaryDataJson from "../../data/equipmentSummary.json" with { type: "json" };
 import {
@@ -17,6 +19,17 @@ import {
   republicanStateName,
   democraticStateName,
 } from "@/lib/state-comparison-data.ts";
+import {
+  optInOptOutData,
+  optInStateName,
+  optOutWithSameDayStateName,
+  optOutWithoutSameDayStateName,
+} from "@/lib/opt-in-opt-out-data.ts";
+import {
+  earlyVotingData,
+  earlyVotingRepublicanStateName,
+  earlyVotingDemocraticStateName,
+} from "@/lib/early-voting-data.ts";
 
 import type { AnalysisItem } from "./analysis-drawer";
 
@@ -30,7 +43,7 @@ export const AnalysisOption = {
   EQUIPMENT_SUMMARY: "Equipment Summary",
   REPUBLICAN_VS_DEMOCRATIC: "Republican vs Democratic",
   OPT_IN_VS_OPT_OUT: "Opt-in vs Opt-out",
-  EARLY_VOTING_COMPARISON: "Early Voting Comparison",
+  EARLY_VOTING_COMPARISON: "Republican vs Democratic Early Voting Comparison",
   DROP_BOX_VOTING_CHART: "Drop Box Voting Chart",
   EQUIPMENT_VS_REJECTED_BALLOTS: "Equipment vs Rejected Ballots",
   POLITICAL_PARTY_BUBBLE_CHART:
@@ -65,19 +78,20 @@ export default function AnalysisModal({
         );
       case AnalysisOption.OPT_IN_VS_OPT_OUT:
         return (
-          <div className="py-4">
-            <p className="text-sm text-muted-foreground">
-              Opt-in vs opt-out registration comparison will be displayed here.
-            </p>
-          </div>
+          <OptInOptOutTable
+            data={optInOptOutData}
+            optInState={optInStateName}
+            optOutWithSameDayState={optOutWithSameDayStateName}
+            optOutWithoutSameDayState={optOutWithoutSameDayStateName}
+          />
         );
       case AnalysisOption.EARLY_VOTING_COMPARISON:
         return (
-          <div className="py-4">
-            <p className="text-sm text-muted-foreground">
-              Early voting comparison will be displayed here.
-            </p>
-          </div>
+          <EarlyVotingTable
+            data={earlyVotingData}
+            republicanState={earlyVotingRepublicanStateName}
+            democraticState={earlyVotingDemocraticStateName}
+          />
         );
       case AnalysisOption.DROP_BOX_VOTING_CHART:
         return (

@@ -4,6 +4,7 @@ export interface StateDetails {
   registrationType: "opt-in" | "opt-out";
   sameDayRegistration: boolean;
   hasDetailedVoterData: boolean;
+  hasDropBoxVoting: boolean;
 }
 
 export const DETAILED_STATES = {
@@ -13,6 +14,7 @@ export const DETAILED_STATES = {
     registrationType: "opt-in",
     sameDayRegistration: false,
     hasDetailedVoterData: true,
+    hasDropBoxVoting: true,
   },
   california: {
     name: "california",
@@ -20,6 +22,7 @@ export const DETAILED_STATES = {
     registrationType: "opt-out",
     sameDayRegistration: true,
     hasDetailedVoterData: false,
+    hasDropBoxVoting: true,
   },
   colorado: {
     name: "colorado",
@@ -27,6 +30,7 @@ export const DETAILED_STATES = {
     registrationType: "opt-out",
     sameDayRegistration: false,
     hasDetailedVoterData: false,
+    hasDropBoxVoting: false,
   },
 } as const satisfies Record<string, StateDetails>;
 
@@ -39,4 +43,9 @@ export function getStateDetails(stateName: string): StateDetails | undefined {
 export function hasDetailedVoterData(stateName: string): boolean {
   const state = getStateDetails(stateName);
   return state?.hasDetailedVoterData ?? false;
+}
+
+export function hasDropBoxVoting(stateName: string): boolean {
+  const state = getStateDetails(stateName);
+  return state?.hasDropBoxVoting ?? false;
 }

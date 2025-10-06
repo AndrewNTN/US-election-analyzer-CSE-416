@@ -4,7 +4,11 @@ import statesJSON from "../../data/us-states.json";
 import countiesJSON from "../../data/counties.geojson.json";
 import censusBlockDataJSON from "../../data/censusBlockData.json";
 import type { CountyProps, StateProps } from "@/types/map.ts";
-import { DETAILED_STATES, hasDetailedVoterData } from "@/constants/states.ts";
+import {
+  DETAILED_STATES,
+  hasDetailedVoterData,
+  hasDropBoxVoting,
+} from "@/constants/states.ts";
 import { getStateFipsCode } from "@/constants/stateFips.ts";
 import { Button } from "@/components/ui/button.tsx";
 import {
@@ -25,6 +29,8 @@ import provisionalBallotsDataJson from "../../data/provisionalBallotsData.json" 
 import { VoterRegistrationLineChart } from "../components/chart/voter-registration-line-chart";
 import voterRegistrationDataJson from "../../data/voterRegistrationChanges.json" with { type: "json" };
 import { ProvisionalBallotsBarChart } from "../components/chart/provisional-ballots-bar-chart";
+import { DropBoxVotingBubbleChart } from "../components/chart/drop-box-voting-bubble-chart";
+import dropBoxVotingDataJson from "../../data/dropBoxVotingData.json" with { type: "json" };
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
@@ -64,6 +70,19 @@ const provisionalBallotsData = provisionalBallotsDataJson as {
   E2i: string; // Notes / remarks
 }[];
 
+// Drop box voting data type
+type DropBoxVotingData = {
+  eavsRegion: string;
+  totalDropBoxVotes: number;
+  republicanVotes: number;
+  democraticVotes: number;
+  otherVotes: number;
+  totalVotes: number;
+  republicanPercentage: number;
+  dropBoxPercentage: number;
+  dominantParty: "republican" | "democratic";
+};
+
 const AnalysisType = {
   PROVISIONAL_BALLOT: "prov-ballot-bchart",
   ACTIVE_VOTERS_2024: "active-voters-2024",
@@ -72,6 +91,9 @@ const AnalysisType = {
   VOTER_REGISTRATION: "voter-registration",
   VOTER_REGISTRATION_CHANGES: "voter-registration-changes",
   STATE_EQUIPMENT_SUMMARY: "state-equip-summary",
+  DROP_BOX_VOTING: "drop-box-voting",
+  EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS:
+    "equipment-quality-vs-rejected-ballots",
 } as const;
 
 type AnalysisTypeValue = (typeof AnalysisType)[keyof typeof AnalysisType];
@@ -84,6 +106,9 @@ const analysisTypeLabels: Record<AnalysisTypeValue, string> = {
   [AnalysisType.VOTER_REGISTRATION]: "Voter Registration",
   [AnalysisType.VOTER_REGISTRATION_CHANGES]: "Voter Registration Changes",
   [AnalysisType.STATE_EQUIPMENT_SUMMARY]: "State Equipment Summary",
+  [AnalysisType.DROP_BOX_VOTING]: "Drop Box Voting",
+  [AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS]:
+    "Equipment vs Rejected Ballots",
 };
 
 // Map analysis types to choropleth options
@@ -103,6 +128,9 @@ const analysisToChoroplethMap: Record<
   [AnalysisType.VOTER_REGISTRATION_CHANGES]:
     STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION,
   [AnalysisType.STATE_EQUIPMENT_SUMMARY]: STATE_CHOROPLETH_OPTIONS.OFF,
+  [AnalysisType.DROP_BOX_VOTING]: STATE_CHOROPLETH_OPTIONS.OFF,
+  [AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS]:
+    STATE_CHOROPLETH_OPTIONS.OFF,
 };
 
 interface StateAnalysisProps {
@@ -132,11 +160,15 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
 
   // Get available analysis options based on state capabilities
   const getAvailableAnalysisOptions = (): AnalysisTypeValue[] => {
+    const urlStateName = stateName.toLowerCase().replace(/\s+/g, "-");
     return Object.values(AnalysisType).filter((option) => {
       // Exclude voter registration if this state doesn't have detailed voter data
       if (option === AnalysisType.VOTER_REGISTRATION) {
-        const urlStateName = stateName.toLowerCase().replace(/\s+/g, "-");
         return hasDetailedVoterData(urlStateName);
+      }
+      // Exclude drop box voting if this state doesn't support it
+      if (option === AnalysisType.DROP_BOX_VOTING) {
+        return hasDropBoxVoting(urlStateName);
       }
       return true;
     });
@@ -212,6 +244,12 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
   const showBubbleChart =
     selectedDataset === AnalysisType.VOTER_REGISTRATION &&
     hasDetailedVoterData(urlStateName);
+
+  // Get drop box voting data for current state
+  const getDropBoxVotingData = (): DropBoxVotingData[] => {
+    const stateKey = urlStateName as keyof typeof dropBoxVotingDataJson;
+    return (dropBoxVotingDataJson[stateKey] || []) as DropBoxVotingData[];
+  };
 
   return (
     <div className="h-screen flex flex-col">
@@ -289,6 +327,16 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                     barData={provisionalBallotsData}
                   ></ProvisionalBallotsBarChart>
                 </div>
+              ) : selectedDataset === AnalysisType.DROP_BOX_VOTING ? (
+                <div className="h-[600px]">
+                  <DropBoxVotingBubbleChart
+                    stateName={formatStateName(stateName)}
+                    data={getDropBoxVotingData()}
+                  />
+                </div>
+              ) : selectedDataset ===
+                AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS ? (
+                <div className="h-[600px]"></div>
               ) : (
                 <p className="text-xs text-muted-foreground text-center py-8">
                   {analysisTypeLabels[selectedDataset]} visualization will be

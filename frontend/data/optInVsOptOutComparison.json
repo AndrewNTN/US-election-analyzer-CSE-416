@@ -1,0 +1,36 @@
+{
+  "optInState": {
+    "state": "Florida",
+    "registrationType": "Opt-in",
+    "sameDayRegistration": "No",
+    "eligibleVoters": 17500000,
+    "registeredVoters": 14875000,
+    "registrationRate": 85.0,
+    "totalVotesCast": 11200000,
+    "turnoutRate": 75.3,
+    "turnoutOfEligible": 64.0
+  },
+  "optOutWithSameDay": {
+    "state": "California",
+    "registrationType": "Opt-out",
+    "sameDayRegistration": "Yes",
+    "eligibleVoters": 30500000,
+    "registeredVoters": 22850000,
+    "registrationRate": 74.9,
+    "totalVotesCast": 17100000,
+    "turnoutRate": 74.8,
+    "turnoutOfEligible": 56.1
+  },
+  "optOutWithoutSameDay": {
+    "state": "Colorado",
+    "registrationType": "Opt-out",
+    "sameDayRegistration": "No",
+    "eligibleVoters": 4600000,
+    "registeredVoters": 4140000,
+    "registrationRate": 90.0,
+    "totalVotesCast": 3360000,
+    "turnoutRate": 81.2,
+    "turnoutOfEligible": 73.0
+  }
+}
+

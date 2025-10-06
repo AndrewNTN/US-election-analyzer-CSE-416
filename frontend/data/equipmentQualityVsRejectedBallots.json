@@ -1,0 +1,181 @@
+{
+  "equipmentQualityData": [
+    {
+      "county": "Maricopa",
+      "equipmentQuality": 85,
+      "rejectedBallotPercentage": 1.2,
+      "totalBallots": 2450000,
+      "rejectedBallots": 29400,
+      "dominantParty": "republican",
+      "mailInRejected": 18200,
+      "provisionalRejected": 8900,
+      "uocavaRejected": 2300
+    },
+    {
+      "county": "Pima",
+      "equipmentQuality": 78,
+      "rejectedBallotPercentage": 1.8,
+      "totalBallots": 580000,
+      "rejectedBallots": 10440,
+      "dominantParty": "democratic",
+      "mailInRejected": 6800,
+      "provisionalRejected": 2940,
+      "uocavaRejected": 700
+    },
+    {
+      "county": "Pinal",
+      "equipmentQuality": 72,
+      "rejectedBallotPercentage": 2.1,
+      "totalBallots": 285000,
+      "rejectedBallots": 5985,
+      "dominantParty": "republican",
+      "mailInRejected": 3890,
+      "provisionalRejected": 1695,
+      "uocavaRejected": 400
+    },
+    {
+      "county": "Coconino",
+      "equipmentQuality": 88,
+      "rejectedBallotPercentage": 0.9,
+      "totalBallots": 95000,
+      "rejectedBallots": 855,
+      "dominantParty": "democratic",
+      "mailInRejected": 520,
+      "provisionalRejected": 285,
+      "uocavaRejected": 50
+    },
+    {
+      "county": "Yavapai",
+      "equipmentQuality": 75,
+      "rejectedBallotPercentage": 1.7,
+      "totalBallots": 145000,
+      "rejectedBallots": 2465,
+      "dominantParty": "republican",
+      "mailInRejected": 1580,
+      "provisionalRejected": 720,
+      "uocavaRejected": 165
+    },
+    {
+      "county": "Mohave",
+      "equipmentQuality": 68,
+      "rejectedBallotPercentage": 2.5,
+      "totalBallots": 128000,
+      "rejectedBallots": 3200,
+      "dominantParty": "republican",
+      "mailInRejected": 2080,
+      "provisionalRejected": 896,
+      "uocavaRejected": 224
+    },
+    {
+      "county": "Yuma",
+      "equipmentQuality": 70,
+      "rejectedBallotPercentage": 2.3,
+      "totalBallots": 112000,
+      "rejectedBallots": 2576,
+      "dominantParty": "republican",
+      "mailInRejected": 1678,
+      "provisionalRejected": 721,
+      "uocavaRejected": 177
+    },
+    {
+      "county": "Cochise",
+      "equipmentQuality": 73,
+      "rejectedBallotPercentage": 2.0,
+      "totalBallots": 78000,
+      "rejectedBallots": 1560,
+      "dominantParty": "republican",
+      "mailInRejected": 1014,
+      "provisionalRejected": 437,
+      "uocavaRejected": 109
+    },
+    {
+      "county": "Navajo",
+      "equipmentQuality": 65,
+      "rejectedBallotPercentage": 2.8,
+      "totalBallots": 68000,
+      "rejectedBallots": 1904,
+      "dominantParty": "democratic",
+      "mailInRejected": 1238,
+      "provisionalRejected": 544,
+      "uocavaRejected": 122
+    },
+    {
+      "county": "Apache",
+      "equipmentQuality": 62,
+      "rejectedBallotPercentage": 3.1,
+      "totalBallots": 45000,
+      "rejectedBallots": 1395,
+      "dominantParty": "democratic",
+      "mailInRejected": 907,
+      "provisionalRejected": 378,
+      "uocavaRejected": 110
+    },
+    {
+      "county": "Gila",
+      "equipmentQuality": 69,
+      "rejectedBallotPercentage": 2.4,
+      "totalBallots": 35000,
+      "rejectedBallots": 840,
+      "dominantParty": "republican",
+      "mailInRejected": 546,
+      "provisionalRejected": 235,
+      "uocavaRejected": 59
+    },
+    {
+      "county": "Graham",
+      "equipmentQuality": 71,
+      "rejectedBallotPercentage": 2.2,
+      "totalBallots": 25000,
+      "rejectedBallots": 550,
+      "dominantParty": "republican",
+      "mailInRejected": 358,
+      "provisionalRejected": 154,
+      "uocavaRejected": 38
+    },
+    {
+      "county": "Santa Cruz",
+      "equipmentQuality": 76,
+      "rejectedBallotPercentage": 1.9,
+      "totalBallots": 28000,
+      "rejectedBallots": 532,
+      "dominantParty": "democratic",
+      "mailInRejected": 346,
+      "provisionalRejected": 149,
+      "uocavaRejected": 37
+    },
+    {
+      "county": "La Paz",
+      "equipmentQuality": 64,
+      "rejectedBallotPercentage": 2.9,
+      "totalBallots": 12000,
+      "rejectedBallots": 348,
+      "dominantParty": "republican",
+      "mailInRejected": 226,
+      "provisionalRejected": 97,
+      "uocavaRejected": 25
+    },
+    {
+      "county": "Greenlee",
+      "equipmentQuality": 67,
+      "rejectedBallotPercentage": 2.6,
+      "totalBallots": 6500,
+      "rejectedBallots": 169,
+      "dominantParty": "republican",
+      "mailInRejected": 110,
+      "provisionalRejected": 46,
+      "uocavaRejected": 13
+    }
+  ],
+  "regressionCoefficients": {
+    "republican": {
+      "a": -0.0008,
+      "b": 0.12,
+      "c": -1.8
+    },
+    "democratic": {
+      "a": -0.0006,
+      "b": 0.08,
+      "c": -0.9
+    }
+  }
+}

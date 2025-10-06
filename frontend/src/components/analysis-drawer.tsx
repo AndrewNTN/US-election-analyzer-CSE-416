@@ -20,7 +20,7 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar.tsx";
 import AnalysisModal, { AnalysisOption } from "@/components/analysis-modal.tsx";
-import { BarChart3, Database, FileText, Users } from "lucide-react";
+import { Database, Users } from "lucide-react";
 import { useState } from "react";
 
 interface AnalysisDrawerProps {
@@ -51,7 +51,7 @@ export default function AnalysisDrawer({
     },
     {
       title: AnalysisOption.EQUIPMENT_SUMMARY,
-      icon: FileText,
+      icon: Database,
       description: "US voting equipment summary by provider",
     },
   ];
@@ -63,32 +63,14 @@ export default function AnalysisDrawer({
       description: "Compare selected Republican and Democratic states",
     },
     {
+      title: AnalysisOption.EARLY_VOTING_COMPARISON,
+      icon: Users,
+      description: "Republican vs Democratic early voting data",
+    },
+    {
       title: AnalysisOption.OPT_IN_VS_OPT_OUT,
       icon: Users,
       description: "Compare opt-in and opt-out registration states",
-    },
-    {
-      title: AnalysisOption.EARLY_VOTING_COMPARISON,
-      icon: BarChart3,
-      description: "Republican vs Democratic early voting data",
-    },
-  ];
-
-  const advancedAnalysisItems: AnalysisItem[] = [
-    {
-      title: AnalysisOption.DROP_BOX_VOTING_CHART,
-      icon: BarChart3,
-      description: "Drop box voting bubble chart by party",
-    },
-    {
-      title: AnalysisOption.EQUIPMENT_VS_REJECTED_BALLOTS,
-      icon: BarChart3,
-      description: "Equipment quality vs ballot rejection rates",
-    },
-    {
-      title: AnalysisOption.POLITICAL_PARTY_BUBBLE_CHART,
-      icon: Users,
-      description: "Political party dominance by census block",
     },
   ];
 
@@ -145,25 +127,6 @@ export default function AnalysisDrawer({
                     <SidebarGroupContent>
                       <SidebarMenu>
                         {comparisonItems.map((item) => (
-                          <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton
-                              tooltip={item.description}
-                              onClick={() => handleItemClick(item)}
-                            >
-                              <item.icon className="h-4 w-4" />
-                              <span>{item.title}</span>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                        ))}
-                      </SidebarMenu>
-                    </SidebarGroupContent>
-                  </SidebarGroup>
-
-                  <SidebarGroup>
-                    <SidebarGroupLabel>Advanced Analysis</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                      <SidebarMenu>
-                        {advancedAnalysisItems.map((item) => (
                           <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                               tooltip={item.description}
