@@ -31,6 +31,8 @@ import voterRegistrationDataJson from "../../data/voterRegistrationChanges.json"
 import { ProvisionalBallotsBarChart } from "../components/chart/provisional-ballots-bar-chart";
 import { DropBoxVotingBubbleChart } from "../components/chart/drop-box-voting-bubble-chart";
 import dropBoxVotingDataJson from "../../data/dropBoxVotingData.json" with { type: "json" };
+import { EquipmentQualityBubbleChart } from "../components/chart/equipment-quality-bubble-chart";
+import equipmentQualityDataJson from "../../data/equipmentQualityVsRejectedBallots.json" with { type: "json" };
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
@@ -251,6 +253,31 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     return (dropBoxVotingDataJson[stateKey] || []) as DropBoxVotingData[];
   };
 
+  // Get equipment quality data for current state
+  const getEquipmentQualityData = () => {
+    // The JSON has the structure: { equipmentQualityData: [...], regressionCoefficients: {...} }
+    // Provided JSON is for Arizona (based on counties)
+    // TODO: Adjust to state specific data
+    return {
+      data: (equipmentQualityDataJson.equipmentQualityData || []) as {
+        county: string;
+        equipmentQuality: number;
+        rejectedBallotPercentage: number;
+        totalBallots: number;
+        rejectedBallots: number;
+        dominantParty: "republican" | "democratic";
+        mailInRejected: number;
+        provisionalRejected: number;
+        uocavaRejected: number;
+      }[],
+      regressionCoefficients:
+        equipmentQualityDataJson.regressionCoefficients as {
+          republican: { a: number; b: number; c: number };
+          democratic: { a: number; b: number; c: number };
+        },
+    };
+  };
+
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
@@ -336,7 +363,15 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                 </div>
               ) : selectedDataset ===
                 AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS ? (
-                <div className="h-[600px]"></div>
+                <div className="h-[600px]">
+                  <EquipmentQualityBubbleChart
+                    stateName={formatStateName(stateName)}
+                    data={getEquipmentQualityData().data}
+                    regressionCoefficients={
+                      getEquipmentQualityData().regressionCoefficients
+                    }
+                  />
+                </div>
               ) : (
                 <p className="text-xs text-muted-foreground text-center py-8">
                   {analysisTypeLabels[selectedDataset]} visualization will be
