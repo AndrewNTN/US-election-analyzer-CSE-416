@@ -131,7 +131,7 @@ export default function AnalysisModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[90vw] sm:max-w-[90vw] w-[90vw] h-[85vh] flex flex-col p-4">
+      <DialogContent className="max-w-[90vw] sm:max-w-[90vw] w-[90vw] h-[95vh] flex flex-col p-4">
         <DialogHeader className="flex-shrink-0 pb-2">
           <DialogTitle className="text-xl">
             {selectedAnalysis?.title}
@@ -140,7 +140,7 @@ export default function AnalysisModal({
             {selectedAnalysis?.description}
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 min-h-0 overflow-hidden">{renderContent()}</div>
+        <div className="flex-1 min-h-0">{renderContent()}</div>
       </DialogContent>
     </Dialog>
   );

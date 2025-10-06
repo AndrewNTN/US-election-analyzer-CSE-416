@@ -1,0 +1,45 @@
+{
+  "California": [
+    { "year": 2016, "dreNoVVPAT": 1200, "dreWithVVPAT": 3500, "ballotMarkingDevice": 4800, "scanner": 12500 },
+    { "year": 2018, "dreNoVVPAT": 800, "dreWithVVPAT": 3200, "ballotMarkingDevice": 5500, "scanner": 13200 },
+    { "year": 2020, "dreNoVVPAT": 400, "dreWithVVPAT": 2800, "ballotMarkingDevice": 6800, "scanner": 14100 },
+    { "year": 2022, "dreNoVVPAT": 150, "dreWithVVPAT": 2200, "ballotMarkingDevice": 7500, "scanner": 14800 },
+    { "year": 2024, "dreNoVVPAT": 50, "dreWithVVPAT": 1800, "ballotMarkingDevice": 8200, "scanner": 15400 }
+  ],
+  "Florida": [
+    { "year": 2016, "dreNoVVPAT": 2100, "dreWithVVPAT": 4200, "ballotMarkingDevice": 3200, "scanner": 10800 },
+    { "year": 2018, "dreNoVVPAT": 1600, "dreWithVVPAT": 3900, "ballotMarkingDevice": 3800, "scanner": 11400 },
+    { "year": 2020, "dreNoVVPAT": 1100, "dreWithVVPAT": 3500, "ballotMarkingDevice": 4500, "scanner": 12200 },
+    { "year": 2022, "dreNoVVPAT": 600, "dreWithVVPAT": 3100, "ballotMarkingDevice": 5200, "scanner": 12800 },
+    { "year": 2024, "dreNoVVPAT": 300, "dreWithVVPAT": 2800, "ballotMarkingDevice": 5800, "scanner": 13400 }
+  ],
+  "Colorado": [
+    { "year": 2016, "dreNoVVPAT": 800, "dreWithVVPAT": 1200, "ballotMarkingDevice": 2800, "scanner": 6500 },
+    { "year": 2018, "dreNoVVPAT": 500, "dreWithVVPAT": 1000, "ballotMarkingDevice": 3200, "scanner": 7100 },
+    { "year": 2020, "dreNoVVPAT": 200, "dreWithVVPAT": 800, "ballotMarkingDevice": 3800, "scanner": 7800 },
+    { "year": 2022, "dreNoVVPAT": 80, "dreWithVVPAT": 600, "ballotMarkingDevice": 4200, "scanner": 8300 },
+    { "year": 2024, "dreNoVVPAT": 20, "dreWithVVPAT": 450, "ballotMarkingDevice": 4600, "scanner": 8900 }
+  ],
+  "Texas": [
+    { "year": 2016, "dreNoVVPAT": 3200, "dreWithVVPAT": 5800, "ballotMarkingDevice": 2100, "scanner": 9500 },
+    { "year": 2018, "dreNoVVPAT": 2800, "dreWithVVPAT": 5400, "ballotMarkingDevice": 2600, "scanner": 10200 },
+    { "year": 2020, "dreNoVVPAT": 2300, "dreWithVVPAT": 5000, "ballotMarkingDevice": 3200, "scanner": 11000 },
+    { "year": 2022, "dreNoVVPAT": 1800, "dreWithVVPAT": 4600, "ballotMarkingDevice": 3800, "scanner": 11600 },
+    { "year": 2024, "dreNoVVPAT": 1400, "dreWithVVPAT": 4200, "ballotMarkingDevice": 4400, "scanner": 12300 }
+  ],
+  "New York": [
+    { "year": 2016, "dreNoVVPAT": 1500, "dreWithVVPAT": 3200, "ballotMarkingDevice": 4100, "scanner": 11200 },
+    { "year": 2018, "dreNoVVPAT": 1100, "dreWithVVPAT": 2900, "ballotMarkingDevice": 4700, "scanner": 11800 },
+    { "year": 2020, "dreNoVVPAT": 700, "dreWithVVPAT": 2500, "ballotMarkingDevice": 5400, "scanner": 12500 },
+    { "year": 2022, "dreNoVVPAT": 350, "dreWithVVPAT": 2100, "ballotMarkingDevice": 6000, "scanner": 13100 },
+    { "year": 2024, "dreNoVVPAT": 150, "dreWithVVPAT": 1800, "ballotMarkingDevice": 6600, "scanner": 13700 }
+  ],
+  "Arizona": [
+    { "year": 2016, "dreNoVVPAT": 1800, "dreWithVVPAT": 2400, "ballotMarkingDevice": 1900, "scanner": 5200 },
+    { "year": 2018, "dreNoVVPAT": 1400, "dreWithVVPAT": 2200, "ballotMarkingDevice": 2300, "scanner": 5600 },
+    { "year": 2020, "dreNoVVPAT": 1000, "dreWithVVPAT": 2000, "ballotMarkingDevice": 2800, "scanner": 6100 },
+    { "year": 2022, "dreNoVVPAT": 600, "dreWithVVPAT": 1800, "ballotMarkingDevice": 3300, "scanner": 6500 },
+    { "year": 2024, "dreNoVVPAT": 300, "dreWithVVPAT": 1600, "ballotMarkingDevice": 3800, "scanner": 7000 }
+  ]
+}
+

@@ -46,6 +46,10 @@ import { DropBoxVotingBubbleChart } from "../components/chart/drop-box-voting-bu
 import dropBoxVotingDataJson from "../../data/dropBoxVotingData.json" with { type: "json" };
 import { EquipmentQualityBubbleChart } from "../components/chart/equipment-quality-bubble-chart";
 import equipmentQualityDataJson from "../../data/equipmentQualityVsRejectedBallots.json" with { type: "json" };
+import votingEquipmentTypeCaliforniaJson from "../../data/votingEquipmentType-california.json" with { type: "json" };
+import votingEquipmentTypeFloridaJson from "../../data/votingEquipmentType-florida.json" with { type: "json" };
+import votingEquipmentTypeColoradoJson from "../../data/votingEquipmentType-colorado.json" with { type: "json" };
+import type { VotingEquipmentType } from "@/lib/colors";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
@@ -164,7 +168,8 @@ const analysisToChoroplethMap: Record<
     STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION,
   [AnalysisType.VOTER_REGISTRATION_CHANGES]:
     STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION,
-  [AnalysisType.STATE_EQUIPMENT_SUMMARY]: STATE_CHOROPLETH_OPTIONS.OFF,
+  [AnalysisType.STATE_EQUIPMENT_SUMMARY]:
+    STATE_CHOROPLETH_OPTIONS.VOTING_EQUIPMENT_TYPE,
   [AnalysisType.DROP_BOX_VOTING]: STATE_CHOROPLETH_OPTIONS.OFF,
   [AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS]:
     STATE_CHOROPLETH_OPTIONS.OFF,
@@ -327,6 +332,127 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     return activeVotersDataJson;
   };
 
+  // Get voting equipment type data for current state
+  const getVotingEquipmentTypeData = () => {
+    const normalizedStateName = urlStateName.toLowerCase();
+
+    if (normalizedStateName === "california") {
+      return votingEquipmentTypeCaliforniaJson;
+    } else if (normalizedStateName === "florida") {
+      return votingEquipmentTypeFloridaJson;
+    } else if (normalizedStateName === "colorado") {
+      return votingEquipmentTypeColoradoJson;
+    }
+
+    // Default to empty array for other states
+    return [];
+  };
+
+  // Enrich county data with voting equipment type information
+  const getEnrichedCountiesData = (): FeatureCollection<
+    Geometry,
+    CountyProps
+  > | null => {
+    if (!currentCountiesData) {
+      return currentCountiesData;
+    }
+
+    // Only enrich when we have equipment data and the right dataset is selected
+    if (selectedDataset !== AnalysisType.STATE_EQUIPMENT_SUMMARY) {
+      return currentCountiesData;
+    }
+
+    const equipmentData = getVotingEquipmentTypeData();
+
+    if (equipmentData.length === 0) {
+      return currentCountiesData;
+    }
+
+    // Create a map of region name to equipment type (with normalized keys)
+    const equipmentMap = new Map<string, VotingEquipmentType>();
+
+    equipmentData.forEach(
+      (item: {
+        eavsRegion: string;
+        equipmentTypes: string[];
+        primaryEquipment: string;
+      }) => {
+        const equipmentType =
+          item.equipmentTypes.length > 1 ? "mixed" : item.primaryEquipment;
+
+        // Store with original key (e.g., "Los Angeles County")
+        equipmentMap.set(item.eavsRegion, equipmentType as VotingEquipmentType);
+
+        // Also store normalized version (e.g., "losangelescounty")
+        const normalized = item.eavsRegion.toLowerCase().replace(/\s+/g, "");
+        equipmentMap.set(normalized, equipmentType as VotingEquipmentType);
+      },
+    );
+
+    // Debug: Log available equipment regions
+    console.log("Equipment data regions:", Array.from(equipmentMap.keys()));
+
+    // Enrich the county features with equipment type
+    const enrichedFeatures = currentCountiesData.features.map((feature) => {
+      const countyName = feature.properties?.NAME;
+
+      let equipmentType: VotingEquipmentType = "scanner"; // Default
+
+      if (countyName) {
+        // Debug: Log county name
+        console.log("Processing county:", countyName);
+
+        // Try 1: Exact match with " County" suffix (e.g., "Los Angeles" -> "Los Angeles County")
+        let match = equipmentMap.get(`${countyName} County`);
+
+        // Try 2: Exact match without modification
+        if (!match) {
+          match = equipmentMap.get(countyName);
+        }
+
+        // Try 3: Normalized matching (e.g., "Los Angeles" -> "losangelescounty")
+        if (!match) {
+          const normalizedCounty = countyName.toLowerCase().replace(/\s+/g, "");
+          match = equipmentMap.get(normalizedCounty + "county");
+        }
+
+        // Try 4: If county name already has "County", try without it
+        if (!match && countyName.toLowerCase().includes("county")) {
+          const withoutCounty = countyName.replace(/\s*County\s*/i, "").trim();
+          match = equipmentMap.get(`${withoutCounty} County`);
+        }
+
+        if (match) {
+          equipmentType = match;
+          console.log(`✓ Matched ${countyName} to ${equipmentType}`);
+        } else {
+          console.log(`✗ No match for ${countyName}, using default: scanner`);
+        }
+      }
+
+      return {
+        ...feature,
+        properties: {
+          ...feature.properties,
+          VOTING_EQUIPMENT_TYPE: equipmentType,
+        },
+      };
+    });
+
+    return {
+      ...currentCountiesData,
+      features: enrichedFeatures,
+    };
+  };
+
+  const enrichedCountiesData = getEnrichedCountiesData();
+
+  // Get equipment data for legend
+  const votingEquipmentData =
+    selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY
+      ? getVotingEquipmentTypeData()
+      : [];
+
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
@@ -368,11 +494,12 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
         <div className="w-[35%] relative flex-shrink-0">
           <StateMap
             currentStateData={currentStateData}
-            currentCountiesData={currentCountiesData}
+            currentCountiesData={enrichedCountiesData}
             isDetailedState={detailedState}
             choroplethOption={choroplethOption}
             censusBlockData={censusBlockData}
             showBubbleChart={showBubbleChart}
+            votingEquipmentData={votingEquipmentData}
           />
         </div>
 
