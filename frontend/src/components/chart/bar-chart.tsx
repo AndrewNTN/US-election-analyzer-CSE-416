@@ -13,7 +13,7 @@ export function DataBarChart({stateName, barData}: BarChartProps) {
 
     const data = [{name: `${stateName}`, registered: registeredCount, unregistered: unregisteredCount, amt: total}];
     return (
-        <BarChart width={500} height={250} data={data}>
+        <BarChart width={500} height={150} data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis />
