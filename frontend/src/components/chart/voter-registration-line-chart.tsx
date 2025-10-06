@@ -60,13 +60,13 @@ export function VoterRegistrationLineChart({
             {tooltipData.jurisdictionName}
           </p>
           <p className="text-sm text-blue-600">
-            2016: {tooltipData["2016"].toLocaleString()} voters
+            2016: {tooltipData["2016"].toLocaleString()} registered voters
           </p>
           <p className="text-sm text-green-600">
-            2020: {tooltipData["2020"].toLocaleString()} voters
+            2020: {tooltipData["2020"].toLocaleString()} registered voters
           </p>
           <p className="text-sm text-orange-600">
-            2024: {tooltipData["2024"].toLocaleString()} voters
+            2024: {tooltipData["2024"].toLocaleString()} registered voters
           </p>
         </div>
       );
@@ -85,7 +85,8 @@ export function VoterRegistrationLineChart({
           <XAxis
             dataKey="jurisdiction"
             label={{
-              value: "Jurisdictions (sorted by 2024 voter count)",
+              value:
+                "Counties (Ordered from Smallest to Largest by 2024 Registration)",
               position: "insideBottom",
               offset: -10,
             }}
@@ -93,7 +94,7 @@ export function VoterRegistrationLineChart({
           />
           <YAxis
             label={{
-              value: "Registered Voters",
+              value: "Number of Registered Voters",
               angle: -90,
               position: "insideLeft",
               style: { textAnchor: "middle" },
@@ -114,7 +115,7 @@ export function VoterRegistrationLineChart({
             stroke="#2563eb"
             strokeWidth={3}
             dot={false}
-            name="2016"
+            name="2016 Registered Voters"
             strokeOpacity={0.9}
           />
           <Line
@@ -123,7 +124,7 @@ export function VoterRegistrationLineChart({
             stroke="#16a34a"
             strokeWidth={3}
             dot={false}
-            name="2020"
+            name="2020 Registered Voters"
             strokeOpacity={0.9}
           />
           <Line
@@ -132,7 +133,7 @@ export function VoterRegistrationLineChart({
             stroke="#ea580c"
             strokeWidth={3}
             dot={false}
-            name="2024"
+            name="2024 Registered Voters"
             strokeOpacity={0.9}
           />
         </LineChart>
