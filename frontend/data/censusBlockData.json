@@ -1,0 +1,402 @@
+[
+  {
+    "blockId": "FL001",
+    "latitude": 25.7617,
+    "longitude": -80.1918,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1245,
+    "republicanVoters": 832
+  },
+  {
+    "blockId": "FL002",
+    "latitude": 25.7714,
+    "longitude": -80.1976,
+    "dominantParty": "Republican",
+    "democraticVoters": 689,
+    "republicanVoters": 1156
+  },
+  {
+    "blockId": "FL003",
+    "latitude": 26.1224,
+    "longitude": -80.1373,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1512,
+    "republicanVoters": 998
+  },
+  {
+    "blockId": "FL004",
+    "latitude": 25.7749,
+    "longitude": -80.1340,
+    "dominantParty": "Republican",
+    "democraticVoters": 776,
+    "republicanVoters": 1243
+  },
+  {
+    "blockId": "FL005",
+    "latitude": 30.4383,
+    "longitude": -84.2807,
+    "dominantParty": "Republican",
+    "democraticVoters": 567,
+    "republicanVoters": 1389
+  },
+  {
+    "blockId": "FL006",
+    "latitude": 25.7907,
+    "longitude": -80.1300,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1467,
+    "republicanVoters": 824
+  },
+  {
+    "blockId": "FL007",
+    "latitude": 28.5383,
+    "longitude": -81.3792,
+    "dominantParty": "Republican",
+    "democraticVoters": 902,
+    "republicanVoters": 1201
+  },
+  {
+    "blockId": "FL008",
+    "latitude": 27.9506,
+    "longitude": -82.4572,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1334,
+    "republicanVoters": 887
+  },
+  {
+    "blockId": "FL009",
+    "latitude": 26.7153,
+    "longitude": -80.0534,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1221,
+    "republicanVoters": 978
+  },
+  {
+    "blockId": "FL010",
+    "latitude": 29.6516,
+    "longitude": -82.3248,
+    "dominantParty": "Republican",
+    "democraticVoters": 594,
+    "republicanVoters": 1167
+  },
+  {
+    "blockId": "FL011",
+    "latitude": 26.3584,
+    "longitude": -80.0831,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1389,
+    "republicanVoters": 734
+  },
+  {
+    "blockId": "FL012",
+    "latitude": 27.7663,
+    "longitude": -82.6404,
+    "dominantParty": "Republican",
+    "democraticVoters": 845,
+    "republicanVoters": 1203
+  },
+  {
+    "blockId": "FL013",
+    "latitude": 25.7617,
+    "longitude": -80.2918,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1456,
+    "republicanVoters": 849
+  },
+  {
+    "blockId": "FL014",
+    "latitude": 30.1588,
+    "longitude": -85.6602,
+    "dominantParty": "Republican",
+    "democraticVoters": 478,
+    "republicanVoters": 1278
+  },
+  {
+    "blockId": "FL015",
+    "latitude": 26.7056,
+    "longitude": -80.1353,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1278,
+    "republicanVoters": 912
+  },
+  {
+    "blockId": "FL016",
+    "latitude": 28.0556,
+    "longitude": -80.6001,
+    "dominantParty": "Republican",
+    "democraticVoters": 723,
+    "republicanVoters": 1156
+  },
+  {
+    "blockId": "FL017",
+    "latitude": 25.4663,
+    "longitude": -80.4572,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1367,
+    "republicanVoters": 798
+  },
+  {
+    "blockId": "FL018",
+    "latitude": 29.2108,
+    "longitude": -81.0228,
+    "dominantParty": "Republican",
+    "democraticVoters": 612,
+    "republicanVoters": 1089
+  },
+  {
+    "blockId": "FL019",
+    "latitude": 26.1901,
+    "longitude": -80.2659,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1434,
+    "republicanVoters": 856
+  },
+  {
+    "blockId": "FL020",
+    "latitude": 27.3364,
+    "longitude": -82.5307,
+    "dominantParty": "Republican",
+    "democraticVoters": 767,
+    "republicanVoters": 1234
+  },
+  {
+    "blockId": "FL021",
+    "latitude": 28.4177,
+    "longitude": -81.5812,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1298,
+    "republicanVoters": 923
+  },
+  {
+    "blockId": "FL022",
+    "latitude": 30.6854,
+    "longitude": -88.0431,
+    "dominantParty": "Republican",
+    "democraticVoters": 456,
+    "republicanVoters": 1345
+  },
+  {
+    "blockId": "FL023",
+    "latitude": 25.9424,
+    "longitude": -80.1289,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1512,
+    "republicanVoters": 789
+  },
+  {
+    "blockId": "FL024",
+    "latitude": 27.9944,
+    "longitude": -82.8014,
+    "dominantParty": "Republican",
+    "democraticVoters": 834,
+    "republicanVoters": 1178
+  },
+  {
+    "blockId": "FL025",
+    "latitude": 26.5629,
+    "longitude": -81.9495,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1345,
+    "republicanVoters": 876
+  },
+  {
+    "blockId": "FL026",
+    "latitude": 30.4518,
+    "longitude": -84.27277,
+    "dominantParty": "Republican",
+    "democraticVoters": 634,
+    "republicanVoters": 1456
+  },
+  {
+    "blockId": "FL027",
+    "latitude": 25.6586,
+    "longitude": -80.3568,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1567,
+    "republicanVoters": 723
+  },
+  {
+    "blockId": "FL028",
+    "latitude": 30.3322,
+    "longitude": -81.6557,
+    "dominantParty": "Republican",
+    "democraticVoters": 798,
+    "republicanVoters": 1289
+  },
+  {
+    "blockId": "FL029",
+    "latitude": 28.0436,
+    "longitude": -82.7177,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1234,
+    "republicanVoters": 934
+  },
+  {
+    "blockId": "FL030",
+    "latitude": 26.5628,
+    "longitude": -80.3706,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1345,
+    "republicanVoters": 887
+  },
+  {
+    "blockId": "FL031",
+    "latitude": 28.6139,
+    "longitude": -81.2081,
+    "dominantParty": "Republican",
+    "democraticVoters": 856,
+    "republicanVoters": 1178
+  },
+  {
+    "blockId": "FL032",
+    "latitude": 25.8906,
+    "longitude": -80.1756,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1423,
+    "republicanVoters": 756
+  },
+  {
+    "blockId": "FL033",
+    "latitude": 29.1815,
+    "longitude": -82.1390,
+    "dominantParty": "Republican",
+    "democraticVoters": 612,
+    "republicanVoters": 1134
+  },
+  {
+    "blockId": "FL034",
+    "latitude": 26.1003,
+    "longitude": -80.1439,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1489,
+    "republicanVoters": 834
+  },
+  {
+    "blockId": "FL035",
+    "latitude": 27.3305,
+    "longitude": -82.4497,
+    "dominantParty": "Republican",
+    "democraticVoters": 723,
+    "republicanVoters": 1256
+  },
+  {
+    "blockId": "FL036",
+    "latitude": 25.5585,
+    "longitude": -80.4486,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1378,
+    "republicanVoters": 912
+  },
+  {
+    "blockId": "FL037",
+    "latitude": 28.0778,
+    "longitude": -80.5888,
+    "dominantParty": "Republican",
+    "democraticVoters": 789,
+    "republicanVoters": 1145
+  },
+  {
+    "blockId": "FL038",
+    "latitude": 30.1963,
+    "longitude": -85.8269,
+    "dominantParty": "Republican",
+    "democraticVoters": 456,
+    "republicanVoters": 1389
+  },
+  {
+    "blockId": "FL039",
+    "latitude": 26.2034,
+    "longitude": -80.2388,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1456,
+    "republicanVoters": 798
+  },
+  {
+    "blockId": "FL040",
+    "latitude": 28.4813,
+    "longitude": -81.4684,
+    "dominantParty": "Republican",
+    "democraticVoters": 867,
+    "republicanVoters": 1198
+  },
+  {
+    "blockId": "FL041",
+    "latitude": 25.6198,
+    "longitude": -80.3931,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1523,
+    "republicanVoters": 712
+  },
+  {
+    "blockId": "FL042",
+    "latitude": 29.8077,
+    "longitude": -81.3124,
+    "dominantParty": "Republican",
+    "democraticVoters": 634,
+    "republicanVoters": 1267
+  },
+  {
+    "blockId": "FL043",
+    "latitude": 27.7700,
+    "longitude": -82.6267,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1289,
+    "republicanVoters": 945
+  },
+  {
+    "blockId": "FL044",
+    "latitude": 26.0112,
+    "longitude": -80.1495,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1467,
+    "republicanVoters": 823
+  },
+  {
+    "blockId": "FL045",
+    "latitude": 28.3922,
+    "longitude": -81.5639,
+    "dominantParty": "Republican",
+    "democraticVoters": 734,
+    "republicanVoters": 1134
+  },
+  {
+    "blockId": "FL046",
+    "latitude": 25.7823,
+    "longitude": -80.2994,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1398,
+    "republicanVoters": 756
+  },
+  {
+    "blockId": "FL047",
+    "latitude": 30.5255,
+    "longitude": -87.2169,
+    "dominantParty": "Republican",
+    "democraticVoters": 423,
+    "republicanVoters": 1456
+  },
+  {
+    "blockId": "FL048",
+    "latitude": 26.3408,
+    "longitude": -80.0776,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1345,
+    "republicanVoters": 889
+  },
+  {
+    "blockId": "FL049",
+    "latitude": 27.9755,
+    "longitude": -82.5329,
+    "dominantParty": "Republican",
+    "democraticVoters": 812,
+    "republicanVoters": 1189
+  },
+  {
+    "blockId": "FL050",
+    "latitude": 25.6744,
+    "longitude": -80.3175,
+    "dominantParty": "Democratic",
+    "democraticVoters": 1512,
+    "republicanVoters": 734
+  }
+]

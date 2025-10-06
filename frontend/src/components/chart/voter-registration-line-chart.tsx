@@ -79,7 +79,7 @@ export function VoterRegistrationLineChart({
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={chartData}
-          margin={{ top: 20, right: 30, left: 30, bottom: 60 }}
+          margin={{ top: 50, right: 30, left: 30, bottom: 60 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
@@ -114,7 +114,7 @@ export function VoterRegistrationLineChart({
             stroke="#2563eb"
             strokeWidth={3}
             dot={false}
-            name="2016 Registered Voters"
+            name="2016"
             strokeOpacity={0.9}
           />
           <Line
@@ -123,7 +123,7 @@ export function VoterRegistrationLineChart({
             stroke="#16a34a"
             strokeWidth={3}
             dot={false}
-            name="2020 Registered Voters"
+            name="2020"
             strokeOpacity={0.9}
           />
           <Line
@@ -132,7 +132,7 @@ export function VoterRegistrationLineChart({
             stroke="#ea580c"
             strokeWidth={3}
             dot={false}
-            name="2024 Registered Voters"
+            name="2024"
             strokeOpacity={0.9}
           />
         </LineChart>

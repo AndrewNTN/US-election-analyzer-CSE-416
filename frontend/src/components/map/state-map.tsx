@@ -1,6 +1,9 @@
 import BaseMap from "@/components/map/base-map.tsx";
 import OutlineLayer from "@/components/map/outline-layer.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
+import BubbleChartLayer, {
+  type CensusBlockData,
+} from "@/components/map/bubble-chart-layer.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
 import type { StateProps, CountyProps } from "@/types/map.ts";
 import type { StateChoroplethOption } from "@/constants/choropleth.ts";
@@ -10,6 +13,8 @@ interface StateMapProps {
   currentCountiesData: FeatureCollection<Geometry, CountyProps> | null;
   isDetailedState: boolean;
   choroplethOption?: StateChoroplethOption;
+  censusBlockData?: CensusBlockData[];
+  showBubbleChart?: boolean;
 }
 
 export default function StateMap({
@@ -17,6 +22,8 @@ export default function StateMap({
   currentCountiesData,
   isDetailedState,
   choroplethOption,
+  censusBlockData = [],
+  showBubbleChart = false,
 }: StateMapProps) {
   return (
     <div className="relative overflow-hidden h-screen">
@@ -25,7 +32,7 @@ export default function StateMap({
         <BaseMap
           center={[39, -97]}
           zoom={4}
-          style={{ width: "100%", height: "100%", zIndex: 0 }}
+          style={{ width: "100%", height: "78%", zIndex: 0 }}
           fitToGeoJSON={currentStateData}
         >
           {/* Show county choropleth for detailed states, state choropleth otherwise */}
@@ -48,6 +55,9 @@ export default function StateMap({
               <OutlineLayer data={currentStateData} stateView={true} />
             </>
           )}
+
+          {/* Bubble chart overlay for political party dominance - rendered last to be on top */}
+          <BubbleChartLayer data={censusBlockData} visible={showBubbleChart} />
         </BaseMap>
       </div>
     </div>
