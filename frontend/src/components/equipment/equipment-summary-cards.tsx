@@ -9,9 +9,7 @@ import {
   EquipmentCardsBase,
   type EquipmentSummary,
 } from "@/components/equipment/equipment-cards-base.tsx";
-import {
-  getCertificationBadge,
-} from "@/components/equipment/equipment-helpers.tsx";
+import { getCertificationBadge } from "@/components/equipment/equipment-helpers.tsx";
 
 interface EquipmentSummaryTableProps {
   data: EquipmentSummary[];
