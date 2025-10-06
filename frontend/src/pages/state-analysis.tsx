@@ -18,6 +18,8 @@ import type { CensusBlockData } from "@/components/map/bubble-chart-layer.tsx";
 //table imports
 import { VoterRegistrationTable } from "../components/table/voter-registration-table";
 import eavsRegionVoterDataJson from "../../data/eavsRegionVoterData.json" with { type: "json" };
+import { ProvisionBallotsTable } from "../components/table/provisional-ballot-table";
+import provisionalBallotsDataJson from "../../data/provisionalBallotsData.json" with { type: "json" };
 
 //chart imports
 import { VoterRegistrationLineChart } from "../components/chart/voter-registration-line-chart";
@@ -48,9 +50,21 @@ const eavsRegionVoterData = eavsRegionVoterDataJson as {
   inactiveVoters: number;
 }[];
 
+//Provisional Ballot Data
+const provisionalBallotsData = provisionalBallotsDataJson as {
+  E2a: number; // Total provisional ballots issued
+  E2b: number; // Counted (fully/partially)
+  E2c: number; // Rejected
+  E2d: number; // Pending
+  E2e: number; // Rejection: not registered
+  E2f: number; // Rejection: wrong jurisdiction
+  E2g: number; // Rejection: missing signature / ID
+  E2h: number; // Rejection: other reasons
+  E2i: string; // Notes / remarks
+}[];
+
 const AnalysisType = {
-  PROVISIONAL_BALLOT_CHART: "prov-ballot-bchart",
-  PROVISIONAL_BALLOT_TABLE: "prob-ballot-table",
+  PROVISIONAL_BALLOT: "prov-ballot-bchart",
   ACTIVE_VOTERS_2024: "active-voters-2024",
   POLLBOOK_DELETIONS_2024: "pb-deletions-2024",
   MAIL_BALLOTS_REJECTED: "mail-balots-rejected",
@@ -62,8 +76,7 @@ const AnalysisType = {
 type AnalysisTypeValue = (typeof AnalysisType)[keyof typeof AnalysisType];
 
 const analysisTypeLabels: Record<AnalysisTypeValue, string> = {
-  [AnalysisType.PROVISIONAL_BALLOT_CHART]: "Provisional Ballot Chart",
-  [AnalysisType.PROVISIONAL_BALLOT_TABLE]: "Provisional Ballot Table",
+  [AnalysisType.PROVISIONAL_BALLOT]: "Provisional Ballots",
   [AnalysisType.ACTIVE_VOTERS_2024]: "2024 EAVS Active Voters",
   [AnalysisType.POLLBOOK_DELETIONS_2024]: "2024 EAVS Pollbook Deletions",
   [AnalysisType.MAIL_BALLOTS_REJECTED]: "Mail Ballots Rejected",
@@ -77,9 +90,7 @@ const analysisToChoroplethMap: Record<
   AnalysisTypeValue,
   StateChoroplethOption
 > = {
-  [AnalysisType.PROVISIONAL_BALLOT_CHART]:
-    STATE_CHOROPLETH_OPTIONS.PROVISIONAL_BALLOTS,
-  [AnalysisType.PROVISIONAL_BALLOT_TABLE]:
+  [AnalysisType.PROVISIONAL_BALLOT]:
     STATE_CHOROPLETH_OPTIONS.PROVISIONAL_BALLOTS,
   [AnalysisType.ACTIVE_VOTERS_2024]: STATE_CHOROPLETH_OPTIONS.ACTIVE_VOTERS,
   [AnalysisType.POLLBOOK_DELETIONS_2024]:
@@ -100,7 +111,7 @@ interface StateAnalysisProps {
 export default function StateAnalysis({ stateName }: StateAnalysisProps) {
   const navigate = useNavigate();
   const [selectedDataset, setSelectedDataset] = useState<AnalysisTypeValue>(
-    AnalysisType.PROVISIONAL_BALLOT_CHART,
+    AnalysisType.PROVISIONAL_BALLOT,
   );
 
   // Check if current state is a detailed state
@@ -268,6 +279,10 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
               ) : selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY ? (
                 <div className="text-xs text-muted-foreground text-center py-8">
                   Equipment data will be displayed here.
+                </div>
+              ) : selectedDataset === AnalysisType.PROVISIONAL_BALLOT ? (
+                <div className="text-xs text-muted-foreground text-center py-8">
+                  <ProvisionBallotsTable data={provisionalBallotsData} />
                 </div>
               ) : (
                 <p className="text-xs text-muted-foreground text-center py-8">
