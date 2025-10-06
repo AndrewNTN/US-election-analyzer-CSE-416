@@ -210,8 +210,8 @@ export default function StateAnalysis({
           <h1 className="text-3xl font-bold text-gray-900 mb-6">
             {formatStateName(stateName)}
           </h1>
-
-          <Tabs defaultValue="view-dataset" className="w-[400px]">
+        
+          <Tabs defaultValue="view-dataset" className="w-full">
             <TabsList>
               <TabsTrigger value="view-dataset">View Dataset</TabsTrigger>
               <TabsTrigger value="voter-data">Voter Data</TabsTrigger>
