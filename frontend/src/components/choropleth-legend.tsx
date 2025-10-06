@@ -101,14 +101,17 @@ export function ChoroplethLegend({
               Republican
             </div>
             <div className="flex items-center gap-1">
-              {republicanScale.colors.slice().reverse().map((color, idx) => (
-                <div
-                  key={idx}
-                  className="flex-1 h-6 border border-gray-300"
-                  style={{ backgroundColor: color }}
-                  title={`${republicanScale.breaks.slice().reverse()[idx]}%+`}
-                />
-              ))}
+              {republicanScale.colors
+                .slice(5)
+                .reverse()
+                .map((color, idx) => (
+                  <div
+                    key={idx}
+                    className="flex-1 h-6 border border-gray-300"
+                    style={{ backgroundColor: color }}
+                    title={`${republicanScale.breaks.slice(5).reverse()[idx]}%+`}
+                  />
+                ))}
             </div>
             <div className="flex justify-between text-xs text-muted-foreground mt-1">
               <span>Strong</span>
@@ -120,14 +123,17 @@ export function ChoroplethLegend({
               Democratic
             </div>
             <div className="flex items-center gap-1">
-              {democraticScale.colors.slice().reverse().map((color, idx) => (
-                <div
-                  key={idx}
-                  className="flex-1 h-6 border border-gray-300"
-                  style={{ backgroundColor: color }}
-                  title={`${democraticScale.breaks.slice().reverse()[idx]}%+`}
-                />
-              ))}
+              {democraticScale.colors
+                .slice(5)
+                .reverse()
+                .map((color, idx) => (
+                  <div
+                    key={idx}
+                    className="flex-1 h-6 border border-gray-300"
+                    style={{ backgroundColor: color }}
+                    title={`${democraticScale.breaks.slice(5).reverse()[idx]}%+`}
+                  />
+                ))}
             </div>
             <div className="flex justify-between text-xs text-muted-foreground mt-1">
               <span>Strong</span>
@@ -143,50 +149,42 @@ export function ChoroplethLegend({
   let scale: ColorScale | null = null;
   let title = "";
   let unit = "";
-  let description = "";
 
   switch (choroplethOption) {
     case SPLASH_CHOROPLETH_OPTIONS.DENSITY:
       scale = defaultDensityScale;
       title = "Population Density";
       unit = "per sq mi";
-      description = "Population density per square mile.";
       break;
     case SPLASH_CHOROPLETH_OPTIONS.EQUIPMENT_AGE:
       scale = equipmentAgeScale;
       title = "Voting Equipment Age";
       unit = "years";
-      description = "Average age of voting equipment in years.";
       break;
     case STATE_CHOROPLETH_OPTIONS.PROVISIONAL_BALLOTS:
       scale = provisionalBallotsScale;
       title = "Provisional Ballots";
       unit = "%";
-      description = "Percentage of provisional ballots issued.";
       break;
     case STATE_CHOROPLETH_OPTIONS.ACTIVE_VOTERS:
       scale = activeVotersScale;
       title = "Active Voters";
       unit = "%";
-      description = "Percentage of active registered voters.";
       break;
     case STATE_CHOROPLETH_OPTIONS.POLLBOOK_DELETIONS:
       scale = pollbookDeletionsScale;
       title = "Pollbook Deletions";
       unit = "%";
-      description = "Percentage of voter registrations deleted.";
       break;
     case STATE_CHOROPLETH_OPTIONS.MAIL_BALLOTS_REJECTED:
       scale = mailBallotsRejectedScale;
       title = "Mail Ballots Rejected";
       unit = "%";
-      description = "Percentage of mail ballots rejected.";
       break;
     case STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION:
       scale = voterRegistrationScale;
       title = "Voter Registration";
       unit = "%";
-      description = "Voter registration rate as percentage of eligible population.";
       break;
   }
 

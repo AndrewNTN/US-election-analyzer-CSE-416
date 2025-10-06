@@ -57,11 +57,16 @@ export default function SplashPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.values(SPLASH_CHOROPLETH_OPTIONS).map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {SPLASH_CHOROPLETH_LABELS[option]}
-                      </SelectItem>
-                    ))}
+                    {Object.values(SPLASH_CHOROPLETH_OPTIONS)
+                      .filter(
+                        (option) =>
+                          option !== SPLASH_CHOROPLETH_OPTIONS.DENSITY,
+                      )
+                      .map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {SPLASH_CHOROPLETH_LABELS[option]}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
