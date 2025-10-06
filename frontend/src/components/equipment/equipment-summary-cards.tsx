@@ -11,7 +11,6 @@ import {
 } from "@/components/equipment/equipment-cards-base.tsx";
 import {
   getCertificationBadge,
-  getReliabilityColor,
   getQualityBadge,
 } from "@/components/equipment/equipment-helpers.tsx";
 
@@ -85,11 +84,7 @@ export function EquipmentSummaryCards({ data }: EquipmentSummaryTableProps) {
           </div>
           <div className="text-center">
             <div className="text-muted-foreground text-[10px]">Reliability</div>
-            <div
-              className={`font-semibold ${getReliabilityColor(item.reliability)}`}
-            >
-              {item.reliability.toFixed(1)}%
-            </div>
+            <div className="font-semibold">{item.reliability.toFixed(1)}%</div>
           </div>
         </div>
       </CardContent>
