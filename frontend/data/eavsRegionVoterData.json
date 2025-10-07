@@ -1,0 +1,223 @@
+[
+  {
+    "eavsRegion": "Miami-Dade County",
+    "totalRegisteredVoters": 1642859,
+    "democraticVoters": 852967,
+    "republicanVoters": 456734,
+    "unaffiliatedVoters": 298456,
+    "otherPartyVoters": 34702,
+    "registrationRate": 78.5,
+    "activeVoters": 1567234,
+    "inactiveVoters": 75625
+  },
+  {
+    "eavsRegion": "Broward County",
+    "totalRegisteredVoters": 1289456,
+    "democraticVoters": 723891,
+    "republicanVoters": 356789,
+    "unaffiliatedVoters": 189234,
+    "otherPartyVoters": 19542,
+    "registrationRate": 76.2,
+    "activeVoters": 1234567,
+    "inactiveVoters": 54889
+  },
+  {
+    "eavsRegion": "Palm Beach County",
+    "totalRegisteredVoters": 987654,
+    "democraticVoters": 456789,
+    "republicanVoters": 398765,
+    "unaffiliatedVoters": 123456,
+    "otherPartyVoters": 8644,
+    "registrationRate": 74.8,
+    "activeVoters": 945678,
+    "inactiveVoters": 41976
+  },
+  {
+    "eavsRegion": "Hillsborough County",
+    "totalRegisteredVoters": 923456,
+    "democraticVoters": 398765,
+    "republicanVoters": 423891,
+    "unaffiliatedVoters": 89234,
+    "otherPartyVoters": 11566,
+    "registrationRate": 72.4,
+    "activeVoters": 887654,
+    "inactiveVoters": 35802
+  },
+  {
+    "eavsRegion": "Orange County",
+    "totalRegisteredVoters": 845678,
+    "democraticVoters": 398234,
+    "republicanVoters": 334567,
+    "unaffiliatedVoters": 102345,
+    "otherPartyVoters": 10532,
+    "registrationRate": 75.6,
+    "activeVoters": 812345,
+    "inactiveVoters": 33333
+  },
+  {
+    "eavsRegion": "Pinellas County",
+    "totalRegisteredVoters": 723456,
+    "democraticVoters": 334567,
+    "republicanVoters": 298765,
+    "unaffiliatedVoters": 78456,
+    "otherPartyVoters": 11668,
+    "registrationRate": 73.9,
+    "activeVoters": 698765,
+    "inactiveVoters": 24691
+  },
+  {
+    "eavsRegion": "Duval County",
+    "totalRegisteredVoters": 687543,
+    "democraticVoters": 298765,
+    "republicanVoters": 323456,
+    "unaffiliatedVoters": 56789,
+    "otherPartyVoters": 8533,
+    "registrationRate": 71.2,
+    "activeVoters": 656789,
+    "inactiveVoters": 30754
+  },
+  {
+    "eavsRegion": "Lee County",
+    "totalRegisteredVoters": 567890,
+    "democraticVoters": 189234,
+    "republicanVoters": 298765,
+    "unaffiliatedVoters": 71234,
+    "otherPartyVoters": 8657,
+    "registrationRate": 69.8,
+    "activeVoters": 545678,
+    "inactiveVoters": 22212
+  },
+  {
+    "eavsRegion": "Polk County",
+    "totalRegisteredVoters": 456789,
+    "democraticVoters": 156789,
+    "republicanVoters": 234567,
+    "unaffiliatedVoters": 58901,
+    "otherPartyVoters": 6532,
+    "registrationRate": 68.4,
+    "activeVoters": 434567,
+    "inactiveVoters": 22222
+  },
+  {
+    "eavsRegion": "Brevard County",
+    "totalRegisteredVoters": 423456,
+    "democraticVoters": 156789,
+    "republicanVoters": 198765,
+    "unaffiliatedVoters": 62345,
+    "otherPartyVoters": 5557,
+    "registrationRate": 70.1,
+    "activeVoters": 408765,
+    "inactiveVoters": 14691
+  },
+  {
+    "eavsRegion": "Volusia County",
+    "totalRegisteredVoters": 398765,
+    "democraticVoters": 167890,
+    "republicanVoters": 178234,
+    "unaffiliatedVoters": 48901,
+    "otherPartyVoters": 3740,
+    "registrationRate": 72.3,
+    "activeVoters": 384567,
+    "inactiveVoters": 14198
+  },
+  {
+    "eavsRegion": "Pasco County",
+    "totalRegisteredVoters": 367890,
+    "democraticVoters": 145678,
+    "republicanVoters": 167890,
+    "unaffiliatedVoters": 49876,
+    "otherPartyVoters": 4446,
+    "registrationRate": 71.7,
+    "activeVoters": 354321,
+    "inactiveVoters": 13569
+  },
+  {
+    "eavsRegion": "Seminole County",
+    "totalRegisteredVoters": 334567,
+    "democraticVoters": 145678,
+    "republicanVoters": 156789,
+    "unaffiliatedVoters": 29876,
+    "otherPartyVoters": 2224,
+    "registrationRate": 74.2,
+    "activeVoters": 323456,
+    "inactiveVoters": 11111
+  },
+  {
+    "eavsRegion": "Sarasota County",
+    "totalRegisteredVoters": 312345,
+    "democraticVoters": 123456,
+    "republicanVoters": 156789,
+    "unaffiliatedVoters": 29876,
+    "otherPartyVoters": 2224,
+    "registrationRate": 73.6,
+    "activeVoters": 301234,
+    "inactiveVoters": 11111
+  },
+  {
+    "eavsRegion": "Manatee County",
+    "totalRegisteredVoters": 289012,
+    "democraticVoters": 112345,
+    "republicanVoters": 145678,
+    "unaffiliatedVoters": 28901,
+    "otherPartyVoters": 2088,
+    "registrationRate": 70.9,
+    "activeVoters": 278901,
+    "inactiveVoters": 10111
+  },
+  {
+    "eavsRegion": "Lake County",
+    "totalRegisteredVoters": 267890,
+    "democraticVoters": 89012,
+    "republicanVoters": 145678,
+    "unaffiliatedVoters": 30123,
+    "otherPartyVoters": 3077,
+    "registrationRate": 68.7,
+    "activeVoters": 256789,
+    "inactiveVoters": 11101
+  },
+  {
+    "eavsRegion": "Collier County",
+    "totalRegisteredVoters": 245678,
+    "democraticVoters": 78901,
+    "republicanVoters": 134567,
+    "unaffiliatedVoters": 29876,
+    "otherPartyVoters": 2334,
+    "registrationRate": 71.4,
+    "activeVoters": 237890,
+    "inactiveVoters": 7788
+  },
+  {
+    "eavsRegion": "Escambia County",
+    "totalRegisteredVoters": 223456,
+    "democraticVoters": 89012,
+    "republicanVoters": 112345,
+    "unaffiliatedVoters": 19876,
+    "otherPartyVoters": 2223,
+    "registrationRate": 67.8,
+    "activeVoters": 214567,
+    "inactiveVoters": 8889
+  },
+  {
+    "eavsRegion": "Leon County",
+    "totalRegisteredVoters": 201234,
+    "democraticVoters": 112345,
+    "republicanVoters": 67890,
+    "unaffiliatedVoters": 18901,
+    "otherPartyVoters": 2098,
+    "registrationRate": 76.3,
+    "activeVoters": 195432,
+    "inactiveVoters": 5802
+  },
+  {
+    "eavsRegion": "Clay County",
+    "totalRegisteredVoters": 189012,
+    "democraticVoters": 56789,
+    "republicanVoters": 112345,
+    "unaffiliatedVoters": 17890,
+    "otherPartyVoters": 1988,
+    "registrationRate": 69.2,
+    "activeVoters": 182345,
+    "inactiveVoters": 6667
+  }
+]
+
