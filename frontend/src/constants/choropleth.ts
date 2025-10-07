@@ -13,6 +13,7 @@ export const STATE_CHOROPLETH_OPTIONS = {
   POLLBOOK_DELETIONS: "pollbook_deletions",
   MAIL_BALLOTS_REJECTED: "mail_ballots_rejected",
   VOTER_REGISTRATION: "voter_registration",
+  VOTING_EQUIPMENT_TYPE: "voting_equipment_type",
   OFF: "off",
 } as const;
 
@@ -38,5 +39,6 @@ export const STATE_CHOROPLETH_LABELS: Record<StateChoroplethOption, string> = {
   [STATE_CHOROPLETH_OPTIONS.POLLBOOK_DELETIONS]: "2024 EAVS Pollbook Deletions",
   [STATE_CHOROPLETH_OPTIONS.MAIL_BALLOTS_REJECTED]: "Mail Ballots Rejected",
   [STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION]: "Voter Registration",
+  [STATE_CHOROPLETH_OPTIONS.VOTING_EQUIPMENT_TYPE]: "Voting Equipment Type",
   [STATE_CHOROPLETH_OPTIONS.OFF]: "Off",
 };

@@ -143,6 +143,22 @@ export const voterRegistrationScale: ColorScale = {
   breaks: [50, 55, 60, 65, 70, 75, 80, 85],
 };
 
+// Voting equipment type colors (high contrast colors)
+export const VOTING_EQUIPMENT_COLORS = {
+  dre_no_vvpat: "#e41a1c", // Red
+  dre_with_vvpat: "#ff7f00", // Orange
+  ballot_marking_device: "#4daf4a", // Green
+  scanner: "#377eb8", // Blue
+  mixed: "#984ea3", // Purple (for multiple types)
+} as const;
+
+export type VotingEquipmentType =
+  | "dre_no_vvpat"
+  | "dre_with_vvpat"
+  | "ballot_marking_device"
+  | "scanner"
+  | "mixed";
+
 // Generic function to get color based on value and color scale
 export function getColorFromScale(value: number, scale: ColorScale): string {
   for (let i = 0; i < scale.breaks.length; i++) {
@@ -187,6 +203,15 @@ export function getMailBallotsRejectedColor(percentage: number): string {
 
 export function getVoterRegistrationColor(percentage: number): string {
   return getColorFromScale(percentage, voterRegistrationScale);
+}
+
+// Get voting equipment type color
+export function getVotingEquipmentTypeColor(
+  equipmentType: VotingEquipmentType,
+): string {
+  return (
+    VOTING_EQUIPMENT_COLORS[equipmentType] || VOTING_EQUIPMENT_COLORS.mixed
+  );
 }
 
 // Function to get political color based on which party has higher percentage

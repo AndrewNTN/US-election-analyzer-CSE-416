@@ -6,6 +6,7 @@ import BaseMap from "@/components/map/base-map.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
 import OutlineLayer from "@/components/map/outline-layer.tsx";
 import AnalysisDrawer from "@/components/analysis-drawer.tsx";
+import { ChoroplethLegend } from "@/components/choropleth-legend.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Select,
@@ -56,11 +57,16 @@ export default function SplashPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.values(SPLASH_CHOROPLETH_OPTIONS).map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {SPLASH_CHOROPLETH_LABELS[option]}
-                      </SelectItem>
-                    ))}
+                    {Object.values(SPLASH_CHOROPLETH_OPTIONS)
+                      .filter(
+                        (option) =>
+                          option !== SPLASH_CHOROPLETH_OPTIONS.DENSITY,
+                      )
+                      .map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {SPLASH_CHOROPLETH_LABELS[option]}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -81,6 +87,13 @@ export default function SplashPage() {
           />
           <OutlineLayer data={statesData} />
         </BaseMap>
+
+        {/* Choropleth Legend */}
+        {choroplethOption && choroplethOption !== "off" && (
+          <div className="absolute bottom-32 left-4 z-10 max-w-xs">
+            <ChoroplethLegend choroplethOption={choroplethOption} />
+          </div>
+        )}
       </div>
     </div>
   );
