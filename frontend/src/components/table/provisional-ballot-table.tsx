@@ -11,14 +11,18 @@ interface ProvisionalBallotsTableProps {
   fipsPrefix: string; // e.g. "30" for Montana
 }
 
-export function ProvisionBallotsTable({ fipsPrefix }: ProvisionalBallotsTableProps) {
+export function ProvisionBallotsTable({
+  fipsPrefix,
+}: ProvisionalBallotsTableProps) {
   const [data, setData] = useState<ProvisionBallotsData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch(`http://localhost:8080/api/eavs/provisional/state/${fipsPrefix}`);
+        const res = await fetch(
+          `http://localhost:8080/api/eavs/provisional/state/${fipsPrefix}`,
+        );
         const json = await res.json();
 
         const mapped = json.map((record: any) => {

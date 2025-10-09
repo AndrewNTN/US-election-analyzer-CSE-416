@@ -7,14 +7,16 @@ import type { Voter } from "../../components/table/columns";
 // Helper: convert mock JSON into proper Voter[]
 function getData(stateName: string): Voter[] {
   const raw = (mockData as Record<string, any[]>)[stateName] || [];
-  return raw.map((entry, i): Voter => ({
-    id: String(entry.id ?? i),
-    name: entry.name ?? "Unknown",
-    email: entry.email ?? "",
-    registered: String(entry.registered ?? "unknown"),
-    mailInVote: Boolean(entry.mailInVote ?? false),
-    zip: entry.zip ?? "UNK",
-  }));
+  return raw.map(
+    (entry, i): Voter => ({
+      id: String(entry.id ?? i),
+      name: entry.name ?? "Unknown",
+      email: entry.email ?? "",
+      registered: String(entry.registered ?? "unknown"),
+      mailInVote: Boolean(entry.mailInVote ?? false),
+      zip: entry.zip ?? "UNK",
+    }),
+  );
 }
 
 // Define the route (TanStack Router)
@@ -36,9 +38,8 @@ function State() {
 
         const abbr = stateName.slice(0, 2).toUpperCase(); // crude but works for now
         const url = `http://localhost:8080/api/eavs/states/${encodeURIComponent(
-          abbr
+          abbr,
         )}?electionYear=2024&includeJurisdictions=true`;
-
 
         const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -48,8 +49,8 @@ function State() {
         const rows = Array.isArray(json?.jurisdictions)
           ? json.jurisdictions
           : Array.isArray(json)
-          ? json
-          : [];
+            ? json
+            : [];
 
         if (!rows.length) {
           throw new Error("No jurisdictions returned");
@@ -81,7 +82,11 @@ function State() {
   }, [stateName]);
 
   if (loading) {
-    return <div className="p-4 text-muted-foreground">Loading data for {stateName}…</div>;
+    return (
+      <div className="p-4 text-muted-foreground">
+        Loading data for {stateName}…
+      </div>
+    );
   }
 
   if (error) {
