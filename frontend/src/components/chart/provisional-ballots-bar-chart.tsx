@@ -95,7 +95,9 @@ export function ProvisionalBallotsBarChart({
             textAnchor="end"
             height={60}
           />
-          <YAxis />
+          <YAxis label={{ value: 'Number of Ballots', angle: -90, position: 'insideLeft',
+            style: { textAnchor: "middle" },
+            }} />
           <Tooltip />
           <Legend />
           <Bar dataKey="value" name={stateName}>
