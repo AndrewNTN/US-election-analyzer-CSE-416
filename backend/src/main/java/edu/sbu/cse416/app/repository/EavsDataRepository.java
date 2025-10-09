@@ -19,9 +19,16 @@ public interface EavsDataRepository extends MongoRepository<EavsData, String> {
 
     List<EavsData> findByStateFullAndElectionYear(String stateFull, Integer electionYear);
 
-    List<EavsData> findByFipsCodeStartingWithAndElectionYear(String fipsPrefix, Integer electionYear);
+    @Query("{ 'fipsCode': { $regex: ?0, $options: 'i' }, 'electionYear': ?1 }")
+List<EavsData> findByFipsCodeStartingWithAndElectionYear(String regex, Integer electionYear);
 
     EavsData findByFipsCode(String fipsCode);
 
     EavsData findByFipsCodeAndElectionYear(String fipsCode, Integer electionYear);
+
+    @Query("{ 'fipsCode': { $regex: ?0, $options: 'i' }, 'electionYear': ?1 }")
+    List<EavsData> findByFipsPatternAndElectionYear(String regex, Integer electionYear);
+
+
 }
+
