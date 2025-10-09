@@ -92,8 +92,9 @@ public class EavsAggregationService {
     public StateWithJurisdictions getStateWithJurisdictionsByFips(
         String stateFips, Integer electionYear, boolean includeJurisdictions) {
 
-    List<EavsData> records =
-            eavsRepository.findByFipsCodeStartingWithAndElectionYear(stateFips, electionYear);
+        List<EavsData> records =
+            eavsRepository.findByFipsCodeRegexAndElectionYear("^" + stateFips, electionYear);
+    
 
     if (records.isEmpty()) {
         return null;
