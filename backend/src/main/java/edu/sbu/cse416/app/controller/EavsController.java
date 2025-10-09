@@ -73,4 +73,31 @@ public class EavsController {
         List<StateEavsData> comparison = aggregationService.compareStates(stateAbbrs, electionYear);
         return ResponseEntity.ok(comparison);
     }
+
+    @GetMapping("/states/fips/{stateFips}")
+    public ResponseEntity<StateWithJurisdictions> getStateWithJurisdictionsByFips(
+            @PathVariable String stateFips,
+            @RequestParam Integer electionYear,
+            @RequestParam(defaultValue = "false") boolean includeJurisdictions) {
+
+        StateWithJurisdictions result =
+                aggregationService.getStateWithJurisdictionsByFips(stateFips, electionYear, includeJurisdictions);
+
+        if (result == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/provisional/fips/{fipsCode}")
+    public ResponseEntity<EavsData> getProvisionalByFips(@PathVariable String fipsCode) {
+        EavsData record = eavsRepository.findByFipsCode(fipsCode); // <-- use eavsRepository
+        if (record == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(record);
+    }
+
+
+
 }
