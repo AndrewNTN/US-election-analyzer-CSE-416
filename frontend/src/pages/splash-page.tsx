@@ -28,7 +28,7 @@ const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 export default function SplashPage() {
   const [open, setOpen] = useState(false);
   const [choroplethOption, setChoroplethOption] =
-    useState<SplashChoroplethOption>(SPLASH_CHOROPLETH_OPTIONS.POLITICAL);
+    useState<SplashChoroplethOption>(SPLASH_CHOROPLETH_OPTIONS.OFF);
 
   const handleChoroplethChange = (value: string) => {
     setChoroplethOption(value as SplashChoroplethOption);
@@ -58,10 +58,6 @@ export default function SplashPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {Object.values(SPLASH_CHOROPLETH_OPTIONS)
-                      .filter(
-                        (option) =>
-                          option !== SPLASH_CHOROPLETH_OPTIONS.DENSITY,
-                      )
                       .map((option) => (
                         <SelectItem key={option} value={option}>
                           {SPLASH_CHOROPLETH_LABELS[option]}

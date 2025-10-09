@@ -4,8 +4,6 @@ import type { PathOptions, Layer, LeafletMouseEvent } from "leaflet";
 import type { BaseMapProps, MapFeatureProps } from "@/types/map";
 import {
   defaultGrayTint,
-  getDensityColor,
-  getPoliticalColor,
   getEquipmentAgeColor,
   getProvisionalBallotsColor,
   getActiveVotersColor,
@@ -52,26 +50,6 @@ export default function ChoroplethLayer<
 
       switch (choroplethOption) {
         // Splash page choropleth options
-        case SPLASH_CHOROPLETH_OPTIONS.DENSITY: {
-          const density =
-            "DENSITY" in props ? (props.DENSITY as number) || 0 : 0;
-          fillColor = getDensityColor(density);
-          break;
-        }
-
-        case SPLASH_CHOROPLETH_OPTIONS.POLITICAL: {
-          const republicanPct =
-            "REPUBLICAN_PCT" in props
-              ? (props.REPUBLICAN_PCT as number) || 0
-              : 0;
-          const democraticPct =
-            "DEMOCRATIC_PCT" in props
-              ? (props.DEMOCRATIC_PCT as number) || 0
-              : 0;
-          fillColor = getPoliticalColor(republicanPct, democraticPct);
-          break;
-        }
-
         case SPLASH_CHOROPLETH_OPTIONS.EQUIPMENT_AGE: {
           const equipmentAge =
             "EQUIPMENT_AGE" in props ? (props.EQUIPMENT_AGE as number) || 0 : 0;
