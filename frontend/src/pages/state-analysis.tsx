@@ -491,6 +491,7 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
       
             const formatted = [
               {
+                region: json.jurisdictionName,
                 E2a: json.E2a,
                 E2b: json.E2b,
                 E2c: json.E2c,

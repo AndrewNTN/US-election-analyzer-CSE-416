@@ -11,15 +11,15 @@ import {
 } from "recharts";
 
 export interface ProvisionBallotsData {
-  E2a: number; // Total provisional ballots issued
-  E2b: number; // Counted
-  E2c: number; // Rejected
-  E2d: number; // Pending
-  E2e: number; // Reject: not registered
-  E2f: number; // Reject: wrong jurisdiction
-  E2g: number; // Reject: missing signature / ID
-  E2h: number; // Reject: other reasons
-  E2i: string; // Notes
+  E2a: number; // Not on List
+  E2b: number; // Lacked ID
+  E2c: number; // Challenged Eligibility
+  E2d: number; // Not Eligible
+  E2e: number; // Not Resident
+  E2f: number; // Registration Not Updated
+  E2g: number; // Did Not Surrender Mail Ballot
+  E2h: number; // Judge Extended Hours
+  E2i: number; // Used SDR
 }
 
 export interface ProvisionalBallotsBarChartProps {
@@ -36,19 +36,22 @@ const METRIC_KEYS = [
   "E2f",
   "E2g",
   "E2h",
+  "E2i",
 ] as const;
 type MetricKey = (typeof METRIC_KEYS)[number];
 
 const METRIC_LABELS: Record<MetricKey, string> = {
-  E2a: "E2a – Issued",
-  E2b: "E2b – Counted",
-  E2c: "E2c – Rejected",
-  E2d: "E2d – Pending",
-  E2e: "E2e – Rej: Not registered",
-  E2f: "E2f – Rej: Wrong jurisdiction",
-  E2g: "E2g – Rej: Missing ID/Signature",
-  E2h: "E2h – Rej: Other",
+  E2a: "E2a – Not on List",
+  E2b: "E2b – Lacked ID",
+  E2c: "E2c – Challenged Eligibility",
+  E2d: "E2d – Not Eligible",
+  E2e: "E2e – Not Resident",
+  E2f: "E2f – Registration Not Updated",
+  E2g: "E2g – Did Not Surrender Mail Ballot",
+  E2h: "E2h – Judge Extended Hours",
+  E2i: "E2i – Used SDR",
 };
+
 
 // 🎨 Custom color palette
 const BAR_COLORS = [

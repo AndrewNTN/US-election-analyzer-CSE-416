@@ -11,6 +11,19 @@ interface ProvisionalBallotsTableProps {
   fipsPrefix: string; // e.g. "30" for Montana
 }
 
+interface ProvisionalBallotsApiResponse {
+  jurisdictionName: string;
+  provisionalBallots?: {
+    totalProvisionalBallotsCast?: number;
+    provisionalBallotsFullyCounted?: number;
+    provisionalBallotsPartiallyCounted?: number;
+    provisionalBallotsRejected?: number;
+    reasonNoRegistration?: number;
+    reasonNameNotFound?: number;
+    provisionalComments?: string;
+  };
+}
+
 export function ProvisionBallotsTable({
   fipsPrefix,
 }: ProvisionalBallotsTableProps) {
@@ -23,11 +36,12 @@ export function ProvisionBallotsTable({
         const res = await fetch(
           `http://localhost:8080/api/eavs/provisional/state/${fipsPrefix}`,
         );
-        const json = await res.json();
+        const json: ProvisionalBallotsApiResponse[] = await res.json();
 
-        const mapped = json.map((record: any) => {
+        const mapped = json.map((record) => {
           const p = record.provisionalBallots || {};
           return {
+            region: record.jurisdictionName || "Unknown",
             E2a: p.totalProvisionalBallotsCast ?? 0,
             E2b: p.provisionalBallotsFullyCounted ?? 0,
             E2c: p.provisionalBallotsPartiallyCounted ?? 0,
@@ -36,7 +50,7 @@ export function ProvisionBallotsTable({
             E2f: p.reasonNameNotFound ?? 0,
             E2g: 0,
             E2h: 0,
-            E2i: p.provisionalComments ?? "",
+            E2i: 0,
           };
         });
 
