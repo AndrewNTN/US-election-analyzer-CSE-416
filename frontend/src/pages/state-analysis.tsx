@@ -488,6 +488,51 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
       ? getVotingEquipmentTypeData()
       : [];
 
+
+      const [provChartData, setProvChartData] = useState<any[]>([]);
+      const [provLoading, setProvLoading] = useState(false);
+      const [provError, setProvError] = useState<string | null>(null);
+      
+      useEffect(() => {
+        async function fetchProvChartData() {
+          try {
+            setProvLoading(true);
+            setProvError(null);
+      
+            const fipsPrefix = getStateFipsCode(stateName);
+            if (!fipsPrefix) throw new Error("No FIPS prefix found for " + stateName);
+      
+            const res = await fetch(`http://localhost:8080/api/eavs/provisional/aggregate/${fipsPrefix}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      
+            const json = await res.json();
+      
+            const formatted = [{
+              E2a: json.E2a,
+              E2b: json.E2b,
+              E2c: json.E2c,
+              E2d: json.E2d,
+              E2e: json.E2e,
+              E2f: json.E2f,
+              E2g: json.E2g,
+              E2h: json.E2h,
+              E2i: ""
+            }];
+      
+            setProvChartData(formatted);
+          } catch (err: any) {
+            console.error("Error loading provisional chart data:", err);
+            setProvError(err.message);
+            setProvChartData([]);
+          } finally {
+            setProvLoading(false);
+          }
+        }
+      
+        fetchProvChartData();
+      }, [stateName]);
+      
+
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
@@ -561,12 +606,31 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
                 </div>
               ) : selectedDataset === AnalysisType.PROVISIONAL_BALLOT ? (
                 <div className="text-xs text-muted-foreground text-center py-8">
-                  {/* show backend data if available, fallback to mock JSON */}
-                  <ProvisionBallotsTable fipsCode="3000100000" />
-                  <ProvisionalBallotsBarChart
-                    stateName={formatStateName(stateName)}
-                    barData={mockData?.length ? mockData : provisionalBallotsData}
-                  />
+                  {/* ✅ dynamically load backend provisional ballot data */}
+                  {provLoading ? (
+                    <p>Loading provisional ballot data...</p>
+                  ) : provError ? (
+                    <>
+                      <p>Error loading {stateName} data: {provError}</p>
+                      <ProvisionBallotsTable
+                        fipsPrefix={getStateFipsCode(formatStateName(stateName)) ?? "00"}
+                      />
+                      <ProvisionalBallotsBarChart
+                        stateName={formatStateName(stateName)}
+                        barData={provisionalBallotsData}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <ProvisionBallotsTable
+                        fipsPrefix={getStateFipsCode(formatStateName(stateName)) ?? "00"}
+                      />
+                      <ProvisionalBallotsBarChart
+                        stateName={formatStateName(stateName)}
+                        barData={provChartData}
+                      />
+                    </>
+                  )}
                 </div>
               ) : selectedDataset === AnalysisType.ACTIVE_VOTERS_2024 ? (
                 <div className="text-xs text-muted-foreground text-center py-8">
