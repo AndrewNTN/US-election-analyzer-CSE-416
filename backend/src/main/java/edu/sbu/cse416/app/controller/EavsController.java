@@ -108,14 +108,12 @@ public class EavsController {
             @RequestParam(defaultValue = "2024") Integer electionYear) {
 
         fipsPrefix = fipsPrefix.trim();
-        String regex = "^" + fipsPrefix;  // enforce "starts with"
-
+        String regex = "0*" + fipsPrefix; // matches with leading zeros
         System.out.println("🔍 Querying for FIPS regex: " + regex);
 
-        List<EavsData> data = eavsRepository.findByFipsPatternAndElectionYear(regex, electionYear);
+        List<EavsData> data = eavsRepository.findByFipsCodeRegexAndElectionYear(regex, electionYear);
 
         if (data.isEmpty()) {
-            System.out.println("⚠️ No data found for FIPS prefix: " + fipsPrefix);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
@@ -130,8 +128,8 @@ public ResponseEntity<Map<String, Object>> getProvisionalAggregateByStateFipsPre
     System.out.println("🔍 FIPS prefix request: " + fipsPrefix);
 
     // Find all EAVS data records where FIPS starts with prefix (e.g. "30" for Montana)
-    String regex = "^" + fipsPrefix;
-    List<EavsData> data = eavsRepository.findByFipsPatternAndElectionYear(regex, electionYear);
+    String regex = "0*" + fipsPrefix; // matches with leading zeros
+    List<EavsData> data = eavsRepository.findByFipsCodeRegexAndElectionYear(regex, electionYear);
 
     if (data == null || data.isEmpty()) {
         System.out.println("⚠️ No records found for FIPS prefix: " + fipsPrefix);
