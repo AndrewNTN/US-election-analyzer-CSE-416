@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"; // ⬅ make sure useEffect is imported
+import { stateNameToAbbr } from "@/constants/stateFips";
 import { useNavigate } from "@tanstack/react-router";
 import statesJSON from "../../data/us-states.json";
 import countiesJSON from "../../data/counties.geojson.json";
@@ -180,43 +181,9 @@ interface StateAnalysisProps {
   mockData?: any[]; // added this line
 }
 
-export default function StateAnalysis({
-  stateName,
-  mockData,
-}: StateAnalysisProps) {
+export default function StateAnalysis({ stateName, mockData }: StateAnalysisProps) {
   const navigate = useNavigate();
-  const [jurisdictionData, setJurisdictionData] = useState<any[]>([]);
-  const [loadingJurisdictions, setLoadingJurisdictions] = useState(true);
-  const [jurisdictionError, setJurisdictionError] = useState<string | null>(
-    null,
-  );
 
-  useEffect(() => {
-    async function fetchJurisdictions() {
-      try {
-        setLoadingJurisdictions(true);
-        setJurisdictionError(null);
-
-        const res = await fetch(
-          `http://localhost:8080/api/eavs/states/${encodeURIComponent(
-            stateName.toLowerCase(),
-          )}?electionYear=2024&includeJurisdictions=true`,
-        );
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-        setJurisdictionData(json.jurisdictions || []);
-      } catch (err: any) {
-        console.error("Failed to fetch jurisdictions:", err);
-        setJurisdictionError(err.message || "Failed to fetch data");
-        setJurisdictionData([]);
-      } finally {
-        setLoadingJurisdictions(false);
-      }
-    }
-
-    fetchJurisdictions();
-  }, [stateName]);
 
   const [selectedDataset, setSelectedDataset] = useState<AnalysisTypeValue>(
     AnalysisType.PROVISIONAL_BALLOT,
@@ -251,6 +218,8 @@ export default function StateAnalysis({
       }
       return true;
     });
+
+    
   };
 
   const formatStateName = (stateName: string): string => {
@@ -490,53 +459,64 @@ export default function StateAnalysis({
       ? getVotingEquipmentTypeData()
       : [];
 
-  const [provChartData, setProvChartData] = useState<any[]>([]);
-  const [provLoading, setProvLoading] = useState(false);
-  const [provError, setProvError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchProvChartData() {
-      try {
-        setProvLoading(true);
-        setProvError(null);
-
-        const fipsPrefix = getStateFipsCode(stateName);
-        if (!fipsPrefix)
-          throw new Error("No FIPS prefix found for " + stateName);
-
-        const res = await fetch(
-          `http://localhost:8080/api/eavs/provisional/aggregate/${fipsPrefix}`,
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        const json = await res.json();
-
-        const formatted = [
-          {
-            E2a: json.E2a,
-            E2b: json.E2b,
-            E2c: json.E2c,
-            E2d: json.E2d,
-            E2e: json.E2e,
-            E2f: json.E2f,
-            E2g: json.E2g,
-            E2h: json.E2h,
-            E2i: "",
-          },
-        ];
-
-        setProvChartData(formatted);
-      } catch (err: any) {
-        console.error("Error loading provisional chart data:", err);
-        setProvError(err.message);
-        setProvChartData([]);
-      } finally {
-        setProvLoading(false);
-      }
-    }
-
-    fetchProvChartData();
-  }, [stateName]);
+      const [provChartData, setProvChartData] = useState<any[]>([]);
+      const [provLoading, setProvLoading] = useState(false);
+      const [provError, setProvError] = useState<string | null>(null);
+      
+      useEffect(() => {
+        async function fetchProvChartData() {
+          try {
+            setProvLoading(true);
+            setProvError(null);
+      
+            const formattedState = formatStateName(stateName);
+            const fipsPrefix = getStateFipsCode(formattedState);
+            const stateAbbr =
+              stateNameToAbbr[formattedState] ||
+              formattedState.slice(0, 2).toUpperCase(); // fallback
+      
+            // ✅ Prefer FIPS for backend aggregation endpoint
+            if (!fipsPrefix) throw new Error("No FIPS prefix found for " + formattedState);
+      
+            console.log(`Fetching provisional ballot data for ${formattedState} (${stateAbbr}) with FIPS ${fipsPrefix}`);
+      
+            const res = await fetch(
+              `http://localhost:8080/api/eavs/provisional/aggregate/${fipsPrefix}`
+            );
+      
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      
+            const json = await res.json();
+      
+            const formatted = [
+              {
+                E2a: json.E2a,
+                E2b: json.E2b,
+                E2c: json.E2c,
+                E2d: json.E2d,
+                E2e: json.E2e,
+                E2f: json.E2f,
+                E2g: json.E2g,
+                E2h: json.E2h,
+                E2i: "",
+              },
+            ];
+      
+            setProvChartData(formatted);
+          } catch (err: any) {
+            console.error("Error loading provisional chart data:", err);
+            setProvError(err.message);
+            setProvChartData([]);
+          } finally {
+            setProvLoading(false);
+          }
+        }
+      
+        fetchProvChartData();
+      }, [stateName]);
+      
+      
 
   return (
     <div className="h-screen flex flex-col">
@@ -616,13 +596,9 @@ export default function StateAnalysis({
                     <p>Loading provisional ballot data...</p>
                   ) : provError ? (
                     <>
-                      <p>
-                        Error loading {stateName} data: {provError}
-                      </p>
+                      <p>Error loading {stateName} data: {provError}</p>
                       <ProvisionBallotsTable
-                        fipsPrefix={
-                          getStateFipsCode(formatStateName(stateName)) ?? "00"
-                        }
+                        fipsPrefix={getStateFipsCode(formatStateName(stateName)) ?? "00"}
                       />
                       <ProvisionalBallotsBarChart
                         stateName={formatStateName(stateName)}
@@ -632,9 +608,7 @@ export default function StateAnalysis({
                   ) : (
                     <>
                       <ProvisionBallotsTable
-                        fipsPrefix={
-                          getStateFipsCode(formatStateName(stateName)) ?? "00"
-                        }
+                        fipsPrefix={getStateFipsCode(formatStateName(stateName)) ?? "00"}
                       />
                       <ProvisionalBallotsBarChart
                         stateName={formatStateName(stateName)}
