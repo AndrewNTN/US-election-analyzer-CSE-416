@@ -17,5 +17,11 @@ public interface EavsDataRepository extends MongoRepository<EavsData, String> {
 
     List<EavsData> findByStateAbbrAndElectionYear(String stateAbbr, Integer electionYear);
 
+    List<EavsData> findByStateFullAndElectionYear(String stateFull, Integer electionYear);
+
+    List<EavsData> findByFipsCodeStartingWithAndElectionYear(String fipsPrefix, Integer electionYear);
+
+    EavsData findByFipsCode(String fipsCode);
+
     EavsData findByFipsCodeAndElectionYear(String fipsCode, Integer electionYear);
 }

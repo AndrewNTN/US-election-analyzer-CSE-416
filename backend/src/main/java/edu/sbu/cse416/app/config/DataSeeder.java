@@ -4,18 +4,28 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import java.util.Random;
 
 import edu.sbu.cse416.app.model.EavsData;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-
 @Component
 public class DataSeeder implements CommandLineRunner {
 
     @Autowired
     private EavsDataRepository eavsRepo;
+
+    // ✅ helper function must be defined at class level, not inside run()
+    private double parseVal(String s) {
+        try {
+            double v = Double.parseDouble(s.trim());
+            return (v < 0) ? 0 : v; // EAVS uses -99/-88 as missing
+        } catch (Exception e) {
+            return 0;
+        }
+    }
 
     @Override
     public void run(String... args) throws Exception {
@@ -38,27 +48,51 @@ public class DataSeeder implements CommandLineRunner {
                     continue;
                 }
 
-                String[] values = line.split(","); // CSV is comma-delimited
+                String[] values = line.split(",");
+                if (values.length < 500) continue;
 
-                if (values.length < 4) continue; // sanity check
-
-                // Map the first 4 fields into our record
                 String fipsCode = values[0].replace("\"", "");
                 String jurisdictionName = values[1].replace("\"", "");
                 String stateFull = values[2].replace("\"", "");
                 String stateAbbr = values[3].replace("\"", "");
 
+                int E2a = 379;
+                int E2b = 380;
+                int E2c = 381;
+                int E2d = 382;
+                int E2e = 383;
+                int E2f = 384;
+                int E2g = 385;
+                int E2h = 386;
+                int E2i = 387;
+
+                edu.sbu.cse416.app.model.ProvisionalBallots prov =
+                    new edu.sbu.cse416.app.model.ProvisionalBallots(
+                        (int) parseVal(values[E2a]), // totalProvisionalBallotsCast
+                        (int) parseVal(values[E2b]), // provisionalBallotsFullyCounted
+                        (int) parseVal(values[E2c]), // provisionalBallotsPartiallyCounted
+                        (int) parseVal(values[E2d]), // provisionalBallotsRejected
+                        (int) parseVal(values[E2e]), // reasonNoRegistration
+                        (int) parseVal(values[E2f]), // reasonNameNotFound
+                        values.length > E2i ? values[E2i].replace("\"", "") : "" // provisionalComments
+                    );
+
+
                 EavsData data = new EavsData(
-                        null,              // id → Mongo will generate
-                        fipsCode,
-                        jurisdictionName,
-                        stateFull,
-                        stateAbbr,
-                        2024,              // electionYear
-                        null,              // voterRegistration
-                        null,              // mailBallots
-                        null,              // provisionalBallots
-                        null               // votingEquipment
+                    null,
+                    fipsCode,
+                    jurisdictionName,
+                    stateFull,
+                    stateAbbr,
+                    2024,
+                    new edu.sbu.cse416.app.model.VoterRegistration(
+                        0, 0, 0, "not loaded yet"
+                    ),
+                    new edu.sbu.cse416.app.model.MailBallots(
+                        0, 0, 0, "not loaded yet"
+                    ),
+                    prov,
+                    null
                 );
 
                 eavsRepo.save(data);

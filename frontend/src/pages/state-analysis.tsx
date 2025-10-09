@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // ⬅ make sure useEffect is imported
 import { useNavigate } from "@tanstack/react-router";
 import statesJSON from "../../data/us-states.json";
 import countiesJSON from "../../data/counties.geojson.json";
@@ -177,10 +177,43 @@ const analysisToChoroplethMap: Record<
 
 interface StateAnalysisProps {
   stateName: string;
+  mockData?: any[]; // added this line
 }
 
-export default function StateAnalysis({ stateName }: StateAnalysisProps) {
+export default function StateAnalysis({ stateName, mockData }: StateAnalysisProps) {
   const navigate = useNavigate();
+  const [jurisdictionData, setJurisdictionData] = useState<any[]>([]);
+  const [loadingJurisdictions, setLoadingJurisdictions] = useState(true);
+  const [jurisdictionError, setJurisdictionError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchJurisdictions() {
+      try {
+        setLoadingJurisdictions(true);
+        setJurisdictionError(null);
+
+        const res = await fetch(
+          `http://localhost:8080/api/eavs/states/${encodeURIComponent(
+            stateName.toLowerCase()
+          )}?electionYear=2024&includeJurisdictions=true`
+        );
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        setJurisdictionData(json.jurisdictions || []);
+      } catch (err: any) {
+        console.error("Failed to fetch jurisdictions:", err);
+        setJurisdictionError(err.message || "Failed to fetch data");
+        setJurisdictionData([]);
+      } finally {
+        setLoadingJurisdictions(false);
+      }
+    }
+
+    fetchJurisdictions();
+  }, [stateName]);
+
+
   const [selectedDataset, setSelectedDataset] = useState<AnalysisTypeValue>(
     AnalysisType.PROVISIONAL_BALLOT,
   );
@@ -214,6 +247,8 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
       }
       return true;
     });
+
+    
   };
 
   const formatStateName = (stateName: string): string => {
@@ -526,11 +561,12 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                 </div>
               ) : selectedDataset === AnalysisType.PROVISIONAL_BALLOT ? (
                 <div className="text-xs text-muted-foreground text-center py-8">
-                  <ProvisionBallotsTable data={provisionalBallotsData} />
+                  {/* show backend data if available, fallback to mock JSON */}
+                  <ProvisionBallotsTable fipsCode="3000100000" />
                   <ProvisionalBallotsBarChart
                     stateName={formatStateName(stateName)}
-                    barData={provisionalBallotsData}
-                  ></ProvisionalBallotsBarChart>
+                    barData={mockData?.length ? mockData : provisionalBallotsData}
+                  />
                 </div>
               ) : selectedDataset === AnalysisType.ACTIVE_VOTERS_2024 ? (
                 <div className="text-xs text-muted-foreground text-center py-8">
