@@ -1,9 +1,7 @@
 // Choropleth visualization options for splash page
 export const SPLASH_CHOROPLETH_OPTIONS = {
-  POLITICAL: "political",
-  DENSITY: "density",
-  EQUIPMENT_AGE: "equipment_age",
   OFF: "off",
+  EQUIPMENT_AGE: "equipment_age",
 } as const;
 
 // Choropleth visualization options for state analysis (detailed states)
@@ -27,10 +25,8 @@ export type ChoroplethOption = SplashChoroplethOption | StateChoroplethOption;
 
 export const SPLASH_CHOROPLETH_LABELS: Record<SplashChoroplethOption, string> =
   {
-    [SPLASH_CHOROPLETH_OPTIONS.POLITICAL]: "Political Leaning",
-    [SPLASH_CHOROPLETH_OPTIONS.DENSITY]: "Population Density",
-    [SPLASH_CHOROPLETH_OPTIONS.EQUIPMENT_AGE]: "Voting Equipment Age",
     [SPLASH_CHOROPLETH_OPTIONS.OFF]: "Off",
+    [SPLASH_CHOROPLETH_OPTIONS.EQUIPMENT_AGE]: "Voting Equipment Age",
   };
 
 export const STATE_CHOROPLETH_LABELS: Record<StateChoroplethOption, string> = {

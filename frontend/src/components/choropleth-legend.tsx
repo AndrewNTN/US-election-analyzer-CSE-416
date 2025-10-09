@@ -1,9 +1,6 @@
 import { Card } from "@/components/ui/card";
 import {
   VOTING_EQUIPMENT_COLORS,
-  defaultDensityScale,
-  republicanScale,
-  democraticScale,
   equipmentAgeScale,
   provisionalBallotsScale,
   activeVotersScale,
@@ -90,72 +87,12 @@ export function ChoroplethLegend({
     );
   }
 
-  // Political Legend (diverging - red vs blue)
-  if (choroplethOption === SPLASH_CHOROPLETH_OPTIONS.POLITICAL) {
-    return (
-      <Card className="p-4">
-        <h3 className="text-sm font-semibold mb-3">Political Leaning</h3>
-        <div className="space-y-3">
-          <div>
-            <div className="text-xs font-medium mb-2 text-red-700">
-              Republican
-            </div>
-            <div className="flex items-center gap-1">
-              {republicanScale.colors
-                .slice(5)
-                .reverse()
-                .map((color, idx) => (
-                  <div
-                    key={idx}
-                    className="flex-1 h-6 border border-gray-300"
-                    style={{ backgroundColor: color }}
-                    title={`${republicanScale.breaks.slice(5).reverse()[idx]}%+`}
-                  />
-                ))}
-            </div>
-            <div className="flex justify-between text-xs text-muted-foreground mt-1">
-              <span>Strong</span>
-              <span>Light</span>
-            </div>
-          </div>
-          <div>
-            <div className="text-xs font-medium mb-2 text-blue-700">
-              Democratic
-            </div>
-            <div className="flex items-center gap-1">
-              {democraticScale.colors
-                .slice(5)
-                .reverse()
-                .map((color, idx) => (
-                  <div
-                    key={idx}
-                    className="flex-1 h-6 border border-gray-300"
-                    style={{ backgroundColor: color }}
-                    title={`${democraticScale.breaks.slice(5).reverse()[idx]}%+`}
-                  />
-                ))}
-            </div>
-            <div className="flex justify-between text-xs text-muted-foreground mt-1">
-              <span>Strong</span>
-              <span>Light</span>
-            </div>
-          </div>
-        </div>
-      </Card>
-    );
-  }
-
   // Get the appropriate color scale and labels for sequential legends
   let scale: ColorScale | null = null;
   let title = "";
   let unit = "";
 
   switch (choroplethOption) {
-    case SPLASH_CHOROPLETH_OPTIONS.DENSITY:
-      scale = defaultDensityScale;
-      title = "Population Density";
-      unit = "per sq mi";
-      break;
     case SPLASH_CHOROPLETH_OPTIONS.EQUIPMENT_AGE:
       scale = equipmentAgeScale;
       title = "Voting Equipment Age";

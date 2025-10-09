@@ -46,7 +46,7 @@ export default function Header() {
               </div>
             </Link>
           </div>
-          <div className="text-sm font-medium px-3 py-1 rounded-full text-white">
+          <div className="text-xl font-bold px-3 py-1 rounded-full text-white">
             Team Lakers
           </div>
         </div>
