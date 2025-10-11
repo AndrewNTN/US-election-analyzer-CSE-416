@@ -21,17 +21,16 @@ import type { FeatureCollection, Geometry } from "geojson";
 import type { CensusBlockData } from "@/components/map/bubble-chart-layer.tsx";
 
 //table imports
-import { VoterRegistrationTable } from "../components/table/voter-registration-table";
+import { VoterRegistrationTable } from "../components/table/state-tables/voter-registration-table.tsx";
 import eavsRegionVoterDataJson from "../../data/eavsRegionVoterData.json" with { type: "json" };
-import { ProvisionBallotsTable } from "../components/table/provisional-ballot-table";
-import provisionalBallotsDataJson from "../../data/provisionalBallotsData.json" with { type: "json" };
-import { ActiveVotersTable } from "../components/table/active-voters-table";
+import { ProvisionBallotsTable } from "../components/table/state-tables/provisional-ballot-table.tsx";
+import { ActiveVotersTable } from "../components/table/state-tables/active-voters-table.tsx";
 import activeVotersDataJson from "../../data/activeVotersData.json" with { type: "json" };
 import activeVotersDataCaliforniaJson from "../../data/activeVotersData-california.json" with { type: "json" };
 import activeVotersDataFloridaJson from "../../data/activeVotersData-florida.json" with { type: "json" };
-import { PollbookDeletionsTable } from "../components/table/pollbook-deletions-table";
+import { PollbookDeletionsTable } from "../components/table/state-tables/pollbook-deletions-table.tsx";
 import pollbookDeletionsDataJson from "../../data/pollbookDeletionsData.json" with { type: "json" };
-import { MailBallotsRejectedTable } from "../components/table/mail-ballots-rejected-table";
+import { MailBallotsRejectedTable } from "../components/table/state-tables/mail-ballots-rejected-table.tsx";
 import mailBallotsRejectedDataJson from "../../data/mailBallotsRejectedData.json" with { type: "json" };
 import { StateEquipmentSummaryCards } from "../components/equipment/state-equipment-summary-cards";
 import stateEquipmentSummaryJson from "../../data/stateEquipmentSummary.json" with { type: "json" };
@@ -39,7 +38,10 @@ import stateEquipmentSummaryJson from "../../data/stateEquipmentSummary.json" wi
 //chart imports
 import { VoterRegistrationLineChart } from "../components/chart/voter-registration-line-chart";
 import voterRegistrationDataJson from "../../data/voterRegistrationChanges.json" with { type: "json" };
-import { ProvisionalBallotsBarChart } from "../components/chart/provisional-ballots-bar-chart";
+import {
+  ProvisionalBallotsBarChart,
+  type ProvisionBallotsData,
+} from "../components/chart/provisional-ballots-bar-chart";
 import { ActiveVotersBarChart } from "../components/chart/active-voters-bar-chart";
 import { PollbookDeletionsBarChart } from "../components/chart/pollbook-deletions-bar-chart";
 import { MailBallotsRejectedBarChart } from "../components/chart/mail-ballots-rejected-bar-chart";
@@ -75,19 +77,6 @@ const eavsRegionVoterData = eavsRegionVoterDataJson as {
   registrationRate: number;
   activeVoters: number;
   inactiveVoters: number;
-}[];
-
-//Provisional Ballot Data
-const provisionalBallotsData = provisionalBallotsDataJson as {
-  E2a: number; // Total provisional ballots issued
-  E2b: number; // Counted (fully/partially)
-  E2c: number; // Rejected
-  E2d: number; // Pending
-  E2e: number; // Rejection: not registered
-  E2f: number; // Rejection: wrong jurisdiction
-  E2g: number; // Rejection: missing signature / ID
-  E2h: number; // Rejection: other reasons
-  E2i: string; // Notes / remarks
 }[];
 
 // Mail Ballots Rejected Data
@@ -178,12 +167,10 @@ const analysisToChoroplethMap: Record<
 
 interface StateAnalysisProps {
   stateName: string;
-  mockData?: any[]; // added this line
 }
 
-export default function StateAnalysis({ stateName, mockData }: StateAnalysisProps) {
+export default function StateAnalysis({ stateName }: StateAnalysisProps) {
   const navigate = useNavigate();
-
 
   const [selectedDataset, setSelectedDataset] = useState<AnalysisTypeValue>(
     AnalysisType.PROVISIONAL_BALLOT,
@@ -218,8 +205,6 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
       }
       return true;
     });
-
-    
   };
 
   const formatStateName = (stateName: string): string => {
@@ -459,65 +444,65 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
       ? getVotingEquipmentTypeData()
       : [];
 
+  const [provChartData, setProvChartData] = useState<ProvisionBallotsData[]>(
+    [],
+  );
+  const [provLoading, setProvLoading] = useState(false);
+  const [provError, setProvError] = useState<string | null>(null);
 
-      const [provChartData, setProvChartData] = useState<any[]>([]);
-      const [provLoading, setProvLoading] = useState(false);
-      const [provError, setProvError] = useState<string | null>(null);
-      
-      useEffect(() => {
-        async function fetchProvChartData() {
-          try {
-            setProvLoading(true);
-            setProvError(null);
-      
-            const formattedState = formatStateName(stateName);
-            const fipsPrefix = getStateFipsCode(formattedState);
-            const stateAbbr =
-              stateNameToAbbr[formattedState] ||
-              formattedState.slice(0, 2).toUpperCase(); // fallback
-      
-            // ✅ Prefer FIPS for backend aggregation endpoint
-            if (!fipsPrefix) throw new Error("No FIPS prefix found for " + formattedState);
-      
-            console.log(`Fetching provisional ballot data for ${formattedState} (${stateAbbr}) with FIPS ${fipsPrefix}`);
-      
-            const res = await fetch(
-              `http://localhost:8080/api/eavs/provisional/aggregate/${fipsPrefix}`
-            );
-      
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      
-            const json = await res.json();
-      
-            const formatted = [
-              {
-                region: json.jurisdictionName,
-                E2a: json.E2a,
-                E2b: json.E2b,
-                E2c: json.E2c,
-                E2d: json.E2d,
-                E2e: json.E2e,
-                E2f: json.E2f,
-                E2g: json.E2g,
-                E2h: json.E2h,
-                E2i: "",
-              },
-            ];
-      
-            setProvChartData(formatted);
-          } catch (err: any) {
-            console.error("Error loading provisional chart data:", err);
-            setProvError(err.message);
-            setProvChartData([]);
-          } finally {
-            setProvLoading(false);
-          }
-        }
-      
-        fetchProvChartData();
-      }, [stateName]);
-      
-      
+  useEffect(() => {
+    async function fetchProvChartData() {
+      try {
+        setProvLoading(true);
+        setProvError(null);
+
+        const formattedState = formatStateName(stateName);
+        const fipsPrefix = getStateFipsCode(formattedState);
+        const stateAbbr =
+          stateNameToAbbr[formattedState] ||
+          formattedState.slice(0, 2).toUpperCase(); // fallback
+
+        if (!fipsPrefix)
+          throw new Error("No FIPS prefix found for " + formattedState);
+
+        console.log(
+          `Fetching provisional ballot data for ${formattedState} (${stateAbbr}) with FIPS ${fipsPrefix}`,
+        );
+
+        const res = await fetch(
+          `http://localhost:8080/api/eavs/provisional/aggregate/${fipsPrefix}`,
+        );
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const json = await res.json();
+
+        const formatted: ProvisionBallotsData[] = [
+          {
+            E2a: json.E2a ?? 0,
+            E2b: json.E2b ?? 0,
+            E2c: json.E2c ?? 0,
+            E2d: json.E2d ?? 0,
+            E2e: json.E2e ?? 0,
+            E2f: json.E2f ?? 0,
+            E2g: json.E2g ?? 0,
+            E2h: json.E2h ?? 0,
+            E2i: json.E2i ?? 0,
+          },
+        ];
+
+        setProvChartData(formatted);
+      } catch (err: unknown) {
+        console.error("Error loading provisional chart data:", err);
+        setProvError(err instanceof Error ? err.message : "Unknown error");
+        setProvChartData([]);
+      } finally {
+        setProvLoading(false);
+      }
+    }
+
+    fetchProvChartData();
+  }, [stateName]);
 
   return (
     <div className="h-screen flex flex-col">
@@ -591,25 +576,19 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
                   />
                 </div>
               ) : selectedDataset === AnalysisType.PROVISIONAL_BALLOT ? (
-                <div className="text-xs text-muted-foreground text-center py-8">
-                  {/* ✅ dynamically load backend provisional ballot data */}
+                <div className="text-xs text-muted-foreground text-center overflow-y-auto">
                   {provLoading ? (
                     <p>Loading provisional ballot data...</p>
                   ) : provError ? (
-                    <>
-                      <p>Error loading {stateName} data: {provError}</p>
-                      <ProvisionBallotsTable
-                        fipsPrefix={getStateFipsCode(formatStateName(stateName)) ?? "00"}
-                      />
-                      <ProvisionalBallotsBarChart
-                        stateName={formatStateName(stateName)}
-                        barData={provisionalBallotsData}
-                      />
-                    </>
+                    <p className="py-8">
+                      Error loading {stateName} data: {provError}
+                    </p>
                   ) : (
                     <>
                       <ProvisionBallotsTable
-                        fipsPrefix={getStateFipsCode(formatStateName(stateName)) ?? "00"}
+                        fipsPrefix={
+                          getStateFipsCode(formatStateName(stateName)) ?? "00"
+                        }
                       />
                       <ProvisionalBallotsBarChart
                         stateName={formatStateName(stateName)}
@@ -619,7 +598,7 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
                   )}
                 </div>
               ) : selectedDataset === AnalysisType.ACTIVE_VOTERS_2024 ? (
-                <div className="text-xs text-muted-foreground text-center py-8">
+                <div className="text-xs text-muted-foreground text-center overflow-y-auto">
                   <ActiveVotersTable data={getActiveVotersData()} />
                   <ActiveVotersBarChart
                     stateName={formatStateName(stateName)}
@@ -645,7 +624,7 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
                   />
                 </div>
               ) : selectedDataset === AnalysisType.POLLBOOK_DELETIONS_2024 ? (
-                <div className="text-xs text-muted-foreground text-center py-8">
+                <div className="text-xs text-muted-foreground text-center overflow-y-auto">
                   <PollbookDeletionsTable data={pollbookDeletionsDataJson} />
                   <PollbookDeletionsBarChart
                     stateName={formatStateName(stateName)}
@@ -653,7 +632,7 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
                   />
                 </div>
               ) : selectedDataset === AnalysisType.MAIL_BALLOTS_REJECTED ? (
-                <div className="text-xs text-muted-foreground text-center py-8">
+                <div className="text-xs text-muted-foreground text-center overflow-y-auto">
                   <MailBallotsRejectedTable data={mailBallotsRejectedData} />
                   <MailBallotsRejectedBarChart
                     stateName={formatStateName(stateName)}
@@ -661,7 +640,7 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
                   />
                 </div>
               ) : (
-                <p className="text-xs text-muted-foreground text-center py-8">
+                <p className="text-xs text-muted-foreground text-center overflow-y-auto">
                   {analysisTypeLabels[selectedDataset]} visualization will be
                   displayed here.
                 </p>

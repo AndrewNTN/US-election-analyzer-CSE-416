@@ -1,10 +1,10 @@
 "use client";
 
-import { DataTable } from "./data-table";
+import { DataTable } from "../data-table.tsx";
 import {
   voterRegistrationColumns,
   type EAVSRegionVoterData,
-} from "./voter-registration-columns";
+} from "./voter-registration-columns.tsx";
 
 interface VoterRegistrationTableProps {
   data: EAVSRegionVoterData[];
@@ -12,10 +12,11 @@ interface VoterRegistrationTableProps {
 
 export function VoterRegistrationTable({ data }: VoterRegistrationTableProps) {
   return (
-    <div className="space-y-2">
-      <div className="text-xs">
-        <DataTable columns={voterRegistrationColumns} data={data} />
-      </div>
-    </div>
+    <DataTable
+      data={data}
+      columns={voterRegistrationColumns}
+      className="space-y-2"
+      bodyClassName="text-xs"
+    />
   );
 }

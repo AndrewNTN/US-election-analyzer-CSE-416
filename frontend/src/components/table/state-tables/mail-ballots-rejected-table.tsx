@@ -1,10 +1,10 @@
 "use client";
 
-import { DataTable } from "./data-table";
+import { DataTable } from "../data-table.tsx";
 import {
   mailBallotsRejectedColumns,
   type MailBallotsRejectedData,
-} from "./mail-ballots-rejected-columns";
+} from "./mail-ballots-rejected-columns.tsx";
 
 interface MailBallotsRejectedTableProps {
   data: MailBallotsRejectedData[];
@@ -14,10 +14,11 @@ export function MailBallotsRejectedTable({
   data,
 }: MailBallotsRejectedTableProps) {
   return (
-    <div className="space-y-2">
-      <div className="text-xs">
-        <DataTable columns={mailBallotsRejectedColumns} data={data} />
-      </div>
-    </div>
+    <DataTable
+      data={data}
+      columns={mailBallotsRejectedColumns}
+      className="space-y-2"
+      bodyClassName="text-xs"
+    />
   );
 }

@@ -1,10 +1,10 @@
 "use client";
 
-import { DataTable } from "./data-table";
+import { DataTable } from "../data-table.tsx";
 import {
   pollbookDeletionsColumns,
   type PollbookDeletionsData,
-} from "./pollbook-deletions-columns";
+} from "./pollbook-deletions-columns.tsx";
 
 interface PollbookDeletionsTableProps {
   data: PollbookDeletionsData[];
@@ -12,10 +12,11 @@ interface PollbookDeletionsTableProps {
 
 export function PollbookDeletionsTable({ data }: PollbookDeletionsTableProps) {
   return (
-    <div className="space-y-2">
-      <div className="text-xs">
-        <DataTable columns={pollbookDeletionsColumns} data={data} />
-      </div>
-    </div>
+    <DataTable
+      data={data}
+      columns={pollbookDeletionsColumns}
+      className="space-y-2"
+      bodyClassName="text-xs"
+    />
   );
 }
