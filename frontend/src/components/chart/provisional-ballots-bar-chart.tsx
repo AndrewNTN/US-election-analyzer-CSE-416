@@ -52,7 +52,6 @@ const METRIC_LABELS: Record<MetricKey, string> = {
   E2i: "E2i – Used SDR",
 };
 
-
 // 🎨 Custom color palette
 const BAR_COLORS = [
   "#8e51ff", // purple
