@@ -19,7 +19,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
     accessorKey: "eavsRegion",
     header: "County",
     cell: ({ row }) => (
-      <div className="font-medium text-xs">{row.getValue("eavsRegion")}</div>
+      <div className="font-medium text-sm">{row.getValue("eavsRegion")}</div>
     ),
   },
   {
@@ -28,7 +28,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
     cell: ({ row }) => {
       const amount = Number(row.getValue("totalRegisteredVoters"));
       return (
-        <div className="text-right text-xs">{amount.toLocaleString()}</div>
+        <div className="text-right text-sm">{amount.toLocaleString()}</div>
       );
     },
   },
@@ -38,7 +38,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
     cell: ({ row }) => {
       const amount = row.getValue("democraticVoters");
       return (
-        <div className="text-right text-xs">
+        <div className="text-right text-sm">
           <div>{Number(amount).toLocaleString()}</div>
         </div>
       );
@@ -50,7 +50,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
     cell: ({ row }) => {
       const amount = row.getValue("republicanVoters");
       return (
-        <div className="text-right text-xs">
+        <div className="text-right text-sm">
           <div>{Number(amount).toLocaleString()}</div>
         </div>
       );
@@ -62,7 +62,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
     cell: ({ row }) => {
       const amount = row.getValue("unaffiliatedVoters");
       return (
-        <div className="text-right text-xs">
+        <div className="text-right text-sm">
           <div>{Number(amount).toLocaleString()}</div>
         </div>
       );
@@ -74,7 +74,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
     cell: ({ row }) => {
       const amount = row.getValue("otherPartyVoters");
       return (
-        <div className="text-right text-xs">
+        <div className="text-right text-sm">
           <div>{Number(amount).toLocaleString()}</div>
         </div>
       );
@@ -85,7 +85,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
     header: () => <div className="text-right">Rate</div>,
     cell: ({ row }) => {
       const rate = Number(row.getValue("registrationRate"));
-      return <div className="text-right text-xs">{rate}%</div>;
+      return <div className="text-right text-sm">{rate}%</div>;
     },
   },
   {
@@ -94,7 +94,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
     cell: ({ row }) => {
       const amount = row.getValue("activeVoters");
       return (
-        <div className="text-right text-xs">
+        <div className="text-right text-sm">
           {Number(amount).toLocaleString()}
         </div>
       );
@@ -106,7 +106,7 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
     cell: ({ row }) => {
       const amount = row.getValue("inactiveVoters");
       return (
-        <div className="text-right text-xs">
+        <div className="text-right text-sm">
           {Number(amount).toLocaleString()}
         </div>
       );

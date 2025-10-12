@@ -17,7 +17,7 @@ export const pollbookDeletionsColumns: ColumnDef<PollbookDeletionsData>[] = [
     accessorKey: "eavsRegion",
     header: () => <div className="text-left">EAVS Region</div>,
     cell: ({ row }: { row: Row<PollbookDeletionsData> }) => (
-      <div className="text-xs text-left text-black font-medium">
+      <div className="text-sm text-left text-black font-medium">
         {row.getValue("eavsRegion")}
       </div>
     ),
@@ -27,7 +27,7 @@ export const pollbookDeletionsColumns: ColumnDef<PollbookDeletionsData>[] = [
       accessorKey: key,
       header: () => <div className="text-right">{key.toUpperCase()}</div>,
       cell: ({ row }: { row: Row<PollbookDeletionsData> }) => (
-        <div className="text-xs text-right text-black">
+        <div className="text-sm text-right text-black">
           {(row.getValue(key) as number).toLocaleString()}
         </div>
       ),
@@ -37,7 +37,7 @@ export const pollbookDeletionsColumns: ColumnDef<PollbookDeletionsData>[] = [
     accessorKey: "notes",
     header: () => <div className="text-left">Notes</div>,
     cell: ({ row }: { row: Row<PollbookDeletionsData> }) => (
-      <div className="text-xs text-left text-black">
+      <div className="text-sm text-left text-black">
         {row.getValue("notes")}
       </div>
     ),

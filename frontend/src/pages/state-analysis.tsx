@@ -590,20 +590,24 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                           getStateFipsCode(formatStateName(stateName)) ?? "00"
                         }
                       />
-                      <ProvisionalBallotsBarChart
-                        stateName={formatStateName(stateName)}
-                        barData={provChartData}
-                      />
+                      <div className="mt-8">
+                        <ProvisionalBallotsBarChart
+                          stateName={formatStateName(stateName)}
+                          barData={provChartData}
+                        />
+                      </div>
                     </>
                   )}
                 </div>
               ) : selectedDataset === AnalysisType.ACTIVE_VOTERS_2024 ? (
                 <div className="text-xs text-muted-foreground text-center overflow-y-auto">
                   <ActiveVotersTable data={getActiveVotersData()} />
-                  <ActiveVotersBarChart
-                    stateName={formatStateName(stateName)}
-                    barData={getActiveVotersData()}
-                  />
+                  <div className="mt-8">
+                    <ActiveVotersBarChart
+                      stateName={formatStateName(stateName)}
+                      barData={getActiveVotersData()}
+                    />
+                  </div>
                 </div>
               ) : selectedDataset === AnalysisType.DROP_BOX_VOTING ? (
                 <div className="h-[600px]">
@@ -626,18 +630,22 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
               ) : selectedDataset === AnalysisType.POLLBOOK_DELETIONS_2024 ? (
                 <div className="text-xs text-muted-foreground text-center overflow-y-auto">
                   <PollbookDeletionsTable data={pollbookDeletionsDataJson} />
-                  <PollbookDeletionsBarChart
-                    stateName={formatStateName(stateName)}
-                    barData={pollbookDeletionsDataJson}
-                  />
+                  <div className="mt-8">
+                    <PollbookDeletionsBarChart
+                      stateName={formatStateName(stateName)}
+                      barData={pollbookDeletionsDataJson}
+                    />
+                  </div>
                 </div>
               ) : selectedDataset === AnalysisType.MAIL_BALLOTS_REJECTED ? (
                 <div className="text-xs text-muted-foreground text-center overflow-y-auto">
                   <MailBallotsRejectedTable data={mailBallotsRejectedData} />
-                  <MailBallotsRejectedBarChart
-                    stateName={formatStateName(stateName)}
-                    barData={mailBallotsRejectedData}
-                  />
+                  <div className="mt-8">
+                    <MailBallotsRejectedBarChart
+                      stateName={formatStateName(stateName)}
+                      barData={mailBallotsRejectedData}
+                    />
+                  </div>
                 </div>
               ) : (
                 <p className="text-xs text-muted-foreground text-center overflow-y-auto">

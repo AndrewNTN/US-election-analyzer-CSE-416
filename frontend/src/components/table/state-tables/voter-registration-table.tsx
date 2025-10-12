@@ -16,7 +16,6 @@ export function VoterRegistrationTable({ data }: VoterRegistrationTableProps) {
       data={data}
       columns={voterRegistrationColumns}
       className="space-y-2"
-      bodyClassName="text-xs"
     />
   );
 }

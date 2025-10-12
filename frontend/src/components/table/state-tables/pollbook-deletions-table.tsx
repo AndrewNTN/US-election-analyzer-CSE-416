@@ -16,7 +16,6 @@ export function PollbookDeletionsTable({ data }: PollbookDeletionsTableProps) {
       data={data}
       columns={pollbookDeletionsColumns}
       className="space-y-2"
-      bodyClassName="text-xs"
     />
   );
 }
