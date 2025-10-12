@@ -138,8 +138,8 @@ export default function AnalysisModal({
     selectedAnalysis?.title === AnalysisOption.EARLY_VOTING_COMPARISON ||
     selectedAnalysis?.title === AnalysisOption.OPT_IN_VS_OPT_OUT;
   const dialogWidthClass = isComparisonTable
-    ? "min-w-[40vw] max-w-[70vw]"
-    : "min-w-[60vw] max-w-[95vw]";
+    ? "min-w-[45rem] max-w-[90%]"
+    : "min-w-[77rem] max-w-[95%]";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
