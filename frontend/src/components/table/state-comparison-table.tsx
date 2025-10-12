@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import type { ColumnDef } from "@tanstack/react-table";
 
 import { DataTable, DataTablePagination } from "./data-table.tsx";
 import {
@@ -19,12 +20,22 @@ export function StateComparisonTable({
 }: StateComparisonTableProps) {
   const columns = useMemo(
     () =>
-      stateComparisonColumns.map((col, idx) => {
+      stateComparisonColumns.map((col, idx): ColumnDef<StateComparisonRow> => {
         if (idx === 1) {
-          return { ...col, header: `${republicanState} (R)` };
+          return {
+            ...col,
+            header: () => (
+              <div className="text-right">{republicanState} (R)</div>
+            ),
+          } as ColumnDef<StateComparisonRow>;
         }
         if (idx === 2) {
-          return { ...col, header: `${democraticState} (D)` };
+          return {
+            ...col,
+            header: () => (
+              <div className="text-right">{democraticState} (D)</div>
+            ),
+          } as ColumnDef<StateComparisonRow>;
         }
         return col;
       }),
@@ -35,7 +46,7 @@ export function StateComparisonTable({
     <DataTable
       data={data}
       columns={columns}
-      pageSize={15}
+      pageSize={5}
       className="flex flex-col h-full space-y-2"
       tableContainerClassName="flex-1 min-h-0 overflow-auto"
       bodyClassName="text-sm"
