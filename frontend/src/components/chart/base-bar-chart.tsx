@@ -19,6 +19,7 @@ interface BaseBarChartProps<TData, TMetricKey extends string> {
   metricAccessor: (data: TData, key: TMetricKey) => number;
   barColors?: string[];
   yAxisLabel?: string;
+  yAxisTickFormatter?: (value: number) => string;
   height?: string;
   margin?: { top: number; right: number; left: number; bottom: number };
   tooltipOptions?: ChartTooltipOptions;
@@ -39,6 +40,7 @@ export function BaseBarChart<TData, TMetricKey extends string>({
   metricAccessor,
   barColors,
   yAxisLabel,
+  yAxisTickFormatter,
   height = DEFAULT_HEIGHT,
   margin = DEFAULT_MARGIN,
   tooltipOptions,
@@ -92,10 +94,10 @@ export function BaseBarChart<TData, TMetricKey extends string>({
                       angle: -90,
                       position: "insideLeft",
                       style: { textAnchor: "middle" },
-                      offset: -10,
                     }
                   : undefined
               }
+              tickFormatter={yAxisTickFormatter}
             />
             <Tooltip
               cursor={{ fill: "rgba(148, 163, 184, 0.2)" }}
