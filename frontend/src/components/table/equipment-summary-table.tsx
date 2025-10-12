@@ -57,7 +57,7 @@ export function EquipmentSummaryTable() {
         tableContainerClassName="!overflow-visible rounded-md border"
         tableClassName="w-auto"
         headerClassName="bg-background"
-        bodyClassName="text-xs"
+        bodyClassName="text-sm"
         rowClassName="h-8"
         cellClassName="py-1 px-3 whitespace-nowrap"
         paginationSlot={(instance) => (

@@ -75,7 +75,7 @@ export function VotingEquipmentTable({ data }: VotingEquipmentTableProps) {
         className="flex flex-col space-y-1"
         tableContainerClassName="rounded-md overflow-visible"
         headerClassName="bg-background"
-        bodyClassName="text-xs"
+        bodyClassName="text-sm"
         rowClassName="h-7 cursor-pointer hover:bg-muted/50"
         getRowProps={(row) => ({
           onClick: () => row.toggleSelected(),
@@ -109,7 +109,7 @@ export function VotingEquipmentTable({ data }: VotingEquipmentTableProps) {
 
       {selectedState && equipmentByYear.length === 0 && (
         <div className="flex items-center justify-center border-t pt-2 h-16">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground font-medium">
             No historical equipment data available for {selectedState.state}.
           </p>
         </div>
@@ -117,7 +117,7 @@ export function VotingEquipmentTable({ data }: VotingEquipmentTableProps) {
 
       {!selectedState && (
         <div className="flex items-center justify-center h-16">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground font-medium">
             Click on a state to view equipment trends from 2016-2024
           </p>
         </div>

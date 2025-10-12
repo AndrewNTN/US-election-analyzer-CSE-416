@@ -31,11 +31,6 @@ const earlyVotingRaw = earlyVotingDataJson as {
 
 export const earlyVotingData: EarlyVotingRow[] = [
   {
-    metric: "State",
-    republicanValue: earlyVotingRaw.republicanState.state,
-    democraticValue: earlyVotingRaw.democraticState.state,
-  },
-  {
     metric: "Political Dominance",
     republicanValue: earlyVotingRaw.republicanState.politicalDominance,
     democraticValue: earlyVotingRaw.democraticState.politicalDominance,
