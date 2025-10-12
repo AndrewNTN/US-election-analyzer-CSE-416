@@ -80,7 +80,6 @@ export function ProvisionBallotsTable({
       <DataTable
         data={data}
         columns={provisionalBallotsColumns}
-        bodyClassName="text-xs"
         paginationSlot={(table) => (
           <DataTablePagination
             table={table}

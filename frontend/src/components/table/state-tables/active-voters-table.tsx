@@ -16,7 +16,6 @@ export function ActiveVotersTable({ data }: ActiveVotersTableProps) {
       data={data}
       columns={activeVotersColumns}
       className="space-y-2"
-      bodyClassName="text-xs"
     />
   );
 }

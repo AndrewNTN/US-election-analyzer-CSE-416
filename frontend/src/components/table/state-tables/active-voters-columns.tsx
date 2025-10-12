@@ -15,7 +15,7 @@ export const activeVotersColumns: ColumnDef<ActiveVotersData>[] = [
     accessorKey: "eavsRegion",
     header: () => <div className="text-left">EAVS Region</div>,
     cell: ({ row }: { row: Row<ActiveVotersData> }) => (
-      <div className="text-xs text-left text-black font-medium">
+      <div className="text-sm text-left text-black font-medium">
         {row.getValue("eavsRegion")}
       </div>
     ),
@@ -24,7 +24,7 @@ export const activeVotersColumns: ColumnDef<ActiveVotersData>[] = [
     accessorKey: "activeVoters",
     header: () => <div className="text-right">Active Voters</div>,
     cell: ({ row }: { row: Row<ActiveVotersData> }) => (
-      <div className="text-xs text-right text-black">
+      <div className="text-sm text-right text-black">
         {(row.getValue("activeVoters") as number).toLocaleString()}
       </div>
     ),
@@ -33,7 +33,7 @@ export const activeVotersColumns: ColumnDef<ActiveVotersData>[] = [
     accessorKey: "totalVoters",
     header: () => <div className="text-right">Total Voters</div>,
     cell: ({ row }: { row: Row<ActiveVotersData> }) => (
-      <div className="text-xs text-right text-black">
+      <div className="text-sm text-right text-black">
         {(row.getValue("totalVoters") as number).toLocaleString()}
       </div>
     ),
@@ -42,7 +42,7 @@ export const activeVotersColumns: ColumnDef<ActiveVotersData>[] = [
     accessorKey: "inactiveVoters",
     header: () => <div className="text-right">Inactive Voters</div>,
     cell: ({ row }: { row: Row<ActiveVotersData> }) => (
-      <div className="text-xs text-right text-black">
+      <div className="text-sm text-right text-black">
         {(row.getValue("inactiveVoters") as number).toLocaleString()}
       </div>
     ),
@@ -53,9 +53,9 @@ export const activeVotersColumns: ColumnDef<ActiveVotersData>[] = [
     cell: ({ row }: { row: Row<ActiveVotersData> }) => {
       const value = row.getValue("cvap2023") as number | undefined;
       if (value === undefined)
-        return <div className="text-xs text-right text-gray-400">N/A</div>;
+        return <div className="text-sm text-right text-gray-400">N/A</div>;
       return (
-        <div className="text-xs text-right text-black">
+        <div className="text-sm text-right text-black">
           {value.toLocaleString()}
         </div>
       );
@@ -67,10 +67,10 @@ export const activeVotersColumns: ColumnDef<ActiveVotersData>[] = [
     cell: ({ row }: { row: Row<ActiveVotersData> }) => {
       const value = row.getValue("registrationRate") as number | undefined;
       if (value === undefined)
-        return <div className="text-xs text-right text-gray-400">N/A</div>;
+        return <div className="text-sm text-right text-gray-400">N/A</div>;
 
       return (
-        <div className="text-xs text-right text-black">{value.toFixed(1)}%</div>
+        <div className="text-sm text-right text-black">{value.toFixed(1)}%</div>
       );
     },
   },
@@ -78,7 +78,7 @@ export const activeVotersColumns: ColumnDef<ActiveVotersData>[] = [
     accessorKey: "notes",
     header: () => <div className="text-left">Notes</div>,
     cell: ({ row }: { row: Row<ActiveVotersData> }) => (
-      <div className="text-xs text-left text-black">
+      <div className="text-sm text-left text-black">
         {row.getValue("notes")}
       </div>
     ),

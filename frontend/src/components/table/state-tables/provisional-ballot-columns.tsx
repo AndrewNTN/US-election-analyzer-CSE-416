@@ -22,7 +22,7 @@ export const provisionalBallotsColumns: ColumnDef<ProvisionBallotsData>[] = [
     accessorKey: "region",
     header: () => <div className="text-left font-semibold">EAVS Region</div>,
     cell: ({ row }: { row: Row<ProvisionBallotsData> }) => (
-      <div className="text-xs text-left text-black font-medium py-0 px-0">
+      <div className="text-sm text-left text-black font-medium py-0 px-0">
         {row.getValue("region")}
       </div>
     ),
@@ -33,7 +33,7 @@ export const provisionalBallotsColumns: ColumnDef<ProvisionBallotsData>[] = [
     cell: ({ row }: { row: Row<ProvisionBallotsData> }) => {
       const metrics = row.original.metrics;
       return (
-        <div className="text-xs text-right text-black">
+        <div className="text-sm text-right text-black">
           {metrics?.[key]?.toLocaleString?.() ?? "0"}
         </div>
       );

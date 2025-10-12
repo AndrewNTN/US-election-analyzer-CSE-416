@@ -18,7 +18,6 @@ export function MailBallotsRejectedTable({
       data={data}
       columns={mailBallotsRejectedColumns}
       className="space-y-2"
-      bodyClassName="text-xs"
     />
   );
 }
