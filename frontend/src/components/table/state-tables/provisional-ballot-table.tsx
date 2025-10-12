@@ -15,13 +15,13 @@ interface ProvisionalBallotsTableProps {
 interface ProvisionalBallotsApiResponse {
   jurisdictionName: string;
   provisionalBallots?: {
-    totalProvisionalBallotsCast?: number;
-    provisionalBallotsFullyCounted?: number;
-    provisionalBallotsPartiallyCounted?: number;
-    provisionalBallotsRejected?: number;
-    reasonNoRegistration?: number;
-    reasonNameNotFound?: number;
-    provisionalComments?: string;
+    E1a?: number; // Total Provisional Ballots Cast
+    E1b?: number; // Provisional Ballots Fully Counted
+    E1c?: number; // Provisional Ballots Partially Counted
+    E1d?: number; // Provisional Ballots Rejected
+    E1e?: number; // Provisional Ballots Other Status
+    E1e_Other?: string; // Other Text
+    E1Comments?: string; // Comments
   };
 }
 
@@ -45,16 +45,13 @@ export function ProvisionBallotsTable({
           return {
             region: record.jurisdictionName || "Unknown",
             metrics: {
-              E2a: p.totalProvisionalBallotsCast ?? 0,
-              E2b: p.provisionalBallotsFullyCounted ?? 0,
-              E2c: p.provisionalBallotsPartiallyCounted ?? 0,
-              E2d: p.provisionalBallotsRejected ?? 0,
-              E2e: p.reasonNoRegistration ?? 0,
-              E2f: p.reasonNameNotFound ?? 0,
-              E2g: 0,
-              E2h: 0,
-              E2i: 0,
+              E1a: p.E1a ?? 0, // Total Provisional Ballots Cast
+              E1b: p.E1b ?? 0, // Provisional Ballots Fully Counted
+              E1c: p.E1c ?? 0, // Provisional Ballots Partially Counted
+              E1d: p.E1d ?? 0, // Provisional Ballots Rejected
+              E1e: p.E1e ?? 0, // Provisional Ballots Other Status
             },
+            comments: p.E1Comments,
           } satisfies ProvisionBallotsData;
         });
 

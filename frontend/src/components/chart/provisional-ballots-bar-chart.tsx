@@ -11,6 +11,7 @@ export interface ProvisionBallotsData {
   E2g: number; // Did Not Surrender Mail Ballot
   E2h: number; // Judge Extended Hours
   E2i: number; // Used SDR
+  Other: number; // Other
 }
 
 export interface ProvisionalBallotsBarChartProps {
@@ -28,6 +29,7 @@ const METRIC_KEYS = [
   "E2g",
   "E2h",
   "E2i",
+  "Other",
 ] as const;
 type MetricKey = (typeof METRIC_KEYS)[number];
 
@@ -41,6 +43,7 @@ const METRIC_LABELS: Record<MetricKey, string> = {
   E2g: "E2g – Did Not Surrender Mail Ballot",
   E2h: "E2h – Judge Extended Hours",
   E2i: "E2i – Used SDR",
+  Other: "Other",
 };
 
 export function ProvisionalBallotsBarChart({

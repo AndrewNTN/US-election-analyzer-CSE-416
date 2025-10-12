@@ -3,19 +3,24 @@ import type { ColumnDef, Row } from "@tanstack/react-table";
 export interface ProvisionBallotsData {
   region: string;
   metrics: Record<string, number>;
+  comments?: string;
 }
 
 const metricKeys = [
-  "E2a",
-  "E2b",
-  "E2c",
-  "E2d",
-  "E2e",
-  "E2f",
-  "E2g",
-  "E2h",
-  "E2i",
+  "E1a", // Total Provisional Ballots Cast
+  "E1b", // Provisional Ballots Fully Counted
+  "E1c", // Provisional Ballots Partially Counted
+  "E1d", // Provisional Ballots Rejected
+  "E1e", // Provisional Ballots Other Status
 ] as const;
+
+const columnHeaders = {
+  E1a: "Ballots Cast",
+  E1b: "Fully Counted",
+  E1c: "Partially Counted",
+  E1d: "Rejected",
+  E1e: "Other Status",
+} as const;
 
 export const provisionalBallotsColumns: ColumnDef<ProvisionBallotsData>[] = [
   {
@@ -29,7 +34,7 @@ export const provisionalBallotsColumns: ColumnDef<ProvisionBallotsData>[] = [
   },
   ...metricKeys.map((key) => ({
     id: key,
-    header: () => <div className="text-right">{key.toUpperCase()}</div>,
+    header: () => <div className="text-right">{columnHeaders[key]}</div>,
     cell: ({ row }: { row: Row<ProvisionBallotsData> }) => {
       const metrics = row.original.metrics;
       return (
@@ -39,4 +44,13 @@ export const provisionalBallotsColumns: ColumnDef<ProvisionBallotsData>[] = [
       );
     },
   })),
+  {
+    id: "comments",
+    header: () => <div className="text-left">Comments</div>,
+    cell: ({ row }: { row: Row<ProvisionBallotsData> }) => (
+      <div className="text-sm text-left text-black max-w-xs truncate">
+        {row.original.comments || "-"}
+      </div>
+    ),
+  },
 ];
