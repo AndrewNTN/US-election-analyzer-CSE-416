@@ -8,7 +8,7 @@ import {
   mailBallotsRejectedScale,
   voterRegistrationScale,
   type ColorScale,
-} from "@/lib/colors";
+} from "@/lib/choropleth";
 import {
   SPLASH_CHOROPLETH_OPTIONS,
   STATE_CHOROPLETH_OPTIONS,

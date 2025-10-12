@@ -12,7 +12,7 @@ import {
   getVoterRegistrationColor,
   getVotingEquipmentTypeColor,
   type VotingEquipmentType,
-} from "@/lib/colors";
+} from "@/lib/choropleth";
 import {
   SPLASH_CHOROPLETH_OPTIONS,
   STATE_CHOROPLETH_OPTIONS,

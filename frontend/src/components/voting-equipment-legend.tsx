@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { VOTING_EQUIPMENT_COLORS } from "@/lib/colors";
+import { VOTING_EQUIPMENT_COLORS } from "@/lib/choropleth";
 
 interface VotingEquipmentLegendProps {
   data: Array<{
