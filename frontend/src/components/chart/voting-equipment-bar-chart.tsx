@@ -63,7 +63,7 @@ export function VotingEquipmentBarChart({
               {category.label}
             </h4>
             <div className="overflow-visible">
-              <ResponsiveContainer width="100%" height={105}>
+              <ResponsiveContainer width="100%" height={150}>
                 <BarChart
                   data={data}
                   margin={{ top: 3, right: 3, left: 0, bottom: 3 }}
@@ -75,18 +75,19 @@ export function VotingEquipmentBarChart({
                       value: "Year",
                       position: "insideBottom",
                       offset: -3,
-                      style: { fontSize: 10 },
+                      style: { fontSize: 12 },
                     }}
-                    tick={{ fontSize: 10 }}
+                    tick={{ fontSize: 12 }}
                   />
                   <YAxis
                     label={{
-                      value: "Qty",
+                      value: "Quantity",
                       angle: -90,
                       position: "insideLeft",
-                      style: { fontSize: 10 },
+                      style: { textAnchor: "middle", fontSize: 12 },
+                      offset: 12,
                     }}
-                    tick={{ fontSize: 10 }}
+                    tick={{ fontSize: 12 }}
                     tickFormatter={formatNumber}
                   />
                   <Tooltip
