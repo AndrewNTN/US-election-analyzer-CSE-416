@@ -125,9 +125,27 @@ export default function AnalysisModal({
     }
   };
 
+  // Set taller height for US Voting Equipment to accommodate bar charts
+  const isVotingEquipmentAnalysis =
+    selectedAnalysis?.title === AnalysisOption.US_VOTING_EQUIPMENT;
+  const dialogHeightClass = isVotingEquipmentAnalysis
+    ? "h-auto h-[47vw] max-h-[85vw]"
+    : "h-auto max-h-[95vw]";
+
+  // Set narrower width for comparison tables
+  const isComparisonTable =
+    selectedAnalysis?.title === AnalysisOption.REPUBLICAN_VS_DEMOCRATIC ||
+    selectedAnalysis?.title === AnalysisOption.EARLY_VOTING_COMPARISON ||
+    selectedAnalysis?.title === AnalysisOption.OPT_IN_VS_OPT_OUT;
+  const dialogWidthClass = isComparisonTable
+    ? "min-w-[40vw] max-w-[70vw]"
+    : "min-w-[60vw] max-w-[95vw]";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-auto min-w-[60vw] max-h-[90vh] max-w-[95vw] flex flex-col p-5">
+      <DialogContent
+        className={`${dialogHeightClass} ${dialogWidthClass} flex flex-col p-5 w-auto`}
+      >
         <DialogHeader className="flex-shrink-0 pb-2">
           <DialogTitle className="text-xl">
             {selectedAnalysis?.title}
@@ -136,9 +154,7 @@ export default function AnalysisModal({
             {selectedAnalysis?.description}
           </DialogDescription>
         </DialogHeader>
-        <div className="overflow-y-auto overflow-x-hidden flex-1">
-          {renderContent()}
-        </div>
+        <div className="flex-1 min-h-0">{renderContent()}</div>
       </DialogContent>
     </Dialog>
   );

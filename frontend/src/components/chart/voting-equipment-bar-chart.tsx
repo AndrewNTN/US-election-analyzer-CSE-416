@@ -89,6 +89,9 @@ export function VotingEquipmentBarChart({
                     }}
                     tick={{ fontSize: 12 }}
                     tickFormatter={formatNumber}
+                    domain={[0, "auto"]}
+                    tickCount={6}
+                    allowDecimals={false}
                   />
                   <Tooltip
                     content={
