@@ -38,11 +38,11 @@ export function VotingEquipmentTable({ data }: VotingEquipmentTableProps) {
     },
     initialState: {
       pagination: {
-        pageSize: 3, // Reduced from 5 to 3
+        pageSize: 6,
       },
     },
     enableRowSelection: true,
-    enableMultiRowSelection: false, // Only allow selecting one state at a time
+    enableMultiRowSelection: false,
   });
 
   const selectedRows = table.getSelectedRowModel().rows;
@@ -69,11 +69,11 @@ export function VotingEquipmentTable({ data }: VotingEquipmentTableProps) {
   }, [selectedState]);
 
   return (
-    <div className="flex flex-col h-full space-y-2">
+    <div className="flex flex-col space-y-1">
       <DataTableView
         table={table}
         className="flex flex-col space-y-1"
-        tableContainerClassName="rounded-md"
+        tableContainerClassName="rounded-md overflow-visible"
         headerClassName="bg-background"
         bodyClassName="text-xs"
         rowClassName="h-7 cursor-pointer hover:bg-muted/50"
@@ -93,24 +93,13 @@ export function VotingEquipmentTable({ data }: VotingEquipmentTableProps) {
             table={instance}
             align="between"
             className="px-1 py-0.5"
-            label={
-              <span className="text-xs">
-                Page {instance.getState().pagination.pageIndex + 1} of{" "}
-                {instance.getPageCount()} | Total: {data.length} states
-                {selectedState && (
-                  <span className="ml-2 font-semibold text-primary">
-                    | Selected: {selectedState.state}
-                  </span>
-                )}
-              </span>
-            }
           />
         )}
         cellClassName="py-1 px-2"
       />
 
       {selectedState && equipmentByYear.length > 0 && (
-        <div className="flex-shrink-0 border-t pt-2">
+        <div className="flex-shrink-0 border-t pt-1 overflow-visible">
           <VotingEquipmentBarChart
             stateName={selectedState.state}
             data={equipmentByYear}

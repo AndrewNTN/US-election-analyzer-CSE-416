@@ -52,9 +52,6 @@ export function OptInOptOutTable({
           table={tableInstance}
           align="between"
           className="py-2"
-          label={`Page ${
-            tableInstance.getState().pagination.pageIndex + 1
-          } of ${tableInstance.getPageCount()}`}
         />
       )}
     />

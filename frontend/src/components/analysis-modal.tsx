@@ -7,12 +7,11 @@ import {
 } from "@/components/ui/dialog.tsx";
 import { VotingEquipmentTable } from "@/components/table/voting-equipment-table.tsx";
 import type { VotingEquipment } from "@/components/table/voting-equipment-columns.tsx";
-import { EquipmentSummaryCards } from "@/components/equipment/equipment-summary-cards.tsx";
+import { EquipmentSummaryTable } from "@/components/table/equipment-summary-table";
 import { StateComparisonTable } from "@/components/table/state-comparison-table.tsx";
 import { OptInOptOutTable } from "@/components/table/opt-in-opt-out-table.tsx";
 import { EarlyVotingTable } from "@/components/table/early-voting-table.tsx";
 import votingEquipmentDataJson from "../../data/votingEquipment.json" with { type: "json" };
-import equipmentSummaryDataJson from "../../data/equipmentSummary.json" with { type: "json" };
 import {
   stateComparisonData,
   republicanStateName,
@@ -31,12 +30,9 @@ import {
 } from "@/lib/early-voting-data.ts";
 
 import type { AnalysisItem } from "./analysis-drawer";
-import type { EquipmentSummary } from "@/components/equipment/equipment-cards-base.tsx";
 
 const votingEquipmentData: VotingEquipment[] =
   votingEquipmentDataJson as VotingEquipment[];
-const equipmentSummaryData: EquipmentSummary[] =
-  equipmentSummaryDataJson as EquipmentSummary[];
 
 export const AnalysisOption = {
   US_VOTING_EQUIPMENT: "US Voting Equipment",
@@ -67,7 +63,7 @@ export default function AnalysisModal({
       case AnalysisOption.US_VOTING_EQUIPMENT:
         return <VotingEquipmentTable data={votingEquipmentData} />;
       case AnalysisOption.EQUIPMENT_SUMMARY:
-        return <EquipmentSummaryCards data={equipmentSummaryData} />;
+        return <EquipmentSummaryTable />;
       case AnalysisOption.REPUBLICAN_VS_DEMOCRATIC:
         return (
           <StateComparisonTable
@@ -131,7 +127,7 @@ export default function AnalysisModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[90vw] sm:max-w-[90vw] w-[90vw] h-[95vh] flex flex-col p-4">
+      <DialogContent className="w-auto min-w-[60vw] max-h-[90vh] max-w-[95vw] flex flex-col p-5">
         <DialogHeader className="flex-shrink-0 pb-2">
           <DialogTitle className="text-xl">
             {selectedAnalysis?.title}
@@ -140,7 +136,9 @@ export default function AnalysisModal({
             {selectedAnalysis?.description}
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 min-h-0">{renderContent()}</div>
+        <div className="overflow-y-auto overflow-x-hidden flex-1">
+          {renderContent()}
+        </div>
       </DialogContent>
     </Dialog>
   );

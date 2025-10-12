@@ -45,9 +45,6 @@ export function StateComparisonTable({
           table={tableInstance}
           align="between"
           className="px-2 py-1"
-          label={`Page ${
-            tableInstance.getState().pagination.pageIndex + 1
-          } of ${tableInstance.getPageCount()} | Total: ${data.length} metrics`}
         />
       )}
     />
