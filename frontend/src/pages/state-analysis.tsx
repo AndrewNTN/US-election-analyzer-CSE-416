@@ -488,6 +488,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
             E2g: json.E2g ?? 0,
             E2h: json.E2h ?? 0,
             E2i: json.E2i ?? 0,
+            Other: json.Other ?? 0,
           },
         ];
 
@@ -556,11 +557,11 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
 
         {/* Right - Analysis Content */}
         <div className="flex-1 bg-white border-l overflow-y-auto min-w-0">
-          <div className="p-3">
-            <h2 className="text-sm font-semibold text-gray-900 mb-2">
+          <div className="p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b">
               {analysisTypeLabels[selectedDataset]}
             </h2>
-            <div className="bg-gray-50 rounded-lg p-3">
+            <div className="mt-4">
               {selectedDataset === AnalysisType.VOTER_REGISTRATION_CHANGES ? (
                 <div className="h-[400px]">
                   <VoterRegistrationLineChart data={voterRegistrationData} />
