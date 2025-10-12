@@ -6,7 +6,10 @@ export type StateComparisonRow = {
   democraticValue: string;
 };
 
-export const stateComparisonColumns: ColumnDef<StateComparisonRow>[] = [
+export const getStateComparisonColumns = (
+  republicanState: string,
+  democraticState: string,
+): ColumnDef<StateComparisonRow>[] => [
   {
     accessorKey: "metric",
     header: "Metric",
@@ -16,16 +19,16 @@ export const stateComparisonColumns: ColumnDef<StateComparisonRow>[] = [
   },
   {
     accessorKey: "republicanValue",
-    header: () => <div className="text-right">Republican State</div>,
+    header: () => <div className="text-center">{republicanState} (R)</div>,
     cell: ({ row }) => (
-      <div className="px-2 text-right">{row.getValue("republicanValue")}</div>
+      <div className="text-center">{row.getValue("republicanValue")}</div>
     ),
   },
   {
     accessorKey: "democraticValue",
-    header: () => <div className="text-right">Democratic State</div>,
+    header: () => <div className="text-center">{democraticState} (D)</div>,
     cell: ({ row }) => (
-      <div className="text-right">{row.getValue("democraticValue")}</div>
+      <div className="text-center">{row.getValue("democraticValue")}</div>
     ),
   },
 ];

@@ -10,27 +10,6 @@ const optInOptOutRaw = optInOptOutDataJson as {
 
 export const optInOptOutData: OptInOptOutRow[] = [
   {
-    metric: "State",
-    optInValue: optInOptOutRaw.optInState.state,
-    optOutWithSameDayValue: optInOptOutRaw.optOutWithSameDay.state,
-    optOutWithoutSameDayValue: optInOptOutRaw.optOutWithoutSameDay.state,
-  },
-  {
-    metric: "Registration Type",
-    optInValue: optInOptOutRaw.optInState.registrationType,
-    optOutWithSameDayValue: optInOptOutRaw.optOutWithSameDay.registrationType,
-    optOutWithoutSameDayValue:
-      optInOptOutRaw.optOutWithoutSameDay.registrationType,
-  },
-  {
-    metric: "Same-Day Registration",
-    optInValue: optInOptOutRaw.optInState.sameDayRegistration,
-    optOutWithSameDayValue:
-      optInOptOutRaw.optOutWithSameDay.sameDayRegistration,
-    optOutWithoutSameDayValue:
-      optInOptOutRaw.optOutWithoutSameDay.sameDayRegistration,
-  },
-  {
     metric: "Eligible Voters",
     optInValue: (
       optInOptOutRaw.optInState.eligibleVoters as number

@@ -31,11 +31,6 @@ const earlyVotingRaw = earlyVotingDataJson as {
 
 export const earlyVotingData: EarlyVotingRow[] = [
   {
-    metric: "Political Dominance",
-    republicanValue: earlyVotingRaw.republicanState.politicalDominance,
-    democraticValue: earlyVotingRaw.democraticState.politicalDominance,
-  },
-  {
     metric: "Total Votes Cast",
     republicanValue:
       earlyVotingRaw.republicanState.totalVotesCast.toLocaleString(),
@@ -55,30 +50,6 @@ export const earlyVotingData: EarlyVotingRow[] = [
     democraticValue: `${earlyVotingRaw.democraticState.earlyVotingCategories.inPersonEarlyVoting.percentage}%`,
   },
   {
-    metric: "Mail-In/Absentee Voting (Votes)",
-    republicanValue:
-      earlyVotingRaw.republicanState.earlyVotingCategories.mailInAbsenteeVoting.votes.toLocaleString(),
-    democraticValue:
-      earlyVotingRaw.democraticState.earlyVotingCategories.mailInAbsenteeVoting.votes.toLocaleString(),
-  },
-  {
-    metric: "Mail-In/Absentee Voting (%)",
-    republicanValue: `${earlyVotingRaw.republicanState.earlyVotingCategories.mailInAbsenteeVoting.percentage}%`,
-    democraticValue: `${earlyVotingRaw.democraticState.earlyVotingCategories.mailInAbsenteeVoting.percentage}%`,
-  },
-  {
-    metric: "Drop Box Voting (Votes)",
-    republicanValue:
-      earlyVotingRaw.republicanState.earlyVotingCategories.dropBoxVoting.votes.toLocaleString(),
-    democraticValue:
-      earlyVotingRaw.democraticState.earlyVotingCategories.dropBoxVoting.votes.toLocaleString(),
-  },
-  {
-    metric: "Drop Box Voting (%)",
-    republicanValue: `${earlyVotingRaw.republicanState.earlyVotingCategories.dropBoxVoting.percentage}%`,
-    democraticValue: `${earlyVotingRaw.democraticState.earlyVotingCategories.dropBoxVoting.percentage}%`,
-  },
-  {
     metric: "Total Early Voting (Votes)",
     republicanValue:
       earlyVotingRaw.republicanState.earlyVotingCategories.totalEarlyVoting.votes.toLocaleString(),
@@ -89,18 +60,6 @@ export const earlyVotingData: EarlyVotingRow[] = [
     metric: "Total Early Voting (%)",
     republicanValue: `${earlyVotingRaw.republicanState.earlyVotingCategories.totalEarlyVoting.percentage}%`,
     democraticValue: `${earlyVotingRaw.democraticState.earlyVotingCategories.totalEarlyVoting.percentage}%`,
-  },
-  {
-    metric: "Election Day Voting (Votes)",
-    republicanValue:
-      earlyVotingRaw.republicanState.electionDayVoting.votes.toLocaleString(),
-    democraticValue:
-      earlyVotingRaw.democraticState.electionDayVoting.votes.toLocaleString(),
-  },
-  {
-    metric: "Election Day Voting (%)",
-    republicanValue: `${earlyVotingRaw.republicanState.electionDayVoting.percentage}%`,
-    democraticValue: `${earlyVotingRaw.democraticState.electionDayVoting.percentage}%`,
   },
 ];
 

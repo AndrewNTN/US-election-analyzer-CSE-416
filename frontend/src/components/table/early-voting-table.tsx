@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { DataTable, DataTablePagination } from "./data-table.tsx";
 import {
-  earlyVotingColumns,
+  getEarlyVotingColumns,
   type EarlyVotingRow,
 } from "./early-voting-columns.tsx";
 
@@ -18,16 +18,7 @@ export function EarlyVotingTable({
   democraticState,
 }: EarlyVotingTableProps) {
   const columns = useMemo(
-    () =>
-      earlyVotingColumns.map((col, idx) => {
-        if (idx === 1) {
-          return { ...col, header: `${republicanState} (R)` };
-        }
-        if (idx === 2) {
-          return { ...col, header: `${democraticState} (D)` };
-        }
-        return col;
-      }),
+    () => getEarlyVotingColumns(republicanState, democraticState),
     [republicanState, democraticState],
   );
 
@@ -35,7 +26,7 @@ export function EarlyVotingTable({
     <DataTable
       data={data}
       columns={columns}
-      pageSize={12}
+      pageSize={5}
       className="flex flex-col h-full space-y-2"
       tableContainerClassName="flex-1 min-h-0 overflow-auto"
       bodyClassName="text-sm"

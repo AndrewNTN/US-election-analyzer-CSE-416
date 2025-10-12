@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { DataTable, DataTablePagination } from "./data-table.tsx";
 import {
-  optInOptOutColumns,
+  getOptInOptOutColumns,
   type OptInOptOutRow,
 } from "./opt-in-opt-out-columns.tsx";
 
@@ -21,21 +21,11 @@ export function OptInOptOutTable({
 }: OptInOptOutTableProps) {
   const columns = useMemo(
     () =>
-      optInOptOutColumns.map((col, idx) => {
-        if (idx === 1) {
-          return { ...col, header: `${optInState} (Opt-in)` };
-        }
-        if (idx === 2) {
-          return {
-            ...col,
-            header: `${optOutWithSameDayState} (Opt-out, Same-Day)`,
-          };
-        }
-        if (idx === 3) {
-          return { ...col, header: `${optOutWithoutSameDayState} (Opt-out)` };
-        }
-        return col;
-      }),
+      getOptInOptOutColumns(
+        optInState,
+        optOutWithSameDayState,
+        optOutWithoutSameDayState,
+      ),
     [optInState, optOutWithSameDayState, optOutWithoutSameDayState],
   );
 
@@ -43,6 +33,7 @@ export function OptInOptOutTable({
     <DataTable
       data={data}
       columns={columns}
+      pageSize={6}
       className="flex flex-col h-full space-y-2"
       tableContainerClassName="flex-1 min-h-0 overflow-auto"
       bodyClassName="text-sm"
