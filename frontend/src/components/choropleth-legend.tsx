@@ -131,13 +131,13 @@ export function ChoroplethLegend({
 
   // Render sequential color scale legend
   return (
-    <Card className="p-4">
+    <Card className="p-3.5">
       <h3 className="text-sm font-semibold mb-3">{title}</h3>
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {scale.colors.map((color, idx) => (
           <div key={idx} className="flex items-center gap-2">
             <div
-              className="w-6 h-6 rounded border border-gray-300 flex-shrink-0"
+              className="w-5 h-5 rounded border border-gray-300 flex-shrink-0"
               style={{ backgroundColor: color }}
             />
             <div className="text-sm">
