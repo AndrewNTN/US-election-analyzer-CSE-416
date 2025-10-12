@@ -27,7 +27,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 7;
 
 type Slot<TData> = ReactNode | ((table: TanstackTable<TData>) => ReactNode);
 
@@ -120,12 +120,12 @@ export function DataTableView<TData>({
     ));
 
   return (
-    <div className={cn("flex flex-col space-y-3", className)}>
+    <div className={cn("flex flex-col items-center space-y-1 pb-4", className)}>
       {renderSlot(toolbar, table)}
 
       <div
         className={cn(
-          "overflow-x-auto rounded-md border",
+          "overflow-x-auto rounded-md border w-fit",
           tableContainerClassName,
         )}
       >
@@ -148,35 +148,63 @@ export function DataTableView<TData>({
           </TableHeader>
           <TableBody className={bodyClassName}>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row, index) => {
-                const extraRowProps = getRowProps?.(row, index) ?? {};
-                const { className: extraRowClassName, ...restRowProps } =
-                  extraRowProps;
+              <>
+                {table.getRowModel().rows.map((row, index) => {
+                  const extraRowProps = getRowProps?.(row, index) ?? {};
+                  const { className: extraRowClassName, ...restRowProps } =
+                    extraRowProps;
 
-                return (
+                  return (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                      className={cn(
+                        resolveRowClassName(index),
+                        extraRowClassName,
+                      )}
+                      {...restRowProps}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          className={resolveCellClassName(cell)}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                })}
+                {/* Add empty placeholder rows to maintain consistent height */}
+                {Array.from({
+                  length: Math.max(
+                    0,
+                    table.getState().pagination.pageSize -
+                      table.getRowModel().rows.length,
+                  ),
+                }).map((_, index) => (
                   <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className={cn(
-                      resolveRowClassName(index),
-                      extraRowClassName,
+                    key={`empty-${index}`}
+                    className={resolveRowClassName(
+                      table.getRowModel().rows.length + index,
                     )}
-                    {...restRowProps}
                   >
-                    {row.getVisibleCells().map((cell) => (
+                    {table.getAllLeafColumns().map((column) => (
                       <TableCell
-                        key={cell.id}
-                        className={resolveCellClassName(cell)}
+                        key={column.id}
+                        className={resolveCellClassName({
+                          column,
+                        } as Cell<TData, unknown>)}
                       >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
+                        &nbsp;
                       </TableCell>
                     ))}
                   </TableRow>
-                );
-              })
+                ))}
+              </>
             ) : (
               <TableRow>
                 <TableCell
@@ -252,7 +280,8 @@ export function DataTablePagination<TData>({
   className,
   align,
 }: DataTablePaginationProps<TData>) {
-  const labelContent = renderSlot(label, table);
+  const defaultLabel = `Page ${table.getState().pagination.pageIndex + 1} of ${table.getPageCount()}`;
+  const labelContent = renderSlot(label, table) ?? defaultLabel;
   const justify = align ?? (labelContent ? "between" : "end");
 
   return (

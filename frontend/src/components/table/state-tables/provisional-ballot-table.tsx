@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { DataTable, DataTablePagination } from "../data-table.tsx";
 import {
@@ -61,7 +61,7 @@ export function ProvisionBallotsTable({
         setData(mapped);
         setError(null);
       } catch (error) {
-        console.error("❌ Failed to fetch provisional ballot data", error);
+        console.error("Failed to fetch provisional ballot data", error);
         setError("Failed to load provisional ballot data");
       } finally {
         setLoading(false);
@@ -70,15 +70,6 @@ export function ProvisionBallotsTable({
 
     fetchData();
   }, [fipsPrefix]);
-
-  const hasData = data.length > 0;
-  const paginationLabel = useMemo(() => {
-    if (!hasData) {
-      return "No jurisdictions found";
-    }
-
-    return `Jurisdictions: ${data.length}`;
-  }, [data.length, hasData]);
 
   if (loading) return <p className="text-xs text-muted-foreground">Loading…</p>;
   if (error)
@@ -94,7 +85,6 @@ export function ProvisionBallotsTable({
           <DataTablePagination
             table={table}
             align="between"
-            label={paginationLabel}
             className="text-xs"
           />
         )}
