@@ -35,11 +35,11 @@
     "scanner": 5200
   },
   {
-    "state": "Colorado",
+    "state": "Oregon",
     "dreNoVVPAT": 0,
-    "dreWithVVPAT": 420,
-    "ballotMarkingDevice": 890,
-    "scanner": 1350
+    "dreWithVVPAT": 350,
+    "ballotMarkingDevice": 720,
+    "scanner": 1100
   },
   {
     "state": "Connecticut",

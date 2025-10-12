@@ -51,7 +51,7 @@ import { EquipmentQualityBubbleChart } from "../components/chart/equipment-quali
 import equipmentQualityDataJson from "../../data/equipmentQualityVsRejectedBallots.json" with { type: "json" };
 import votingEquipmentTypeCaliforniaJson from "../../data/votingEquipmentType-california.json" with { type: "json" };
 import votingEquipmentTypeFloridaJson from "../../data/votingEquipmentType-florida.json" with { type: "json" };
-import votingEquipmentTypeColoradoJson from "../../data/votingEquipmentType-colorado.json" with { type: "json" };
+import votingEquipmentTypeOregonJson from "../../data/votingEquipmentType-oregon.json" with { type: "json" };
 import type { VotingEquipmentType } from "@/lib/colors";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
@@ -331,8 +331,8 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
       return votingEquipmentTypeCaliforniaJson;
     } else if (normalizedStateName === "florida") {
       return votingEquipmentTypeFloridaJson;
-    } else if (normalizedStateName === "colorado") {
-      return votingEquipmentTypeColoradoJson;
+    } else if (normalizedStateName === "oregon") {
+      return votingEquipmentTypeOregonJson;
     }
 
     // Default to empty array for other states

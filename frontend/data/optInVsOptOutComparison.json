@@ -22,15 +22,15 @@
     "turnoutOfEligible": 56.1
   },
   "optOutWithoutSameDay": {
-    "state": "Colorado",
+    "state": "Oregon",
     "registrationType": "Opt-out",
     "sameDayRegistration": "No",
-    "eligibleVoters": 4600000,
-    "registeredVoters": 4140000,
+    "eligibleVoters": 3400000,
+    "registeredVoters": 3060000,
     "registrationRate": 90.0,
-    "totalVotesCast": 3360000,
-    "turnoutRate": 81.2,
-    "turnoutOfEligible": 73.0
+    "totalVotesCast": 2450000,
+    "turnoutRate": 80.1,
+    "turnoutOfEligible": 72.1
   }
 }
 

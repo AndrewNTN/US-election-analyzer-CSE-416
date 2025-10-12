@@ -101,22 +101,22 @@
     { "id": "ar14", "name": "Chloe Bell", "email": "chloe.bell@example.com", "registered": "true", "mailInVote": true, "zip": "ELD" },
     { "id": "ar15", "name": "Matthew Rogers", "email": "matthew.rogers@example.com", "registered": "false", "mailInVote": false, "zip": "JBR" }
   ],
-  "colorado": [
-    { "id": "co01", "name": "Isla Brown", "email": "isla.brown@example.com", "registered": "true", "mailInVote": true, "zip": "DEN" },
-    { "id": "co02", "name": "James Walker", "email": "james.walker@example.com", "registered": "false", "mailInVote": false, "zip": "COS" },
-    { "id": "co03", "name": "Sophia Hall", "email": "sophia.hall@example.com", "registered": "true", "mailInVote": false, "zip": "ASE" },
-    { "id": "co04", "name": "Mason Allen", "email": "mason.allen@example.com", "registered": "true", "mailInVote": true, "zip": "EGE" },
-    { "id": "co05", "name": "Harper Young", "email": "harper.young@example.com", "registered": "false", "mailInVote": true, "zip": "GJT" },
-    { "id": "co06", "name": "Evelyn Hernandez", "email": "evelyn.hernandez@example.com", "registered": "true", "mailInVote": false, "zip": "PUB" },
-    { "id": "co07", "name": "Elijah King", "email": "elijah.king@example.com", "registered": "true", "mailInVote": true, "zip": "HDN" },
-    { "id": "co08", "name": "Luna Scott", "email": "luna.scott@example.com", "registered": "false", "mailInVote": false, "zip": "CEZ" },
-    { "id": "co09", "name": "Jackson Hill", "email": "jackson.hill@example.com", "registered": "true", "mailInVote": false, "zip": "LHX" },
-    { "id": "co10", "name": "Grace Lewis", "email": "grace.lewis@example.com", "registered": "true", "mailInVote": true, "zip": "ALS" },
-    { "id": "co11", "name": "Oliver Green", "email": "oliver.green@example.com", "registered": "false", "mailInVote": false, "zip": "DEN" },
-    { "id": "co12", "name": "Ava Adams", "email": "ava.adams@example.com", "registered": "true", "mailInVote": true, "zip": "COS" },
-    { "id": "co13", "name": "Benjamin Carter", "email": "benjamin.carter@example.com", "registered": "true", "mailInVote": false, "zip": "ASE" },
-    { "id": "co14", "name": "Mia Rivera", "email": "mia.rivera@example.com", "registered": "false", "mailInVote": true, "zip": "EGE" },
-    { "id": "co15", "name": "Liam Torres", "email": "liam.torres@example.com", "registered": "true", "mailInVote": true, "zip": "GJT" }
+  "oregon": [
+    { "id": "or01", "name": "Isla Brown", "email": "isla.brown@example.com", "registered": "true", "mailInVote": true, "zip": "PDX" },
+    { "id": "or02", "name": "James Walker", "email": "james.walker@example.com", "registered": "false", "mailInVote": false, "zip": "EUG" },
+    { "id": "or03", "name": "Sophia Hall", "email": "sophia.hall@example.com", "registered": "true", "mailInVote": false, "zip": "SLE" },
+    { "id": "or04", "name": "Mason Allen", "email": "mason.allen@example.com", "registered": "true", "mailInVote": true, "zip": "MFR" },
+    { "id": "or05", "name": "Harper Young", "email": "harper.young@example.com", "registered": "false", "mailInVote": true, "zip": "BND" },
+    { "id": "or06", "name": "Evelyn Hernandez", "email": "evelyn.hernandez@example.com", "registered": "true", "mailInVote": false, "zip": "CRV" },
+    { "id": "or07", "name": "Elijah King", "email": "elijah.king@example.com", "registered": "true", "mailInVote": true, "zip": "AST" },
+    { "id": "or08", "name": "Luna Scott", "email": "luna.scott@example.com", "registered": "false", "mailInVote": false, "zip": "PDX" },
+    { "id": "or09", "name": "Jackson Hill", "email": "jackson.hill@example.com", "registered": "true", "mailInVote": false, "zip": "EUG" },
+    { "id": "or10", "name": "Grace Lewis", "email": "grace.lewis@example.com", "registered": "true", "mailInVote": true, "zip": "SLE" },
+    { "id": "or11", "name": "Oliver Green", "email": "oliver.green@example.com", "registered": "false", "mailInVote": false, "zip": "MFR" },
+    { "id": "or12", "name": "Ava Adams", "email": "ava.adams@example.com", "registered": "true", "mailInVote": true, "zip": "BND" },
+    { "id": "or13", "name": "Benjamin Carter", "email": "benjamin.carter@example.com", "registered": "true", "mailInVote": false, "zip": "CRV" },
+    { "id": "or14", "name": "Mia Rivera", "email": "mia.rivera@example.com", "registered": "false", "mailInVote": true, "zip": "AST" },
+    { "id": "or15", "name": "Liam Torres", "email": "liam.torres@example.com", "registered": "true", "mailInVote": true, "zip": "PDX" }
   ],
   "connecticut": [
     { "id": "ct01", "name": "Sophia Robinson", "email": "sophia.robinson@example.com", "registered": "true", "mailInVote": true, "zip": "BDL" },

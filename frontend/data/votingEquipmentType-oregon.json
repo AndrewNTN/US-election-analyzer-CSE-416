@@ -1,31 +1,41 @@
 [
   {
-    "eavsRegion": "Denver County",
+    "eavsRegion": "Multnomah County",
     "equipmentTypes": ["ballot_marking_device", "scanner"],
-    "primaryEquipment": "ballot_marking_device"
+    "primaryEquipment": "scanner"
   },
   {
-    "eavsRegion": "El Paso County",
+    "eavsRegion": "Washington County",
     "equipmentTypes": ["scanner"],
     "primaryEquipment": "scanner"
   },
   {
-    "eavsRegion": "Arapahoe County",
+    "eavsRegion": "Clackamas County",
     "equipmentTypes": ["scanner"],
     "primaryEquipment": "scanner"
   },
   {
-    "eavsRegion": "Jefferson County",
-    "equipmentTypes": ["scanner"],
-    "primaryEquipment": "scanner"
-  },
-  {
-    "eavsRegion": "Adams County",
+    "eavsRegion": "Lane County",
     "equipmentTypes": ["scanner", "ballot_marking_device"],
     "primaryEquipment": "scanner"
   },
   {
-    "eavsRegion": "Larimer County",
+    "eavsRegion": "Marion County",
+    "equipmentTypes": ["scanner"],
+    "primaryEquipment": "scanner"
+  },
+  {
+    "eavsRegion": "Jackson County",
+    "equipmentTypes": ["scanner"],
+    "primaryEquipment": "scanner"
+  },
+  {
+    "eavsRegion": "Deschutes County",
+    "equipmentTypes": ["scanner", "ballot_marking_device"],
+    "primaryEquipment": "scanner"
+  },
+  {
+    "eavsRegion": "Linn County",
     "equipmentTypes": ["scanner"],
     "primaryEquipment": "scanner"
   },
@@ -35,68 +45,59 @@
     "primaryEquipment": "scanner"
   },
   {
-    "eavsRegion": "Boulder County",
-    "equipmentTypes": ["ballot_marking_device"],
-    "primaryEquipment": "ballot_marking_device"
-  },
-  {
-    "eavsRegion": "Weld County",
+    "eavsRegion": "Yamhill County",
     "equipmentTypes": ["scanner"],
     "primaryEquipment": "scanner"
   },
   {
-    "eavsRegion": "Pueblo County",
-    "equipmentTypes": ["scanner", "ballot_marking_device"],
-    "primaryEquipment": "scanner"
-  },
-  {
-    "eavsRegion": "Mesa County",
-    "equipmentTypes": ["scanner"],
-    "primaryEquipment": "scanner"
-  },
-  {
-    "eavsRegion": "Broomfield County",
-    "equipmentTypes": ["ballot_marking_device"],
-    "primaryEquipment": "ballot_marking_device"
-  },
-  {
-    "eavsRegion": "Garfield County",
-    "equipmentTypes": ["scanner"],
-    "primaryEquipment": "scanner"
-  },
-  {
-    "eavsRegion": "Eagle County",
-    "equipmentTypes": ["scanner"],
-    "primaryEquipment": "scanner"
-  },
-  {
-    "eavsRegion": "Fremont County",
-    "equipmentTypes": ["scanner"],
-    "primaryEquipment": "scanner"
-  },
-  {
-    "eavsRegion": "La Plata County",
-    "equipmentTypes": ["scanner", "ballot_marking_device"],
-    "primaryEquipment": "scanner"
-  },
-  {
-    "eavsRegion": "Montrose County",
-    "equipmentTypes": ["scanner"],
-    "primaryEquipment": "scanner"
-  },
-  {
-    "eavsRegion": "Delta County",
-    "equipmentTypes": ["scanner"],
-    "primaryEquipment": "scanner"
-  },
-  {
-    "eavsRegion": "Montezuma County",
-    "equipmentTypes": ["scanner"],
-    "primaryEquipment": "scanner"
-  },
-  {
-    "eavsRegion": "Routt County",
+    "eavsRegion": "Benton County",
     "equipmentTypes": ["ballot_marking_device", "scanner"],
+    "primaryEquipment": "scanner"
+  },
+  {
+    "eavsRegion": "Josephine County",
+    "equipmentTypes": ["scanner"],
+    "primaryEquipment": "scanner"
+  },
+  {
+    "eavsRegion": "Klamath County",
+    "equipmentTypes": ["scanner"],
+    "primaryEquipment": "scanner"
+  },
+  {
+    "eavsRegion": "Polk County",
+    "equipmentTypes": ["scanner"],
+    "primaryEquipment": "scanner"
+  },
+  {
+    "eavsRegion": "Columbia County",
+    "equipmentTypes": ["scanner"],
+    "primaryEquipment": "scanner"
+  },
+  {
+    "eavsRegion": "Umatilla County",
+    "equipmentTypes": ["scanner"],
+    "primaryEquipment": "scanner"
+  },
+  {
+    "eavsRegion": "Coos County",
+    "equipmentTypes": ["scanner"],
+    "primaryEquipment": "scanner"
+  },
+  {
+    "eavsRegion": "Lincoln County",
+    "equipmentTypes": ["scanner"],
+    "primaryEquipment": "scanner"
+  },
+  {
+    "eavsRegion": "Hood River County",
+    "equipmentTypes": ["ballot_marking_device"],
     "primaryEquipment": "ballot_marking_device"
+  },
+  {
+    "eavsRegion": "Crook County",
+    "equipmentTypes": ["scanner"],
+    "primaryEquipment": "scanner"
   }
 ]
+
