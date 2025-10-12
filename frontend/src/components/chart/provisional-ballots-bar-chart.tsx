@@ -1,4 +1,5 @@
 import { BaseBarChart } from "./base-bar-chart";
+import { formatNumber } from "@/lib/utils";
 
 export interface ProvisionBallotsData {
   E2a: number; // Not on List
@@ -54,6 +55,7 @@ export function ProvisionalBallotsBarChart({
       metricLabels={METRIC_LABELS}
       metricAccessor={(data, key) => data[key]}
       yAxisLabel="Number of Ballots"
+      yAxisTickFormatter={formatNumber}
     />
   );
 }

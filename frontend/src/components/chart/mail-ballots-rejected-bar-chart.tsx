@@ -1,4 +1,5 @@
 import { BaseBarChart } from "./base-bar-chart";
+import { formatNumber } from "@/lib/utils";
 
 export interface MailBallotsRejectedData {
   eavsRegion: string;
@@ -78,6 +79,7 @@ export function MailBallotsRejectedBarChart({
       metricAccessor={(data, key) => data[key]}
       margin={{ top: 0, right: 16, left: 35, bottom: 8 }}
       yAxisLabel="Number of Rejected Ballots"
+      yAxisTickFormatter={formatNumber}
     />
   );
 }

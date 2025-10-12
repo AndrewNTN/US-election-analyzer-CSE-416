@@ -24,8 +24,8 @@ export const DETAILED_STATES = {
     hasDetailedVoterData: false,
     hasDropBoxVoting: true,
   },
-  colorado: {
-    name: "colorado",
+  oregon: {
+    name: "oregon",
     politicalDominance: "democratic",
     registrationType: "opt-out",
     sameDayRegistration: false,

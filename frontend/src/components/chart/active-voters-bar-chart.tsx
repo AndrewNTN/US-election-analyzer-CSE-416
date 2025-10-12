@@ -1,4 +1,5 @@
 import { BaseBarChart } from "./base-bar-chart";
+import { formatNumber } from "@/lib/utils";
 
 export interface ActiveVotersData {
   eavsRegion: string;
@@ -22,16 +23,6 @@ const METRIC_LABELS: Record<MetricKey, string> = {
   inactiveVoters: "Inactive Voters",
 };
 
-// Format large numbers in millions (e.g., 1,500,000 -> "1.5M")
-const formatMillions = (value: number): string => {
-  if (value >= 1000000) {
-    return `${(value / 1000000).toFixed(1)}M`;
-  } else if (value >= 1000) {
-    return `${(value / 1000).toFixed(1)}K`;
-  }
-  return value.toString();
-};
-
 export function ActiveVotersBarChart({
   stateName,
   barData,
@@ -44,7 +35,7 @@ export function ActiveVotersBarChart({
       metricLabels={METRIC_LABELS}
       metricAccessor={(data, key) => data[key]}
       yAxisLabel="Number of Voters"
-      yAxisTickFormatter={formatMillions}
+      yAxisTickFormatter={formatNumber}
     />
   );
 }

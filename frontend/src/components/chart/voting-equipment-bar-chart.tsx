@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { ChartTooltip } from "./chart-tooltip";
+import { formatNumber } from "@/lib/utils";
 
 interface VotingEquipmentBarChartProps {
   stateName: string;
@@ -86,6 +87,7 @@ export function VotingEquipmentBarChart({
                       style: { fontSize: 10 },
                     }}
                     tick={{ fontSize: 10 }}
+                    tickFormatter={formatNumber}
                   />
                   <Tooltip
                     content={

@@ -1,4 +1,5 @@
 import { BaseBarChart } from "./base-bar-chart";
+import { formatNumber } from "@/lib/utils";
 
 export interface PollbookDeletionsData {
   eavsRegion: string;
@@ -50,6 +51,7 @@ export function PollbookDeletionsBarChart({
       metricLabels={METRIC_LABELS}
       metricAccessor={(data, key) => data[key]}
       yAxisLabel="Number of Deletions"
+      yAxisTickFormatter={formatNumber}
     />
   );
 }

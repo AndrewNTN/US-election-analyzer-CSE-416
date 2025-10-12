@@ -8,6 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { formatNumber } from "@/lib/utils";
 
 type VoterRegistrationData = {
   jurisdiction: string;
@@ -100,7 +101,7 @@ export function VoterRegistrationLineChart({
               style: { textAnchor: "middle" },
             }}
             tick={{ fontSize: 12 }}
-            tickFormatter={(value) => value.toLocaleString()}
+            tickFormatter={formatNumber}
             width={80}
           />
           <Tooltip content={<CustomTooltip />} />
