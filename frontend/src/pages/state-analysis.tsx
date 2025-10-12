@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react"; // ⬅ make sure useEffect is imported
-import { stateNameToAbbr } from "@/constants/stateFips";
+import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import statesJSON from "../../data/us-states.json";
 import countiesJSON from "../../data/counties.geojson.json";
@@ -52,7 +51,8 @@ import equipmentQualityDataJson from "../../data/equipmentQualityVsRejectedBallo
 import votingEquipmentTypeCaliforniaJson from "../../data/votingEquipmentType-california.json" with { type: "json" };
 import votingEquipmentTypeFloridaJson from "../../data/votingEquipmentType-florida.json" with { type: "json" };
 import votingEquipmentTypeOregonJson from "../../data/votingEquipmentType-oregon.json" with { type: "json" };
-import type { VotingEquipmentType } from "@/lib/colors";
+import type { VotingEquipmentType } from "@/lib/choropleth.ts";
+import { useProvisionalAggregateQuery } from "@/hooks/use-eavs-queries";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
@@ -177,13 +177,28 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
   );
 
   // Check if current state is a detailed state
-  const isDetailedState = (): boolean => {
-    const urlStateName = stateName.toLowerCase().replace(/\s+/g, "-");
-    return Object.keys(DETAILED_STATES).includes(urlStateName);
-  };
+  const normalizedStateKey = useMemo(
+    () => stateName.toLowerCase().replace(/\s+/g, "-"),
+    [stateName],
+  );
+
+  const formattedStateName = useMemo(
+    () => formatStateName(stateName),
+    [stateName],
+  );
+
+  const stateFipsPrefix = useMemo(
+    () => getStateFipsCode(formattedStateName),
+    [formattedStateName],
+  );
+
+  const isDetailedState = useMemo(
+    () => Object.keys(DETAILED_STATES).includes(normalizedStateKey),
+    [normalizedStateKey],
+  );
 
   // Set choropleth option based on selected dataset, but only for detailed states
-  const choroplethOption = isDetailedState()
+  const choroplethOption = isDetailedState
     ? analysisToChoroplethMap[selectedDataset]
     : STATE_CHOROPLETH_OPTIONS.OFF;
 
@@ -192,22 +207,21 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
   };
 
   // Get available analysis options based on state capabilities
-  const getAvailableAnalysisOptions = (): AnalysisTypeValue[] => {
-    const urlStateName = stateName.toLowerCase().replace(/\s+/g, "-");
-    return Object.values(AnalysisType).filter((option) => {
-      // Exclude voter registration if this state doesn't have detailed voter data
-      if (option === AnalysisType.VOTER_REGISTRATION) {
-        return hasDetailedVoterData(urlStateName);
-      }
-      // Exclude drop box voting if this state doesn't support it
-      if (option === AnalysisType.DROP_BOX_VOTING) {
-        return hasDropBoxVoting(urlStateName);
-      }
-      return true;
-    });
-  };
+  const availableAnalysisOptions = useMemo<AnalysisTypeValue[]>(
+    () =>
+      Object.values(AnalysisType).filter((option) => {
+        if (option === AnalysisType.VOTER_REGISTRATION) {
+          return hasDetailedVoterData(normalizedStateKey);
+        }
+        if (option === AnalysisType.DROP_BOX_VOTING) {
+          return hasDropBoxVoting(normalizedStateKey);
+        }
+        return true;
+      }),
+    [normalizedStateKey],
+  );
 
-  const formatStateName = (stateName: string): string => {
+  function formatStateName(stateName: string): string {
     if (
       stateName === stateName.toLowerCase() ||
       stateName === stateName.toUpperCase()
@@ -227,12 +241,10 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ")
       .trim();
-  };
+  }
 
   // Filter states data to only include the current state
   const getCurrentStateData = (): FeatureCollection<Geometry, StateProps> => {
-    const formattedStateName = formatStateName(stateName);
-
     const filteredFeatures = statesData.features.filter(
       (feature) => feature.properties?.NAME === formattedStateName,
     );
@@ -248,12 +260,11 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     Geometry,
     CountyProps
   > | null => {
-    if (!isDetailedState()) {
+    if (!isDetailedState) {
       return null;
     }
 
-    const formattedStateName = formatStateName(stateName);
-    const stateFips = getStateFipsCode(formattedStateName);
+    const stateFips = stateFipsPrefix;
 
     if (!stateFips) {
       return null;
@@ -271,16 +282,16 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
 
   const currentStateData = getCurrentStateData();
   const currentCountiesData = getCurrentCountiesData();
-  const detailedState = isDetailedState();
+  const detailedState = isDetailedState;
 
-  const urlStateName = stateName.toLowerCase().replace(/\s+/g, "-");
+  const urlStateName = normalizedStateKey;
   const showBubbleChart =
     selectedDataset === AnalysisType.VOTER_REGISTRATION &&
     hasDetailedVoterData(urlStateName);
 
   // Get drop box voting data for current state
   const getDropBoxVotingData = (): DropBoxVotingData[] => {
-    const stateKey = urlStateName as keyof typeof dropBoxVotingDataJson;
+    const stateKey = normalizedStateKey as keyof typeof dropBoxVotingDataJson;
     return (dropBoxVotingDataJson[stateKey] || []) as DropBoxVotingData[];
   };
 
@@ -311,11 +322,9 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
 
   // Get active voters data based on the state
   const getActiveVotersData = () => {
-    const normalizedStateName = urlStateName.toLowerCase();
-
-    if (normalizedStateName === "california") {
+    if (normalizedStateKey === "california") {
       return activeVotersDataCaliforniaJson;
-    } else if (normalizedStateName === "florida") {
+    } else if (normalizedStateKey === "florida") {
       return activeVotersDataFloridaJson;
     }
 
@@ -325,13 +334,11 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
 
   // Get voting equipment type data for current state
   const getVotingEquipmentTypeData = () => {
-    const normalizedStateName = urlStateName.toLowerCase();
-
-    if (normalizedStateName === "california") {
+    if (normalizedStateKey === "california") {
       return votingEquipmentTypeCaliforniaJson;
-    } else if (normalizedStateName === "florida") {
+    } else if (normalizedStateKey === "florida") {
       return votingEquipmentTypeFloridaJson;
-    } else if (normalizedStateName === "oregon") {
+    } else if (normalizedStateKey === "oregon") {
       return votingEquipmentTypeOregonJson;
     }
 
@@ -444,66 +451,37 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
       ? getVotingEquipmentTypeData()
       : [];
 
-  const [provChartData, setProvChartData] = useState<ProvisionBallotsData[]>(
-    [],
-  );
-  const [provLoading, setProvLoading] = useState(false);
-  const [provError, setProvError] = useState<string | null>(null);
+  const {
+    data: provAggregateData,
+    isPending: provLoading,
+    isError: provAggregateHasError,
+    error: provAggregateError,
+  } = useProvisionalAggregateQuery(stateFipsPrefix);
 
-  useEffect(() => {
-    async function fetchProvChartData() {
-      try {
-        setProvLoading(true);
-        setProvError(null);
-
-        const formattedState = formatStateName(stateName);
-        const fipsPrefix = getStateFipsCode(formattedState);
-        const stateAbbr =
-          stateNameToAbbr[formattedState] ||
-          formattedState.slice(0, 2).toUpperCase(); // fallback
-
-        if (!fipsPrefix)
-          throw new Error("No FIPS prefix found for " + formattedState);
-
-        console.log(
-          `Fetching provisional ballot data for ${formattedState} (${stateAbbr}) with FIPS ${fipsPrefix}`,
-        );
-
-        const res = await fetch(
-          `http://localhost:8080/api/eavs/provisional/aggregate/${fipsPrefix}`,
-        );
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        const json = await res.json();
-
-        const formatted: ProvisionBallotsData[] = [
-          {
-            E2a: json.E2a ?? 0,
-            E2b: json.E2b ?? 0,
-            E2c: json.E2c ?? 0,
-            E2d: json.E2d ?? 0,
-            E2e: json.E2e ?? 0,
-            E2f: json.E2f ?? 0,
-            E2g: json.E2g ?? 0,
-            E2h: json.E2h ?? 0,
-            E2i: json.E2i ?? 0,
-            Other: json.Other ?? 0,
-          },
-        ];
-
-        setProvChartData(formatted);
-      } catch (err: unknown) {
-        console.error("Error loading provisional chart data:", err);
-        setProvError(err instanceof Error ? err.message : "Unknown error");
-        setProvChartData([]);
-      } finally {
-        setProvLoading(false);
-      }
+  const provChartData: ProvisionBallotsData[] = useMemo(() => {
+    if (!provAggregateData) {
+      return [];
     }
 
-    fetchProvChartData();
-  }, [stateName]);
+    return [
+      {
+        E2a: provAggregateData.E2a ?? 0,
+        E2b: provAggregateData.E2b ?? 0,
+        E2c: provAggregateData.E2c ?? 0,
+        E2d: provAggregateData.E2d ?? 0,
+        E2e: provAggregateData.E2e ?? 0,
+        E2f: provAggregateData.E2f ?? 0,
+        E2g: provAggregateData.E2g ?? 0,
+        E2h: provAggregateData.E2h ?? 0,
+        E2i: provAggregateData.E2i ?? 0,
+        Other: provAggregateData.Other ?? 0,
+      },
+    ];
+  }, [provAggregateData]);
+
+  const provErrorMessage = provAggregateHasError
+    ? (provAggregateError?.message ?? "Unknown error")
+    : null;
 
   return (
     <div className="h-screen flex flex-col">
@@ -527,7 +505,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
             Select Dataset
           </p>
           <div className="space-y-1.5">
-            {getAvailableAnalysisOptions().map((analysisType) => (
+            {availableAnalysisOptions.map((analysisType) => (
               <Button
                 key={analysisType}
                 variant={
@@ -580,16 +558,14 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                 <div className="text-xs text-muted-foreground text-center overflow-y-auto">
                   {provLoading ? (
                     <p>Loading provisional ballot data...</p>
-                  ) : provError ? (
+                  ) : provErrorMessage ? (
                     <p className="py-8">
-                      Error loading {stateName} data: {provError}
+                      Error loading {stateName} data: {provErrorMessage}
                     </p>
                   ) : (
                     <>
                       <ProvisionBallotsTable
-                        fipsPrefix={
-                          getStateFipsCode(formatStateName(stateName)) ?? "00"
-                        }
+                        fipsPrefix={stateFipsPrefix ?? null}
                       />
                       <div className="mt-8">
                         <ProvisionalBallotsBarChart
