@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { GeoJSON } from "react-leaflet";
 import BaseMap from "@/components/map/base-map.tsx";
 import OutlineLayer from "@/components/map/outline-layer.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
@@ -278,11 +277,6 @@ export default function StateMap({
   const [selectedCounty, setSelectedCounty] = useState<SafeCounty | null>(null);
   const [partyFilter, setPartyFilter] = useState<string>("all");
 
-  const transparentStyle = useMemo(
-    () => ({ color: "#000000", weight: 0, opacity: 0, fillOpacity: 0 }),
-    [],
-  );
-
   // Generate dummy voter data whenever county changes
   const voterData = useMemo<DummyVoterData | null>(() => {
     if (!selectedCounty?.geoid) return null;
@@ -325,21 +319,12 @@ export default function StateMap({
                 choroplethOption={choroplethOption}
                 stateView
               />
-              <OutlineLayer data={currentCountiesData} stateView />
-
-              {/* Click-only overlay */}
-              <GeoJSON
+              <OutlineLayer
                 data={currentCountiesData}
-                style={() => transparentStyle}
-                eventHandlers={{
-                  click: (e) => {
-                    const props =
-                      e?.sourceTarget?.feature?.properties ??
-                      e?.layer?.feature?.properties ??
-                      e?.target?.feature?.properties ??
-                      null;
-                    handleCountyChange(props ? toSafeCounty(props) : null);
-                  },
+                stateView
+                onFeatureClick={(feature) => {
+                  const props = feature?.properties ?? null;
+                  handleCountyChange(props ? toSafeCounty(props) : null);
                 }}
               />
             </>

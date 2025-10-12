@@ -50,17 +50,24 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
 
   const onEachFeature = (feature: Feature<Geometry, T>, layer: Layer) => {
     if (feature.properties) {
+      const isCounty = feature.properties && "STATEFP" in feature.properties;
+      const shouldEnableHover = !stateView || isCounty;
+
       layer.on({
         mouseover: (e: LeafletMouseEvent) => {
-          const targetLayer = e.target;
-          targetLayer.setStyle({
-            weight: hoverWeight,
-            color: hoverColor,
-          });
+          if (shouldEnableHover) {
+            const targetLayer = e.target;
+            targetLayer.setStyle({
+              weight: hoverWeight,
+              color: hoverColor,
+            });
+          }
         },
         mouseout: (e: LeafletMouseEvent) => {
-          const targetLayer = e.target;
-          targetLayer.setStyle(getFeatureStyle(feature));
+          if (shouldEnableHover) {
+            const targetLayer = e.target;
+            targetLayer.setStyle(getFeatureStyle(feature));
+          }
         },
         click: () => {
           // Only handle navigation for state features and when not in state view

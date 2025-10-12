@@ -96,7 +96,7 @@ export function ChoroplethLegend({
     case SPLASH_CHOROPLETH_OPTIONS.EQUIPMENT_AGE:
       scale = equipmentAgeScale;
       title = "Voting Equipment Age";
-      unit = "years";
+      unit = " years";
       break;
     case STATE_CHOROPLETH_OPTIONS.PROVISIONAL_BALLOTS:
       scale = provisionalBallotsScale;
