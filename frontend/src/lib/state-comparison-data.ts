@@ -9,11 +9,6 @@ const stateComparisonRaw = stateComparisonDataJson as {
 
 export const stateComparisonData: StateComparisonRow[] = [
   {
-    metric: "State",
-    republicanValue: stateComparisonRaw.republicanState.state,
-    democraticValue: stateComparisonRaw.democraticState.state,
-  },
-  {
     metric: "Felony Voting Rights",
     republicanValue: stateComparisonRaw.republicanState.felonyVotingRights,
     democraticValue: stateComparisonRaw.democraticState.felonyVotingRights,

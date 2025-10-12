@@ -35,6 +35,7 @@ export function EarlyVotingTable({
     <DataTable
       data={data}
       columns={columns}
+      pageSize={12}
       className="flex flex-col h-full space-y-2"
       tableContainerClassName="flex-1 min-h-0 overflow-auto"
       bodyClassName="text-sm"
