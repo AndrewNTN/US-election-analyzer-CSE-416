@@ -18,7 +18,6 @@ export interface MailBallotsRejectedData {
   C9o: number;
   C9p: number;
   C9q: number;
-  notes: string;
 }
 
 export const mailBallotsRejectedColumns: ColumnDef<MailBallotsRejectedData>[] =
@@ -60,13 +59,4 @@ export const mailBallotsRejectedColumns: ColumnDef<MailBallotsRejectedData>[] =
         </div>
       ),
     })),
-    {
-      accessorKey: "notes",
-      header: () => <div className="text-left">Notes</div>,
-      cell: ({ row }: { row: Row<MailBallotsRejectedData> }) => (
-        <div className="text-sm text-left text-black">
-          {row.getValue("notes")}
-        </div>
-      ),
-    },
   ];

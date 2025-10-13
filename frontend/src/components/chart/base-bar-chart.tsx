@@ -23,6 +23,7 @@ interface BaseBarChartProps<TData, TMetricKey extends string> {
   height?: string;
   margin?: { top: number; right: number; left: number; bottom: number };
   tooltipOptions?: ChartTooltipOptions;
+  xAxisAngle?: number;
 }
 
 const DEFAULT_BAR_COLOR = "#8e51ff";
@@ -44,6 +45,7 @@ export function BaseBarChart<TData, TMetricKey extends string>({
   height = DEFAULT_HEIGHT,
   margin = DEFAULT_MARGIN,
   tooltipOptions,
+  xAxisAngle,
 }: BaseBarChartProps<TData, TMetricKey>) {
   // Calculate totals for each metric
   const totals: Record<TMetricKey, number> = {} as Record<TMetricKey, number>;
@@ -82,7 +84,7 @@ export function BaseBarChart<TData, TMetricKey extends string>({
             <XAxis
               dataKey="name"
               interval={0}
-              angle={-15}
+              angle={xAxisAngle ?? -15}
               textAnchor="end"
               height={60}
             />

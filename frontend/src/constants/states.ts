@@ -5,6 +5,7 @@ export interface StateDetails {
   sameDayRegistration: boolean;
   hasDetailedVoterData: boolean;
   hasDropBoxVoting: boolean;
+  politicalPartyState: boolean;
 }
 
 export const DETAILED_STATES = {
@@ -15,6 +16,7 @@ export const DETAILED_STATES = {
     sameDayRegistration: false,
     hasDetailedVoterData: true,
     hasDropBoxVoting: true,
+    politicalPartyState: true,
   },
   california: {
     name: "california",
@@ -23,6 +25,7 @@ export const DETAILED_STATES = {
     sameDayRegistration: true,
     hasDetailedVoterData: false,
     hasDropBoxVoting: true,
+    politicalPartyState: true,
   },
   oregon: {
     name: "oregon",
@@ -31,6 +34,7 @@ export const DETAILED_STATES = {
     sameDayRegistration: false,
     hasDetailedVoterData: false,
     hasDropBoxVoting: false,
+    politicalPartyState: false,
   },
 } as const satisfies Record<string, StateDetails>;
 

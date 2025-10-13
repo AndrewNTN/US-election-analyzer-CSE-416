@@ -8,7 +8,9 @@ import BubbleChartLayer, {
 import type { FeatureCollection, Geometry } from "geojson";
 import type { StateProps, CountyProps } from "@/types/map.ts";
 import type { StateChoroplethOption } from "@/constants/choropleth.ts";
-import { ChoroplethLegend } from "@/components/choropleth-legend.tsx";
+import { ChoroplethLegend } from "@/components/map/choropleth-legend";
+import { CvapRegistrationLegend } from "@/components/map/cvap-registration-legend";
+import type { ActiveVotersData as ActiveVotersTableData } from "@/components/table/state-tables/active-voters-columns";
 import {
   Dialog,
   DialogContent,
@@ -44,6 +46,8 @@ interface StateMapProps {
     equipmentTypes: string[];
     primaryEquipment: string;
   }>;
+  showCvapLegend?: boolean;
+  cvapLegendData?: ActiveVotersTableData[];
 }
 
 type SafeCounty = {
@@ -273,6 +277,8 @@ export default function StateMap({
   censusBlockData = [],
   showBubbleChart = false,
   votingEquipmentData = [],
+  showCvapLegend = false,
+  cvapLegendData = [],
 }: StateMapProps) {
   const [selectedCounty, setSelectedCounty] = useState<SafeCounty | null>(null);
   const [partyFilter, setPartyFilter] = useState<string>("all");
@@ -351,6 +357,11 @@ export default function StateMap({
             />
           </div>
         )}
+        {showCvapLegend && cvapLegendData.length > 0 ? (
+          <div className="absolute bottom-32 right-4 z-10 max-w-xs">
+            <CvapRegistrationLegend data={cvapLegendData} />
+          </div>
+        ) : null}
       </div>
 
       {/* Modal */}

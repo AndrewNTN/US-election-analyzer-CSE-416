@@ -8,6 +8,7 @@ import {
   DETAILED_STATES,
   hasDetailedVoterData,
   hasDropBoxVoting,
+  getStateDetails,
 } from "@/constants/states.ts";
 import { getStateFipsCode } from "@/constants/stateFips.ts";
 import { Button } from "@/components/ui/button.tsx";
@@ -197,6 +198,13 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     [normalizedStateKey],
   );
 
+  const stateDetails = useMemo(
+    () => getStateDetails(normalizedStateKey),
+    [normalizedStateKey],
+  );
+
+  const isPoliticalPartyState = stateDetails?.politicalPartyState ?? false;
+
   // Set choropleth option based on selected dataset, but only for detailed states
   const choroplethOption = isDetailedState
     ? analysisToChoroplethMap[selectedDataset]
@@ -320,17 +328,14 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     };
   };
 
-  // Get active voters data based on the state
-  const getActiveVotersData = () => {
+  const activeVotersData = useMemo(() => {
     if (normalizedStateKey === "california") {
       return activeVotersDataCaliforniaJson;
     } else if (normalizedStateKey === "florida") {
       return activeVotersDataFloridaJson;
     }
-
-    // Default data for other states
     return activeVotersDataJson;
-  };
+  }, [normalizedStateKey]);
 
   // Get voting equipment type data for current state
   const getVotingEquipmentTypeData = () => {
@@ -422,9 +427,9 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
 
         if (match) {
           equipmentType = match;
-          console.log(`✓ Matched ${countyName} to ${equipmentType}`);
+          console.log(`Matched ${countyName} to ${equipmentType}`);
         } else {
-          console.log(`✗ No match for ${countyName}, using default: scanner`);
+          console.log(`No match for ${countyName}, using default: scanner`);
         }
       }
 
@@ -530,6 +535,8 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
             censusBlockData={censusBlockData}
             showBubbleChart={showBubbleChart}
             votingEquipmentData={votingEquipmentData}
+            showCvapLegend={isPoliticalPartyState}
+            cvapLegendData={activeVotersData}
           />
         </div>
 
@@ -578,11 +585,11 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                 </div>
               ) : selectedDataset === AnalysisType.ACTIVE_VOTERS_2024 ? (
                 <div className="text-xs text-muted-foreground text-center overflow-y-auto">
-                  <ActiveVotersTable data={getActiveVotersData()} />
+                  <ActiveVotersTable data={activeVotersData} />
                   <div className="mt-8">
                     <ActiveVotersBarChart
                       stateName={formatStateName(stateName)}
-                      barData={getActiveVotersData()}
+                      barData={activeVotersData}
                     />
                   </div>
                 </div>

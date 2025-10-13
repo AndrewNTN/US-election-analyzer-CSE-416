@@ -6,7 +6,7 @@ import BaseMap from "@/components/map/base-map.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
 import OutlineLayer from "@/components/map/outline-layer.tsx";
 import AnalysisDrawer from "@/components/analysis-drawer.tsx";
-import { ChoroplethLegend } from "@/components/choropleth-legend.tsx";
+import { ChoroplethLegend } from "@/components/map/choropleth-legend";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Select,
