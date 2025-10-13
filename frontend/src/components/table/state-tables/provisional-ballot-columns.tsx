@@ -3,7 +3,6 @@ import type { ColumnDef, Row } from "@tanstack/react-table";
 export interface ProvisionBallotsData {
   region: string;
   metrics: Record<string, number>;
-  comments?: string;
 }
 
 const metricKeys = [
@@ -25,7 +24,7 @@ const columnHeaders = {
 export const provisionalBallotsColumns: ColumnDef<ProvisionBallotsData>[] = [
   {
     accessorKey: "region",
-    header: () => <div className="text-left font-semibold">EAVS Region</div>,
+    header: () => <div className="text-left font-semibold">Region</div>,
     cell: ({ row }: { row: Row<ProvisionBallotsData> }) => (
       <div className="text-sm text-left text-black font-medium py-0 px-0">
         {row.getValue("region")}
@@ -44,13 +43,4 @@ export const provisionalBallotsColumns: ColumnDef<ProvisionBallotsData>[] = [
       );
     },
   })),
-  {
-    id: "comments",
-    header: () => <div className="text-left">Comments</div>,
-    cell: ({ row }: { row: Row<ProvisionBallotsData> }) => (
-      <div className="text-sm text-left text-black max-w-xs truncate">
-        {row.original.comments || "-"}
-      </div>
-    ),
-  },
 ];

@@ -12,7 +12,7 @@ export interface ActiveVotersData {
 export const activeVotersColumns: ColumnDef<ActiveVotersData>[] = [
   {
     accessorKey: "eavsRegion",
-    header: () => <div className="text-left">EAVS Region</div>,
+    header: () => <div className="text-left">Region</div>,
     cell: ({ row }: { row: Row<ActiveVotersData> }) => (
       <div className="text-sm text-left text-black font-medium">
         {row.getValue("eavsRegion")}

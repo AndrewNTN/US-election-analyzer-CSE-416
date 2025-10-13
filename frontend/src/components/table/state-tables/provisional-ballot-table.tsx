@@ -35,7 +35,6 @@ export function ProvisionBallotsTable({
           E1d: provisional.E1d ?? 0,
           E1e: provisional.E1e ?? 0,
         },
-        comments: provisional.E1Comments,
       } satisfies ProvisionBallotsData;
     });
   }, [data]);
