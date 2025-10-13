@@ -52,7 +52,10 @@ import votingEquipmentTypeCaliforniaJson from "../../data/votingEquipmentType-ca
 import votingEquipmentTypeFloridaJson from "../../data/votingEquipmentType-florida.json" with { type: "json" };
 import votingEquipmentTypeOregonJson from "../../data/votingEquipmentType-oregon.json" with { type: "json" };
 import type { VotingEquipmentType } from "@/lib/choropleth.ts";
-import { useProvisionalAggregateQuery } from "@/hooks/use-eavs-queries";
+import {
+  useProvisionalAggregateQuery,
+  useProvisionalStateQuery,
+} from "@/hooks/use-eavs-queries";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
@@ -462,6 +465,13 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     error: provAggregateError,
   } = useProvisionalAggregateQuery(stateFipsPrefix);
 
+  const {
+    data: provStateData,
+    isPending: provStateLoading,
+    isError: provStateHasError,
+    error: provStateError,
+  } = useProvisionalStateQuery(stateFipsPrefix);
+
   const provChartData: ProvisionBallotsData[] = useMemo(() => {
     if (!provAggregateData) {
       return [];
@@ -571,7 +581,10 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                   ) : (
                     <>
                       <ProvisionBallotsTable
-                        fipsPrefix={stateFipsPrefix ?? null}
+                        data={provStateData}
+                        isPending={provStateLoading}
+                        isError={provStateHasError}
+                        error={provStateError}
                       />
                       <div className="mt-8">
                         <ProvisionalBallotsBarChart
