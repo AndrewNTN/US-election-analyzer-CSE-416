@@ -34,7 +34,6 @@ export interface ProvisionalBallotsApiResponse {
     E1d?: number;
     E1e?: number;
     E1e_Other?: string;
-    E1Comments?: string;
   };
 }
 

@@ -7,18 +7,21 @@ import {
   provisionalBallotsColumns,
   type ProvisionBallotsData,
 } from "./provisional-ballot-columns.tsx";
-import { useProvisionalStateQuery } from "@/hooks/use-eavs-queries";
+import type { ProvisionalBallotsApiResponse } from "@/lib/api/eavs-requests";
 
 interface ProvisionalBallotsTableProps {
-  fipsPrefix: string | null;
+  data: ProvisionalBallotsApiResponse[] | undefined;
+  isPending: boolean;
+  isError: boolean;
+  error: Error | null;
 }
 
 export function ProvisionBallotsTable({
-  fipsPrefix,
+  data,
+  isPending,
+  isError,
+  error,
 }: ProvisionalBallotsTableProps) {
-  const { data, isPending, isError, error } =
-    useProvisionalStateQuery(fipsPrefix);
-
   const tableData = useMemo<ProvisionBallotsData[]>(() => {
     if (!data) {
       return [];
