@@ -77,9 +77,10 @@ export function MailBallotsRejectedBarChart({
       metricKeys={METRIC_KEYS}
       metricLabels={METRIC_LABELS}
       metricAccessor={(data, key) => data[key]}
-      margin={{ top: 0, right: 16, left: 35, bottom: 8 }}
+      margin={{ top: 0, right: 16, left: 35, bottom: 50 }}
       yAxisLabel="Number of Rejected Ballots"
       yAxisTickFormatter={formatNumber}
+      xAxisAngle={-28}
     />
   );
 }
