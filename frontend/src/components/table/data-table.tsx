@@ -133,16 +133,45 @@ export function DataTableView<TData>({
           <TableHeader className={headerClasses}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  // Skip placeholders that aren't in the first header group
+                  if (header.isPlaceholder && headerGroup.depth > 0) {
+                    return null;
+                  }
+
+                  // Skip non-grouped columns in non-first rows (they should span from row 0)
+                  if (
+                    !header.isPlaceholder &&
+                    headerGroup.depth > 0 &&
+                    !header.column.parent
+                  ) {
+                    return null;
+                  }
+
+                  // For placeholders in the first row, render with rowSpan covering all rows
+                  const headerDepth = table.getHeaderGroups().length;
+                  const computedRowSpan = header.isPlaceholder
+                    ? headerDepth
+                    : header.rowSpan > 1
+                      ? header.rowSpan
+                      : undefined;
+                  const colSpan =
+                    header.colSpan > 1 ? header.colSpan : undefined;
+
+                  return (
+                    <TableHead
+                      key={header.id}
+                      colSpan={colSpan}
+                      rowSpan={computedRowSpan}
+                      className={cn(header.colSpan > 1 && "text-center")}
+                    >
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
@@ -178,7 +207,7 @@ export function DataTableView<TData>({
                     </TableRow>
                   );
                 })}
-                {/* Add empty placeholder rows to maintain consistent height */}
+                {/* Add invisible placeholder rows to maintain consistent height */}
                 {Array.from({
                   length: Math.max(
                     0,
@@ -188,19 +217,15 @@ export function DataTableView<TData>({
                 }).map((_, index) => (
                   <TableRow
                     key={`empty-${index}`}
-                    className={resolveRowClassName(
-                      table.getRowModel().rows.length + index,
+                    className={cn(
+                      resolveRowClassName(
+                        table.getRowModel().rows.length + index,
+                      ),
+                      "invisible",
                     )}
                   >
                     {table.getAllLeafColumns().map((column) => (
-                      <TableCell
-                        key={column.id}
-                        className={resolveCellClassName({
-                          column,
-                        } as Cell<TData, unknown>)}
-                      >
-                        &nbsp;
-                      </TableCell>
+                      <TableCell key={column.id}>&nbsp;</TableCell>
                     ))}
                   </TableRow>
                 ))}

@@ -17,7 +17,7 @@ export type EAVSRegionVoterData = {
 export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
   {
     accessorKey: "eavsRegion",
-    header: "County",
+    header: "Region",
     cell: ({ row }) => (
       <div className="font-medium text-sm">{row.getValue("eavsRegion")}</div>
     ),

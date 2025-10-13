@@ -28,7 +28,6 @@ import { ActiveVotersTable } from "../components/table/state-tables/active-voter
 import activeVotersDataJson from "../../data/activeVotersData.json" with { type: "json" };
 import activeVotersDataCaliforniaJson from "../../data/activeVotersData-california.json" with { type: "json" };
 import activeVotersDataFloridaJson from "../../data/activeVotersData-florida.json" with { type: "json" };
-import { PollbookDeletionsTable } from "../components/table/state-tables/pollbook-deletions-table.tsx";
 import pollbookDeletionsDataJson from "../../data/pollbookDeletionsData.json" with { type: "json" };
 import { MailBallotsRejectedTable } from "../components/table/state-tables/mail-ballots-rejected-table.tsx";
 import mailBallotsRejectedDataJson from "../../data/mailBallotsRejectedData.json" with { type: "json" };
@@ -505,7 +504,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
       {/* Main content */}
       <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Left - Dataset Selector */}
-        <div className="w-64 bg-gray-50 border-r p-4 overflow-y-auto flex-shrink-0">
+        <div className="w-64 bg-gray-50 border-r p-4 flex-shrink-0">
           <p className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
             Select Dataset
           </p>
@@ -526,7 +525,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
         </div>
 
         {/* Middle - Map */}
-        <div className="w-[35%] relative flex-shrink-0">
+        <div className="w-[30%] relative flex-shrink-0">
           <StateMap
             currentStateData={currentStateData}
             currentCountiesData={enrichedCountiesData}
@@ -541,7 +540,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
         </div>
 
         {/* Right - Analysis Content */}
-        <div className="flex-1 bg-white border-l overflow-y-auto min-w-0">
+        <div className="flex-1 bg-white border-l min-w-0">
           <div className="p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b">
               {analysisTypeLabels[selectedDataset]}
@@ -552,7 +551,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                   <VoterRegistrationLineChart data={voterRegistrationData} />
                 </div>
               ) : selectedDataset === AnalysisType.VOTER_REGISTRATION ? (
-                <div className="overflow-y-auto">
+                <div>
                   <VoterRegistrationTable data={eavsRegionVoterData} />
                 </div>
               ) : selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY ? (
@@ -562,7 +561,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                   />
                 </div>
               ) : selectedDataset === AnalysisType.PROVISIONAL_BALLOT ? (
-                <div className="text-xs text-muted-foreground text-center overflow-y-auto">
+                <div className="text-xs text-muted-foreground text-center">
                   {provLoading ? (
                     <p>Loading provisional ballot data...</p>
                   ) : provErrorMessage ? (
@@ -584,7 +583,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                   )}
                 </div>
               ) : selectedDataset === AnalysisType.ACTIVE_VOTERS_2024 ? (
-                <div className="text-xs text-muted-foreground text-center overflow-y-auto">
+                <div className="text-xs text-muted-foreground text-center">
                   <ActiveVotersTable data={activeVotersData} />
                   <div className="mt-8">
                     <ActiveVotersBarChart
@@ -612,8 +611,8 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                   />
                 </div>
               ) : selectedDataset === AnalysisType.POLLBOOK_DELETIONS_2024 ? (
-                <div className="text-xs text-muted-foreground text-center overflow-y-auto">
-                  <PollbookDeletionsTable data={pollbookDeletionsDataJson} />
+                <div className="text-xs text-muted-foreground text-center">
+                  <ActiveVotersTable data={activeVotersData} />
                   <div className="mt-8">
                     <PollbookDeletionsBarChart
                       stateName={formatStateName(stateName)}
@@ -622,7 +621,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                   </div>
                 </div>
               ) : selectedDataset === AnalysisType.MAIL_BALLOTS_REJECTED ? (
-                <div className="text-xs text-muted-foreground text-center overflow-y-auto">
+                <div className="text-xs text-muted-foreground text-center">
                   <MailBallotsRejectedTable data={mailBallotsRejectedData} />
                   <div className="mt-8">
                     <MailBallotsRejectedBarChart
@@ -632,7 +631,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-muted-foreground text-center overflow-y-auto">
+                <p className="text-xs text-muted-foreground text-center">
                   {analysisTypeLabels[selectedDataset]} visualization will be
                   displayed here.
                 </p>
