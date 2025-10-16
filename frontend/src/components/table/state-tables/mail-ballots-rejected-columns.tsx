@@ -87,7 +87,7 @@ export const mailBallotsRejectedColumns: ColumnDef<MailBallotsRejectedData>[] =
     ...GROUPED_COLUMNS.map((group) => ({
       id: group.id,
       header: () => (
-        <div className="text-center text-xs font-semibold text-gray-700 border-l-2 border-gray-400 py-1 pl-3">
+        <div className="text-center text-xs font-semibold text-black border-l-2 border-gray-400 py-1 pl-3">
           {group.label}
         </div>
       ),
@@ -95,7 +95,7 @@ export const mailBallotsRejectedColumns: ColumnDef<MailBallotsRejectedData>[] =
         accessorKey: key,
         header: () => (
           <div
-            className={`text-right text-xs text-gray-700 whitespace-nowrap py-0.5 ${colIndex === 0 ? "border-l-2 border-gray-400 pl-2" : ""}`}
+            className={`text-right text-xs text-black whitespace-nowrap py-0.5 ${colIndex === 0 ? "border-l-2 border-gray-400 pl-2" : ""}`}
           >
             {label}
           </div>
