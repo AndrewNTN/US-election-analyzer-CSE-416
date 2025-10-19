@@ -2,9 +2,9 @@ import { useMemo, useState } from "react";
 import BaseMap from "@/components/map/base-map.tsx";
 import OutlineLayer from "@/components/map/outline-layer.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
-import BubbleChartLayer, {
-  type CensusBlockData,
-} from "@/components/map/bubble-chart-layer.tsx";
+// import BubbleChartLayer, {
+//   type CensusBlockData,
+// } from "@/components/map/bubble-chart-layer.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
 import type { StateProps, CountyProps } from "@/types/map.ts";
 import type { StateChoroplethOption } from "@/constants/choropleth.ts";
@@ -39,7 +39,7 @@ interface StateMapProps {
   currentCountiesData: FeatureCollection<Geometry, CountyProps> | null;
   isDetailedState: boolean;
   choroplethOption?: StateChoroplethOption;
-  censusBlockData?: CensusBlockData[];
+  // censusBlockData?: CensusBlockData[];
   showBubbleChart?: boolean;
   votingEquipmentData?: Array<{
     eavsRegion: string;
@@ -274,8 +274,8 @@ export default function StateMap({
   currentCountiesData,
   isDetailedState,
   choroplethOption,
-  censusBlockData = [],
-  showBubbleChart = false,
+  // censusBlockData = [],
+  // showBubbleChart = false,
   votingEquipmentData = [],
   showCvapLegend = false,
   cvapLegendData = [],
@@ -345,7 +345,7 @@ export default function StateMap({
             </>
           )}
 
-          <BubbleChartLayer data={censusBlockData} visible={showBubbleChart} />
+          {/* <BubbleChartLayer data={censusBlockData} visible={showBubbleChart} /> */}
         </BaseMap>
 
         {/* Choropleth Legend - positioned on the map */}
