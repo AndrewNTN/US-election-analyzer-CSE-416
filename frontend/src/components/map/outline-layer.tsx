@@ -15,6 +15,7 @@ interface OutlineLayerProps<T extends BaseMapProps = MapFeatureProps> {
   hoverColor?: string;
   hoverWeight?: number;
   stateView?: boolean;
+  enableCountyInteractions?: boolean;
 }
 
 export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
@@ -25,6 +26,7 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
   hoverColor = "#1a1a1a",
   hoverWeight = 4,
   stateView = false,
+  enableCountyInteractions = true,
 }: OutlineLayerProps<T>) {
   const router = useRouter();
 
@@ -51,7 +53,8 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
   const onEachFeature = (feature: Feature<Geometry, T>, layer: Layer) => {
     if (feature.properties) {
       const isCounty = feature.properties && "STATEFP" in feature.properties;
-      const shouldEnableHover = !stateView || isCounty;
+      const shouldEnableHover =
+        !stateView || (isCounty && enableCountyInteractions);
 
       layer.on({
         mouseover: (e: LeafletMouseEvent) => {
@@ -76,7 +79,8 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
             router.navigate({ to: `/state/${stateName}` });
           }
 
-          if (onFeatureClick) {
+          // Only handle county clicks if interactions are enabled
+          if (onFeatureClick && (!isCounty || enableCountyInteractions)) {
             onFeatureClick(feature);
           }
         },

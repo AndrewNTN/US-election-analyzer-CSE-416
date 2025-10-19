@@ -41,13 +41,9 @@ interface StateMapProps {
   choroplethOption?: StateChoroplethOption;
   // censusBlockData?: CensusBlockData[];
   showBubbleChart?: boolean;
-  votingEquipmentData?: Array<{
-    eavsRegion: string;
-    equipmentTypes: string[];
-    primaryEquipment: string;
-  }>;
   showCvapLegend?: boolean;
   cvapLegendData?: ActiveVotersTableData[];
+  hasDetailedVoterData?: boolean;
 }
 
 type SafeCounty = {
@@ -276,9 +272,9 @@ export default function StateMap({
   choroplethOption,
   // censusBlockData = [],
   // showBubbleChart = false,
-  votingEquipmentData = [],
   showCvapLegend = false,
   cvapLegendData = [],
+  hasDetailedVoterData = false,
 }: StateMapProps) {
   const [selectedCounty, setSelectedCounty] = useState<SafeCounty | null>(null);
   const [partyFilter, setPartyFilter] = useState<string>("all");
@@ -328,10 +324,15 @@ export default function StateMap({
               <OutlineLayer
                 data={currentCountiesData}
                 stateView
-                onFeatureClick={(feature) => {
-                  const props = feature?.properties ?? null;
-                  handleCountyChange(props ? toSafeCounty(props) : null);
-                }}
+                enableCountyInteractions={hasDetailedVoterData}
+                onFeatureClick={
+                  hasDetailedVoterData
+                    ? (feature) => {
+                        const props = feature?.properties ?? null;
+                        handleCountyChange(props ? toSafeCounty(props) : null);
+                      }
+                    : undefined
+                }
               />
             </>
           ) : (
@@ -351,10 +352,7 @@ export default function StateMap({
         {/* Choropleth Legend - positioned on the map */}
         {choroplethOption && choroplethOption !== "off" && (
           <div className="absolute bottom-32 left-4 z-10 max-w-xs">
-            <ChoroplethLegend
-              choroplethOption={choroplethOption}
-              votingEquipmentData={votingEquipmentData}
-            />
+            <ChoroplethLegend choroplethOption={choroplethOption} />
           </div>
         )}
         {showCvapLegend && cvapLegendData.length > 0 ? (
