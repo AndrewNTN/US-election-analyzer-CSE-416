@@ -17,7 +17,7 @@ import {
   SPLASH_CHOROPLETH_OPTIONS,
   STATE_CHOROPLETH_OPTIONS,
   type ChoroplethOption,
-} from "@/constants/choropleth";
+} from "@/lib/choropleth";
 
 interface ChoroplethLayerProps<T extends BaseMapProps = MapFeatureProps> {
   data: FeatureCollection<Geometry, T>;
