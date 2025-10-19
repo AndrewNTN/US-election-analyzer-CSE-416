@@ -21,7 +21,7 @@ import {
   SPLASH_CHOROPLETH_OPTIONS,
   SPLASH_CHOROPLETH_LABELS,
   type SplashChoroplethOption,
-} from "@/constants/choropleth.ts";
+} from "@/lib/choropleth.ts";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 

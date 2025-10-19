@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button.tsx";
 import {
   STATE_CHOROPLETH_OPTIONS,
   type StateChoroplethOption,
-} from "@/constants/choropleth.ts";
+} from "@/lib/choropleth.ts";
 import StateMap from "@/components/map/state-map.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
 // import type { CensusBlockData } from "@/components/map/bubble-chart-layer.tsx";

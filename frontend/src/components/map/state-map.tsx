@@ -7,7 +7,7 @@ import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
 // } from "@/components/map/bubble-chart-layer.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
 import type { StateProps, CountyProps } from "@/types/map.ts";
-import type { StateChoroplethOption } from "@/constants/choropleth.ts";
+import type { StateChoroplethOption } from "@/lib/choropleth.ts";
 import { ChoroplethLegend } from "@/components/map/choropleth-legend";
 import { CvapRegistrationLegend } from "@/components/map/cvap-registration-legend";
 import type { ActiveVotersData as ActiveVotersTableData } from "@/components/table/state-tables/active-voters-columns";
@@ -379,9 +379,7 @@ export default function StateMap({
           {/* Sample voters */}
           <div className="flex flex-col mt-2 gap-4">
             <div className="flex items-center justify-end gap-2 mb-2">
-              <label className="text-sm text-muted-foreground">
-                Filter by Party:
-              </label>
+              <label className="text-sm">Filter by Party:</label>
               <Select value={partyFilter} onValueChange={setPartyFilter}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="All Parties" />
@@ -411,7 +409,7 @@ export default function StateMap({
 
           <DialogFooter className="mt-2">
             <DialogClose asChild>
-              <Button variant="secondary" size="sm">
+              <Button variant="outline" size="sm">
                 Close
               </Button>
             </DialogClose>
