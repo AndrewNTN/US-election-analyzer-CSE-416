@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import statesJSON from "../../data/us-states.json";
 import countiesJSON from "../../data/counties.geojson.json";
-import censusBlockDataJSON from "../../data/censusBlockData.json";
+// import censusBlockDataJSON from "../../data/censusBlockData.json";
 import type { CountyProps, StateProps } from "@/types/map.ts";
 import {
   DETAILED_STATES,
@@ -18,7 +18,7 @@ import {
 } from "@/constants/choropleth.ts";
 import StateMap from "@/components/map/state-map.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
-import type { CensusBlockData } from "@/components/map/bubble-chart-layer.tsx";
+// import type { CensusBlockData } from "@/components/map/bubble-chart-layer.tsx";
 
 //table imports
 import { VoterRegistrationTable } from "../components/table/state-tables/voter-registration-table.tsx";
@@ -59,7 +59,7 @@ import {
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
-const censusBlockData = censusBlockDataJSON as CensusBlockData[];
+// const censusBlockData = censusBlockDataJSON as CensusBlockData[];
 
 // Voter registration data - already sorted by 2024 registered voters in ascending order
 const voterRegistrationData = voterRegistrationDataJson as {
@@ -123,7 +123,6 @@ const AnalysisType = {
   POLLBOOK_DELETIONS_2024: "pb-deletions-2024",
   MAIL_BALLOTS_REJECTED: "mail-balots-rejected",
   VOTER_REGISTRATION: "voter-registration",
-  VOTER_REGISTRATION_CHANGES: "voter-registration-changes",
   STATE_EQUIPMENT_SUMMARY: "state-equip-summary",
   DROP_BOX_VOTING: "drop-box-voting",
   EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS:
@@ -138,7 +137,6 @@ const analysisTypeLabels: Record<AnalysisTypeValue, string> = {
   [AnalysisType.POLLBOOK_DELETIONS_2024]: "2024 EAVS Pollbook Deletions",
   [AnalysisType.MAIL_BALLOTS_REJECTED]: "Mail Ballots Rejected",
   [AnalysisType.VOTER_REGISTRATION]: "Voter Registration",
-  [AnalysisType.VOTER_REGISTRATION_CHANGES]: "Voter Registration Changes",
   [AnalysisType.STATE_EQUIPMENT_SUMMARY]: "State Equipment Summary",
   [AnalysisType.DROP_BOX_VOTING]: "Drop Box Voting",
   [AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS]:
@@ -158,8 +156,6 @@ const analysisToChoroplethMap: Record<
   [AnalysisType.MAIL_BALLOTS_REJECTED]:
     STATE_CHOROPLETH_OPTIONS.MAIL_BALLOTS_REJECTED,
   [AnalysisType.VOTER_REGISTRATION]:
-    STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION,
-  [AnalysisType.VOTER_REGISTRATION_CHANGES]:
     STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION,
   [AnalysisType.STATE_EQUIPMENT_SUMMARY]:
     STATE_CHOROPLETH_OPTIONS.VOTING_EQUIPMENT_TYPE,
@@ -208,9 +204,21 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
   const isPoliticalPartyState = stateDetails?.politicalPartyState ?? false;
 
   // Set choropleth option based on selected dataset, but only for detailed states
-  const choroplethOption = isDetailedState
-    ? analysisToChoroplethMap[selectedDataset]
-    : STATE_CHOROPLETH_OPTIONS.OFF;
+  const choroplethOption = useMemo(() => {
+    if (!isDetailedState) {
+      return STATE_CHOROPLETH_OPTIONS.OFF;
+    }
+
+    // For voter registration, only show choropleth if state has detailed voter data
+    if (
+      selectedDataset === AnalysisType.VOTER_REGISTRATION &&
+      !hasDetailedVoterData(normalizedStateKey)
+    ) {
+      return STATE_CHOROPLETH_OPTIONS.OFF;
+    }
+
+    return analysisToChoroplethMap[selectedDataset];
+  }, [isDetailedState, selectedDataset, normalizedStateKey]);
 
   const handleBackToMainMap = () => {
     navigate({ to: "/" });
@@ -220,9 +228,6 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
   const availableAnalysisOptions = useMemo<AnalysisTypeValue[]>(
     () =>
       Object.values(AnalysisType).filter((option) => {
-        if (option === AnalysisType.VOTER_REGISTRATION) {
-          return hasDetailedVoterData(normalizedStateKey);
-        }
         if (option === AnalysisType.DROP_BOX_VOTING) {
           return hasDropBoxVoting(normalizedStateKey);
         }
@@ -541,7 +546,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
             currentCountiesData={enrichedCountiesData}
             isDetailedState={detailedState}
             choroplethOption={choroplethOption}
-            censusBlockData={censusBlockData}
+            // censusBlockData={censusBlockData}
             showBubbleChart={showBubbleChart}
             votingEquipmentData={votingEquipmentData}
             showCvapLegend={isPoliticalPartyState}
@@ -556,13 +561,14 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
               {analysisTypeLabels[selectedDataset]}
             </h2>
             <div className="mt-4">
-              {selectedDataset === AnalysisType.VOTER_REGISTRATION_CHANGES ? (
-                <div className="h-[400px]">
-                  <VoterRegistrationLineChart data={voterRegistrationData} />
-                </div>
-              ) : selectedDataset === AnalysisType.VOTER_REGISTRATION ? (
+              {selectedDataset === AnalysisType.VOTER_REGISTRATION ? (
                 <div>
-                  <VoterRegistrationTable data={eavsRegionVoterData} />
+                  {hasDetailedVoterData(normalizedStateKey) && (
+                    <VoterRegistrationTable data={eavsRegionVoterData} />
+                  )}
+                  <div className="h-[350px]">
+                    <VoterRegistrationLineChart data={voterRegistrationData} />
+                  </div>
                 </div>
               ) : selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY ? (
                 <div className="h-full">
