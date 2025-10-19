@@ -77,7 +77,7 @@ export const mailBallotsRejectedColumns: ColumnDef<MailBallotsRejectedData>[] =
   [
     {
       accessorKey: "eavsRegion",
-      header: () => <div className="text-left text-xs font-medium">Region</div>,
+      header: () => <div className="text-left text-sm font-medium">Region</div>,
       cell: ({ row }: { row: Row<MailBallotsRejectedData> }) => (
         <div className="text-left text-xs text-black font-medium">
           {row.getValue("eavsRegion")}
