@@ -30,13 +30,13 @@ const METRIC_KEYS = [
 type MetricKey = (typeof METRIC_KEYS)[number];
 
 const METRIC_LABELS: Record<MetricKey, string> = {
-  A12b: "A12b – Death",
-  A12c: "A12c – Felony conviction",
-  A12d: "A12d – Mental incapacity",
-  A12e: "A12e – Moved out of jurisdiction",
-  A12f: "A12f – Voter request",
-  A12g: "A12g – Failed to respond",
-  A12h: "A12h – Other",
+  A12b: "A12b – Moved",
+  A12c: "A12c – Death",
+  A12d: "A12d – Felony",
+  A12e: "A12e – Fail Response",
+  A12f: "A12f – Incompetent to Vote",
+  A12g: "A12g – Voter Request",
+  A12h: "A12h – Duplicate Record",
 };
 
 export function PollbookDeletionsBarChart({
