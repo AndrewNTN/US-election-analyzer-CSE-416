@@ -443,8 +443,15 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                   {hasDetailedVoterData(normalizedStateKey) && (
                     <VoterRegistrationTable data={eavsRegionVoterData} />
                   )}
-                  <div className="h-[350px]">
-                    <VoterRegistrationLineChart data={voterRegistrationData} />
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-2 text-center text-gray-900">
+                      Changes in Voter Registration by County
+                    </h3>
+                    <div className="h-[350px]">
+                      <VoterRegistrationLineChart
+                        data={voterRegistrationData}
+                      />
+                    </div>
                   </div>
                 </div>
               ) : selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY ? (
@@ -469,7 +476,11 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                         isError={provStateHasError}
                         error={provStateError}
                       />
-                      <div className="mt-8">
+                      <div className="mt-4">
+                        <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
+                          Provisional Ballots by Reason -{" "}
+                          {formatStateName(stateName)}
+                        </h3>
                         <ProvisionalBallotsBarChart
                           stateName={formatStateName(stateName)}
                           barData={provChartData}
@@ -481,7 +492,10 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
               ) : selectedDataset === AnalysisType.ACTIVE_VOTERS_2024 ? (
                 <div className="text-xs text-muted-foreground text-center">
                   <ActiveVotersTable data={activeVotersData} />
-                  <div className="mt-8">
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
+                      Active Voters Status - {formatStateName(stateName)}
+                    </h3>
                     <ActiveVotersBarChart
                       stateName={formatStateName(stateName)}
                       barData={activeVotersData}
@@ -509,7 +523,11 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
               ) : selectedDataset === AnalysisType.POLLBOOK_DELETIONS_2024 ? (
                 <div className="text-xs text-muted-foreground text-center">
                   <ActiveVotersTable data={activeVotersData} />
-                  <div className="mt-8">
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
+                      Pollbook Deletions by Reason -{" "}
+                      {formatStateName(stateName)}
+                    </h3>
                     <PollbookDeletionsBarChart
                       stateName={formatStateName(stateName)}
                       barData={pollbookDeletionsDataJson}
@@ -519,7 +537,11 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
               ) : selectedDataset === AnalysisType.MAIL_BALLOTS_REJECTED ? (
                 <div className="text-xs text-muted-foreground text-center">
                   <MailBallotsRejectedTable data={mailBallotsRejectedData} />
-                  <div className="mt-8">
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
+                      Mail Ballots Rejected by Reason -{" "}
+                      {formatStateName(stateName)}
+                    </h3>
                     <MailBallotsRejectedBarChart
                       stateName={formatStateName(stateName)}
                       barData={mailBallotsRejectedData}
