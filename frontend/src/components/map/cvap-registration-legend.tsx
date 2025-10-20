@@ -26,7 +26,7 @@ export function CvapRegistrationLegend({ data }: CvapRegistrationLegendProps) {
       <h3 className="text-sm font-semibold mb-3">CVAP Registration</h3>
       <div className="space-y-2 text-sm">
         <div className="flex items-center justify-between">
-          <span className="text-muted-foreground">
+          <span>
             Average Rate:{" "}
             <span className="font-medium">{formatRate(averageRate)}</span>
           </span>
