@@ -31,7 +31,6 @@ import activeVotersDataFloridaJson from "../../data/activeVotersData-florida.jso
 import pollbookDeletionsDataJson from "../../data/pollbookDeletionsData.json" with { type: "json" };
 import { MailBallotsRejectedTable } from "../components/table/state-tables/mail-ballots-rejected-table.tsx";
 import mailBallotsRejectedDataJson from "../../data/mailBallotsRejectedData.json" with { type: "json" };
-import { StateEquipmentSummaryCards } from "../components/equipment/state-equipment-summary-cards";
 import stateEquipmentSummaryJson from "../../data/stateEquipmentSummary.json" with { type: "json" };
 
 //chart imports
@@ -52,6 +51,8 @@ import {
   useProvisionalAggregateQuery,
   useProvisionalStateQuery,
 } from "@/hooks/use-eavs-queries";
+import { StateEquipmentSummaryTable } from "@/components/table/state-tables/state-equipment-summary-table.tsx";
+import type { StateEquipmentSummary } from "@/components/table/state-tables/state-equipment-summary-columns.tsx";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
@@ -448,8 +449,8 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                 </div>
               ) : selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY ? (
                 <div className="h-full">
-                  <StateEquipmentSummaryCards
-                    data={stateEquipmentSummaryJson}
+                  <StateEquipmentSummaryTable
+                    data={stateEquipmentSummaryJson as StateEquipmentSummary[]}
                   />
                 </div>
               ) : selectedDataset === AnalysisType.PROVISIONAL_BALLOT ? (
