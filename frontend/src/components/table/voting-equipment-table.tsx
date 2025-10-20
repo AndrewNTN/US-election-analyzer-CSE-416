@@ -73,7 +73,7 @@ export function VotingEquipmentTable({ data }: VotingEquipmentTableProps) {
       <DataTableView
         table={table}
         className="flex flex-col space-y-1"
-        tableContainerClassName="rounded-md overflow-visible"
+        tableContainerClassName="rounded-md border"
         headerClassName="bg-background"
         bodyClassName="text-sm"
         rowClassName="h-7 cursor-pointer hover:bg-muted/50"
@@ -95,7 +95,7 @@ export function VotingEquipmentTable({ data }: VotingEquipmentTableProps) {
             className="px-1 py-0.5"
           />
         )}
-        cellClassName="py-1 px-2"
+        cellClassName="py-1.5 px-2"
       />
 
       {selectedState && equipmentByYear.length > 0 && (

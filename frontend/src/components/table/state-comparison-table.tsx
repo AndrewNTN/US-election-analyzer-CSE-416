@@ -30,6 +30,7 @@ export function StateComparisonTable({
       className="flex flex-col h-full space-y-2"
       tableContainerClassName="flex-1 min-h-0 overflow-auto"
       bodyClassName="text-sm"
+      cellClassName="py-1.5 px-2"
       stickyHeader
       paginationSlot={(tableInstance) => (
         <DataTablePagination

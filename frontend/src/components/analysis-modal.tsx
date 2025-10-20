@@ -8,10 +8,12 @@ import {
 import { VotingEquipmentTable } from "@/components/table/voting-equipment-table.tsx";
 import type { VotingEquipment } from "@/components/table/voting-equipment-columns.tsx";
 import { EquipmentSummaryTable } from "@/components/table/equipment-summary-table";
+import type { EquipmentSummary } from "@/components/table/equipment-summary-columns.tsx";
 import { StateComparisonTable } from "@/components/table/state-comparison-table.tsx";
 import { OptInOptOutTable } from "@/components/table/opt-in-opt-out-table.tsx";
 import { EarlyVotingTable } from "@/components/table/early-voting-table.tsx";
 import votingEquipmentDataJson from "../../data/votingEquipment.json" with { type: "json" };
+import equipmentSummaryDataJson from "../../data/equipmentSummary.json" with { type: "json" };
 import {
   stateComparisonData,
   republicanStateName,
@@ -33,6 +35,9 @@ import type { AnalysisItem } from "./analysis-drawer";
 
 const votingEquipmentData: VotingEquipment[] =
   votingEquipmentDataJson as VotingEquipment[];
+
+const equipmentSummaryData: EquipmentSummary[] =
+  equipmentSummaryDataJson as EquipmentSummary[];
 
 export const AnalysisOption = {
   US_VOTING_EQUIPMENT: "US Voting Equipment",
@@ -63,7 +68,7 @@ export default function AnalysisModal({
       case AnalysisOption.US_VOTING_EQUIPMENT:
         return <VotingEquipmentTable data={votingEquipmentData} />;
       case AnalysisOption.EQUIPMENT_SUMMARY:
-        return <EquipmentSummaryTable />;
+        return <EquipmentSummaryTable data={equipmentSummaryData} />;
       case AnalysisOption.REPUBLICAN_VS_DEMOCRATIC:
         return (
           <StateComparisonTable

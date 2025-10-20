@@ -10,7 +10,7 @@ export type EquipmentSummary = {
   scanRate: number;
   errorRate: number;
   reliability: number;
-  qualityMeasure: string;
+  qualityMeasure: number;
 };
 
 export const equipmentSummaryColumns: ColumnDef<EquipmentSummary>[] = [
@@ -38,7 +38,7 @@ export const equipmentSummaryColumns: ColumnDef<EquipmentSummary>[] = [
   },
   {
     accessorKey: "age",
-    header: () => <div className="text-right">Age (years)</div>,
+    header: () => <div className="text-right">Age (Years)</div>,
     cell: ({ row }) => {
       const value = row.getValue("age") as number;
       return <div className="text-right">{value}</div>;
@@ -46,7 +46,7 @@ export const equipmentSummaryColumns: ColumnDef<EquipmentSummary>[] = [
   },
   {
     accessorKey: "operatingSystem",
-    header: "Operating System",
+    header: "OS",
     cell: ({ row }) => <div>{row.getValue("operatingSystem")}</div>,
   },
   {
@@ -56,7 +56,7 @@ export const equipmentSummaryColumns: ColumnDef<EquipmentSummary>[] = [
   },
   {
     accessorKey: "scanRate",
-    header: () => <div className="text-right">Scan Rate (%)</div>,
+    header: () => <div className="text-right">Scan Rate</div>,
     cell: ({ row }) => {
       const value = row.getValue("scanRate") as number;
       return <div className="text-right">{value.toFixed(1)}%</div>;
@@ -64,7 +64,7 @@ export const equipmentSummaryColumns: ColumnDef<EquipmentSummary>[] = [
   },
   {
     accessorKey: "errorRate",
-    header: () => <div className="text-right">Error Rate (%)</div>,
+    header: () => <div className="text-right">Error Rate</div>,
     cell: ({ row }) => {
       const value = row.getValue("errorRate") as number;
       return <div className="text-right">{value.toFixed(1)}%</div>;
@@ -72,7 +72,7 @@ export const equipmentSummaryColumns: ColumnDef<EquipmentSummary>[] = [
   },
   {
     accessorKey: "reliability",
-    header: () => <div className="text-right">Reliability (%)</div>,
+    header: () => <div className="text-right">Reliability</div>,
     cell: ({ row }) => {
       const value = row.getValue("reliability") as number;
       return <div className="text-right">{value.toFixed(1)}%</div>;
@@ -80,10 +80,10 @@ export const equipmentSummaryColumns: ColumnDef<EquipmentSummary>[] = [
   },
   {
     accessorKey: "qualityMeasure",
-    header: () => <div className="text-center">Quality</div>,
+    header: () => <div className="text-right">Quality</div>,
     cell: ({ row }) => {
-      const value = row.getValue("qualityMeasure") as string;
-      return <div className={`text-center`}>{value}</div>;
+      const value = row.getValue("qualityMeasure") as number;
+      return <div className="text-right">{value.toFixed(2)}</div>;
     },
   },
 ];

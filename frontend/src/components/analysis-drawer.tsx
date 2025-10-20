@@ -47,12 +47,12 @@ export default function AnalysisDrawer({
     {
       title: AnalysisOption.US_VOTING_EQUIPMENT,
       icon: Database,
-      description: "National voting equipment by state table",
+      description: "National voting equipment by state table as of 2024",
     },
     {
       title: AnalysisOption.EQUIPMENT_SUMMARY,
       icon: Database,
-      description: "US voting equipment summary by provider",
+      description: "US voting equipment summary by provider as of 2024",
     },
   ];
 
@@ -88,9 +88,6 @@ export default function AnalysisDrawer({
       />
 
       <Drawer open={open} onOpenChange={onOpenChange}>
-        {/*
-      TODO: functionality for tables and graphs here, use https://ui.shadcn.com/docs/components/data-table imo and then chart js
-      TODO: for the rest, generate the mock data, table/chart labels should be in the use cases */}
         <DrawerContent className="h-[85vh]">
           <DrawerHeader className="text-left border-b">
             <DrawerTitle>Election Analysis Tools</DrawerTitle>
