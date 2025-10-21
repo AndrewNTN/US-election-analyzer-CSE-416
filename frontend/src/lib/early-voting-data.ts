@@ -31,11 +31,16 @@ const earlyVotingRaw = earlyVotingDataJson as {
 
 export const earlyVotingData: EarlyVotingRow[] = [
   {
-    metric: "Total Votes Cast",
+    metric: "Total Early Voting (Votes)",
     republicanValue:
-      earlyVotingRaw.republicanState.totalVotesCast.toLocaleString(),
+      earlyVotingRaw.republicanState.earlyVotingCategories.totalEarlyVoting.votes.toLocaleString(),
     democraticValue:
-      earlyVotingRaw.democraticState.totalVotesCast.toLocaleString(),
+      earlyVotingRaw.democraticState.earlyVotingCategories.totalEarlyVoting.votes.toLocaleString(),
+  },
+  {
+    metric: "Total Early Voting (%)",
+    republicanValue: `${earlyVotingRaw.republicanState.earlyVotingCategories.totalEarlyVoting.percentage}%`,
+    democraticValue: `${earlyVotingRaw.democraticState.earlyVotingCategories.totalEarlyVoting.percentage}%`,
   },
   {
     metric: "In-Person Early Voting (Votes)",
@@ -50,16 +55,16 @@ export const earlyVotingData: EarlyVotingRow[] = [
     democraticValue: `${earlyVotingRaw.democraticState.earlyVotingCategories.inPersonEarlyVoting.percentage}%`,
   },
   {
-    metric: "Total Early Voting (Votes)",
+    metric: "Drop Box Voting (Votes)",
     republicanValue:
-      earlyVotingRaw.republicanState.earlyVotingCategories.totalEarlyVoting.votes.toLocaleString(),
+      earlyVotingRaw.republicanState.earlyVotingCategories.dropBoxVoting.votes.toLocaleString(),
     democraticValue:
-      earlyVotingRaw.democraticState.earlyVotingCategories.totalEarlyVoting.votes.toLocaleString(),
+      earlyVotingRaw.democraticState.earlyVotingCategories.dropBoxVoting.votes.toLocaleString(),
   },
   {
-    metric: "Total Early Voting (%)",
-    republicanValue: `${earlyVotingRaw.republicanState.earlyVotingCategories.totalEarlyVoting.percentage}%`,
-    democraticValue: `${earlyVotingRaw.democraticState.earlyVotingCategories.totalEarlyVoting.percentage}%`,
+    metric: "Drop Box Voting (%)",
+    republicanValue: `${earlyVotingRaw.republicanState.earlyVotingCategories.dropBoxVoting.percentage}%`,
+    democraticValue: `${earlyVotingRaw.democraticState.earlyVotingCategories.dropBoxVoting.percentage}%`,
   },
 ];
 
