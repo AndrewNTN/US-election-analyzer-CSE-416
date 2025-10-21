@@ -50,7 +50,7 @@ import equipmentQualityDataJson from "../../data/equipmentQualityVsRejectedBallo
 import {
   useProvisionalAggregateQuery,
   useProvisionalStateQuery,
-} from "@/hooks/use-eavs-queries";
+} from "@/lib/api/use-eavs-queries.ts";
 import { StateEquipmentSummaryTable } from "@/components/table/state-tables/state-equipment-summary-table.tsx";
 import type { StateEquipmentSummary } from "@/components/table/state-tables/state-equipment-summary-columns.tsx";
 

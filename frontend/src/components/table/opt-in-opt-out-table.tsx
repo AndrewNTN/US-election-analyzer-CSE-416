@@ -33,7 +33,7 @@ export function OptInOptOutTable({
     <DataTable
       data={data}
       columns={columns}
-      pageSize={6}
+      pageSize={4}
       className="flex flex-col h-full space-y-2"
       tableContainerClassName="flex-1 min-h-0 overflow-auto"
       bodyClassName="text-sm"

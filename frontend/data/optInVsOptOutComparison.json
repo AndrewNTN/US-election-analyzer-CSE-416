@@ -8,7 +8,7 @@
     "registrationRate": 85.0,
     "totalVotesCast": 11200000,
     "turnoutRate": 75.3,
-    "turnoutOfEligible": 64.0
+    "turnoutVotes": 11200000
   },
   "optOutWithSameDay": {
     "state": "California",
@@ -19,7 +19,7 @@
     "registrationRate": 74.9,
     "totalVotesCast": 17100000,
     "turnoutRate": 74.8,
-    "turnoutOfEligible": 56.1
+    "turnoutVotes": 17100000
   },
   "optOutWithoutSameDay": {
     "state": "Oregon",
@@ -30,7 +30,6 @@
     "registrationRate": 90.0,
     "totalVotesCast": 2450000,
     "turnoutRate": 80.1,
-    "turnoutOfEligible": 72.1
+    "turnoutVotes": 2450000
   }
 }
-

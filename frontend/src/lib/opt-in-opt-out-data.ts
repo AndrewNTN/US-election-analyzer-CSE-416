@@ -1,70 +1,51 @@
 import optInOptOutDataJson from "../../data/optInVsOptOutComparison.json" with { type: "json" };
 import type { OptInOptOutRow } from "@/components/table/opt-in-opt-out-columns.tsx";
 
+interface StateData {
+  state: string;
+  registeredVoters: number;
+  registrationRate: number;
+  turnoutRate: number;
+  turnoutVotes: number;
+}
+
 // Transform opt-in vs opt-out data into table rows
 const optInOptOutRaw = optInOptOutDataJson as {
-  optInState: Record<string, string | number>;
-  optOutWithSameDay: Record<string, string | number>;
-  optOutWithoutSameDay: Record<string, string | number>;
+  optInState: StateData;
+  optOutWithSameDay: StateData;
+  optOutWithoutSameDay: StateData;
 };
 
 export const optInOptOutData: OptInOptOutRow[] = [
   {
-    metric: "Eligible Voters",
-    optInValue: (
-      optInOptOutRaw.optInState.eligibleVoters as number
-    ).toLocaleString(),
-    optOutWithSameDayValue: (
-      optInOptOutRaw.optOutWithSameDay.eligibleVoters as number
-    ).toLocaleString(),
-    optOutWithoutSameDayValue: (
-      optInOptOutRaw.optOutWithoutSameDay.eligibleVoters as number
-    ).toLocaleString(),
+    metric: "Voter Registration (Count)",
+    optInValue: optInOptOutRaw.optInState.registeredVoters.toLocaleString(),
+    optOutWithSameDayValue:
+      optInOptOutRaw.optOutWithSameDay.registeredVoters.toLocaleString(),
+    optOutWithoutSameDayValue:
+      optInOptOutRaw.optOutWithoutSameDay.registeredVoters.toLocaleString(),
   },
   {
-    metric: "Registered Voters",
-    optInValue: (
-      optInOptOutRaw.optInState.registeredVoters as number
-    ).toLocaleString(),
-    optOutWithSameDayValue: (
-      optInOptOutRaw.optOutWithSameDay.registeredVoters as number
-    ).toLocaleString(),
-    optOutWithoutSameDayValue: (
-      optInOptOutRaw.optOutWithoutSameDay.registeredVoters as number
-    ).toLocaleString(),
-  },
-  {
-    metric: "Registration Rate",
+    metric: "Voter Registration (%)",
     optInValue: `${optInOptOutRaw.optInState.registrationRate}%`,
     optOutWithSameDayValue: `${optInOptOutRaw.optOutWithSameDay.registrationRate}%`,
     optOutWithoutSameDayValue: `${optInOptOutRaw.optOutWithoutSameDay.registrationRate}%`,
   },
   {
-    metric: "Total Votes Cast",
-    optInValue: (
-      optInOptOutRaw.optInState.totalVotesCast as number
-    ).toLocaleString(),
-    optOutWithSameDayValue: (
-      optInOptOutRaw.optOutWithSameDay.totalVotesCast as number
-    ).toLocaleString(),
-    optOutWithoutSameDayValue: (
-      optInOptOutRaw.optOutWithoutSameDay.totalVotesCast as number
-    ).toLocaleString(),
+    metric: "Turnout (Votes)",
+    optInValue: optInOptOutRaw.optInState.turnoutVotes.toLocaleString(),
+    optOutWithSameDayValue:
+      optInOptOutRaw.optOutWithSameDay.turnoutVotes.toLocaleString(),
+    optOutWithoutSameDayValue:
+      optInOptOutRaw.optOutWithoutSameDay.turnoutVotes.toLocaleString(),
   },
   {
-    metric: "Turnout Rate (of Registered)",
+    metric: "Turnout (%)",
     optInValue: `${optInOptOutRaw.optInState.turnoutRate}%`,
     optOutWithSameDayValue: `${optInOptOutRaw.optOutWithSameDay.turnoutRate}%`,
     optOutWithoutSameDayValue: `${optInOptOutRaw.optOutWithoutSameDay.turnoutRate}%`,
   },
-  {
-    metric: "Turnout Rate (of Eligible)",
-    optInValue: `${optInOptOutRaw.optInState.turnoutOfEligible}%`,
-    optOutWithSameDayValue: `${optInOptOutRaw.optOutWithSameDay.turnoutOfEligible}%`,
-    optOutWithoutSameDayValue: `${optInOptOutRaw.optOutWithoutSameDay.turnoutOfEligible}%`,
-  },
 ];
-
 export const optInStateName = optInOptOutRaw.optInState.state as string;
 export const optOutWithSameDayStateName = optInOptOutRaw.optOutWithSameDay
   .state as string;
