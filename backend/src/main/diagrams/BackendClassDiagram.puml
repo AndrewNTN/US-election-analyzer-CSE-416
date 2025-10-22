@@ -1,0 +1,145 @@
+@startuml
+!pragma useUnicode true
+skinparam packageStyle rectangle
+hide circle
+set separator none
+
+' --- external stub so "extends" works visually ---
+package "org.springframework.data.mongodb.repository" {
+  interface MongoRepository<T, ID>
+}
+
+' ================== APPLICATION ==================
+package "edu.sbu.cse416.app" {
+  class Application {
+    + static void main(String[] args)
+  }
+}
+
+' ================== CONFIG ==================
+package "edu.sbu.cse416.app.config" {
+  class CorsConfig {
+    + org.springframework.web.servlet.config.annotation.WebMvcConfigurer corsConfigurer()
+  }
+
+  class DataSeeder {
+    + void run(String... args)
+    ' NOTE: helper(s) present in code were truncated in the uploaded file;
+    ' keeping diagram readable and faithful: only public API included.
+  }
+}
+
+' ================== CONTROLLER ==================
+package "edu.sbu.cse416.app.controller" {
+  class EavsController {
+    - edu.sbu.cse416.app.service.EavsAggregationService aggregationService
+    - edu.sbu.cse416.app.repository.EavsDataRepository eavsRepository
+
+    + EavsController(edu.sbu.cse416.app.service.EavsAggregationService, edu.sbu.cse416.app.repository.EavsDataRepository)
+
+    ' from code
+    + org.springframework.http.ResponseEntity<java.util.List<java.lang.Object>> getAllStatesPlaceholder()
+
+    ' visible in file (signatures reconstructed from the visible annotations/params)
+    + org.springframework.http.ResponseEntity<java.util.List<edu.sbu.cse416.app.model.EavsData>> getProvisionalByStateFipsPrefix(
+        @org.springframework.web.bind.annotation.PathVariable String fipsPrefix,
+        @org.springframework.web.bind.annotation.RequestParam(defaultValue="2024") Integer electionYear)
+
+    + org.springframework.http.ResponseEntity<java.util.Map<String, Object>> getProvisionalAggregateByStateFipsPrefix(
+        @org.springframework.web.bind.annotation.PathVariable String fipsPrefix,
+        @org.springframework.web.bind.annotation.RequestParam(defaultValue="2024") Integer electionYear)
+  }
+}
+
+' ================== SERVICE ==================
+package "edu.sbu.cse416.app.service" {
+  class EavsAggregationService {
+    ' file is currently a stub in your repo
+    ' + potential aggregation methods (none defined yet)
+  }
+}
+
+' ================== REPOSITORY ==================
+package "edu.sbu.cse416.app.repository" {
+  interface EavsDataRepository {
+    + java.util.List<edu.sbu.cse416.app.model.EavsData> findByStateAbbrAndElectionYear(String stateAbbr, Integer electionYear)
+    + java.util.List<edu.sbu.cse416.app.model.EavsData> findByFipsCodeRegexAndElectionYear(String regex, Integer electionYear)
+  }
+}
+
+' ================== DOMAIN MODEL ==================
+package "edu.sbu.cse416.app.model" {
+  class EavsData {
+    + String id
+    + String fipsCode
+    + String jurisdictionName
+    + String stateFull
+    + String stateAbbr
+    + Integer electionYear
+    + VoterRegistration voterRegistration
+    + MailBallots mailBallots
+    + ProvisionalBallots provisionalBallots
+    + VotingEquipment votingEquipment
+  }
+
+  class VoterRegistration {
+    + Integer totalRegistered
+    + Integer totalActive
+    + Integer totalInactive
+    + String comments
+  }
+
+  class MailBallots {
+    + Integer totalMailBallotsTransmitted
+    + Integer rejectedNoSignature
+    + Integer rejectedSignatureMismatch
+    + String rejectionComments
+  }
+
+  class ProvisionalBallots {
+    + Integer totalProvisionalBallotsCast
+    + Integer provisionalBallotsFullyCounted
+    + Integer provisionalBallotsPartiallyCounted
+    + Integer provisionalBallotsRejected
+    + Integer reasonNoRegistration
+    + Integer reasonNameNotFound
+    + String provisionalComments
+  }
+
+  class VotingEquipment {
+    + java.util.List<EquipmentDetail> dreNoVvpat
+    + java.util.List<EquipmentDetail> dreWithVvpat
+    + java.util.List<EquipmentDetail> ballotMarkingDevices
+    + java.util.List<EquipmentDetail> opticalScanners
+  }
+
+  class EquipmentDetail {
+    + String make
+    + String model
+    + Integer quantity
+    + Integer age
+    + String underlyingOs
+    + Boolean vvsgCertified
+    + String certificationLevel
+    + Integer scanRate
+    + Double errorRate
+    + String equipmentType
+  }
+}
+
+' ================== RELATIONSHIPS ==================
+' wiring (what the code actually does)
+EavsController ..> EavsDataRepository : queries
+EavsController ..> EavsAggregationService : uses
+DataSeeder ..> EavsDataRepository : inserts
+
+' Spring Data inheritance
+EavsDataRepository -|> MongoRepository
+
+' domain composition/aggregation
+EavsData *-- VoterRegistration
+EavsData *-- MailBallots
+EavsData *-- ProvisionalBallots
+EavsData *-- VotingEquipment
+VotingEquipment o-- "0..*" EquipmentDetail
+@enduml
