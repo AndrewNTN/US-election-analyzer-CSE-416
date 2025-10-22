@@ -1,0 +1,26 @@
+@startuml
+autonumber
+skinparam sequenceMessageAlign center
+
+actor User
+participant "State Analysis Page\n(frontend)" as FE
+participant "EavsController\n(backend)" as API
+participant "EavsDataRepository" as Repo
+database "MongoDB" as DB
+
+User -> FE: Select state / open "Provisional" view
+FE -> API: GET /api/eavs/provisional/aggregate/{fipsPrefix}\n?electionYear=2024
+API -> Repo: findByFipsCodeRegexAndElectionYear("0*{fipsPrefix}", 2024)
+Repo -> DB: Query EavsData by FIPS regex + year
+DB --> Repo: List<EavsData>
+Repo --> API: List<EavsData>
+
+API -> API: Sum E2a..E2h from ProvisionalBallots
+API --> FE: 200 OK\n{ E2a, E2b, ..., E2h, total }
+FE -> FE: Update bar chart + choropleth + table
+
+alt No matches
+  API --> FE: 200 OK { } (empty) or 404 Not Found
+  FE -> FE: Show "No data for selection"
+end
+@enduml
