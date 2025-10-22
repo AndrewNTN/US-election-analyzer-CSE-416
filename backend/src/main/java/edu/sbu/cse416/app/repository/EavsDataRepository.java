@@ -8,24 +8,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EavsDataRepository extends MongoRepository<EavsData, String> {
-    List<EavsData> findByStateAbbr(String stateAbbr);
 
-    List<EavsData> findByElectionYear(Integer year);
-
-    @Query("{ 'stateAbbr': { $in: ?0 }, 'electionYear': ?1 }")
-    List<EavsData> findByStatesAndYear(List<String> stateAbbrs, Integer year);
-
+    // Used by EavsAggregationService
     List<EavsData> findByStateAbbrAndElectionYear(String stateAbbr, Integer electionYear);
 
-    List<EavsData> findByStateFullAndElectionYear(String stateFull, Integer electionYear);
-
-    EavsData findByFipsCode(String fipsCode);
-
-    EavsData findByFipsCodeAndElectionYear(String fipsCode, Integer electionYear);
-
+    // Used by EavsController (provisional endpoints)
     @Query("{ 'fipsCode': { $regex: ?0 }, 'electionYear': ?1 }")
-List<EavsData> findByFipsCodeRegexAndElectionYear(String regex, Integer electionYear);
-
+    List<EavsData> findByFipsCodeRegexAndElectionYear(String regex, Integer electionYear);
 
 }
 
