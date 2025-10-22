@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select.tsx";
 import statesJSON from "../../data/us-states.json";
-import type { StateProps } from "@/types/map.ts";
+import type { StateProps } from "@/lib/map.ts";
 import {
   SPLASH_CHOROPLETH_OPTIONS,
   SPLASH_CHOROPLETH_LABELS,
