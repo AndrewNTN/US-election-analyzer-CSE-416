@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import edu.sbu.cse416.app.dto.StateEavsData;
-import edu.sbu.cse416.app.dto.StateWithJurisdictions;
 import edu.sbu.cse416.app.model.EavsData;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
 import edu.sbu.cse416.app.service.EavsAggregationService;
@@ -30,76 +28,11 @@ public class EavsController {
         this.eavsRepository = eavsRepository;
     }
 
-    // ✅ NEW: Pagination endpoint
-    @GetMapping
-    public Page<EavsData> getAll(@RequestParam(defaultValue = "0") int page,
-                                 @RequestParam(defaultValue = "10") int size) {
-        return eavsRepository.findAll(PageRequest.of(page, size));
-    }
+    @GetMapping("/api/eavs/states")
+public ResponseEntity<List<Object>> getAllStatesPlaceholder() {
+    return ResponseEntity.ok(List.of());
+}
 
-    @GetMapping("/states")
-    public ResponseEntity<List<StateEavsData>> getAllStates(@RequestParam Integer electionYear) {
-        List<StateEavsData> states = aggregationService.getStateAggregatedData(electionYear);
-        return ResponseEntity.ok(states);
-    }
-
-    @GetMapping("/states/{stateAbbr}")
-    public ResponseEntity<StateWithJurisdictions> getStateWithJurisdictions(
-            @PathVariable String stateAbbr,
-            @RequestParam Integer electionYear,
-            @RequestParam(defaultValue = "false") boolean includeJurisdictions) {
-
-        StateWithJurisdictions result =
-                aggregationService.getStateWithJurisdictions(stateAbbr, electionYear, includeJurisdictions);
-
-        if (result == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(result);
-    }
-
-    @GetMapping("/jurisdictions/{fipsCode}")
-    public ResponseEntity<EavsData> getJurisdiction(@PathVariable String fipsCode,
-                                                    @RequestParam Integer electionYear) {
-
-        EavsData jurisdiction = eavsRepository.findByFipsCodeAndElectionYear(fipsCode, electionYear);
-        if (jurisdiction == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(jurisdiction);
-    }
-
-    @GetMapping("/states/compare")
-    public ResponseEntity<List<StateEavsData>> compareStates(
-            @RequestParam List<String> stateAbbrs, @RequestParam Integer electionYear) {
-
-        List<StateEavsData> comparison = aggregationService.compareStates(stateAbbrs, electionYear);
-        return ResponseEntity.ok(comparison);
-    }
-
-    @GetMapping("/states/fips/{stateFips}")
-    public ResponseEntity<StateWithJurisdictions> getStateWithJurisdictionsByFips(
-            @PathVariable String stateFips,
-            @RequestParam Integer electionYear,
-            @RequestParam(defaultValue = "false") boolean includeJurisdictions) {
-
-        StateWithJurisdictions result =
-                aggregationService.getStateWithJurisdictionsByFips(stateFips, electionYear, includeJurisdictions);
-
-        if (result == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(result);
-    }
-
-    @GetMapping("/provisional/fips/{fipsCode}")
-    public ResponseEntity<EavsData> getProvisionalByFips(@PathVariable String fipsCode) {
-        EavsData record = eavsRepository.findByFipsCode(fipsCode); // <-- use eavsRepository
-        if (record == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(record);
-    }
 
 
     @GetMapping("/provisional/state/{fipsPrefix}")
