@@ -1,16 +1,14 @@
 package edu.sbu.cse416.app.config;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import java.util.Random;
-
 import edu.sbu.cse416.app.model.EavsData;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
+
 @Component
 public class DataSeeder implements CommandLineRunner {
 
@@ -37,8 +35,7 @@ public class DataSeeder implements CommandLineRunner {
         int counter = 0;
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(
-                new ClassPathResource("2024_EAVS_for_Public_Release_nolabel_V1.csv").getInputStream()
-        ))) {
+                new ClassPathResource("2024_EAVS_for_Public_Release_nolabel_V1.csv").getInputStream()))) {
             String line;
             boolean isHeader = true;
 
@@ -66,8 +63,7 @@ public class DataSeeder implements CommandLineRunner {
                 int E2h = 386;
                 int E2i = 387;
 
-                edu.sbu.cse416.app.model.ProvisionalBallots prov =
-                    new edu.sbu.cse416.app.model.ProvisionalBallots(
+                edu.sbu.cse416.app.model.ProvisionalBallots prov = new edu.sbu.cse416.app.model.ProvisionalBallots(
                         (int) parseVal(values[E2a]), // totalProvisionalBallotsCast
                         (int) parseVal(values[E2b]), // provisionalBallotsFullyCounted
                         (int) parseVal(values[E2c]), // provisionalBallotsPartiallyCounted
@@ -75,25 +71,19 @@ public class DataSeeder implements CommandLineRunner {
                         (int) parseVal(values[E2e]), // reasonNoRegistration
                         (int) parseVal(values[E2f]), // reasonNameNotFound
                         values.length > E2i ? values[E2i].replace("\"", "") : "" // provisionalComments
-                    );
-
+                        );
 
                 EavsData data = new EavsData(
-                    null,
-                    fipsCode,
-                    jurisdictionName,
-                    stateFull,
-                    stateAbbr,
-                    2024,
-                    new edu.sbu.cse416.app.model.VoterRegistration(
-                        0, 0, 0, "not loaded yet"
-                    ),
-                    new edu.sbu.cse416.app.model.MailBallots(
-                        0, 0, 0, "not loaded yet"
-                    ),
-                    prov,
-                    null
-                );
+                        null,
+                        fipsCode,
+                        jurisdictionName,
+                        stateFull,
+                        stateAbbr,
+                        2024,
+                        new edu.sbu.cse416.app.model.VoterRegistration(0, 0, 0, "not loaded yet"),
+                        new edu.sbu.cse416.app.model.MailBallots(0, 0, 0, "not loaded yet"),
+                        prov,
+                        null);
 
                 eavsRepo.save(data);
                 counter++;

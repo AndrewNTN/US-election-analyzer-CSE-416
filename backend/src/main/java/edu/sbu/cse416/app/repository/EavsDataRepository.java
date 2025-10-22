@@ -15,6 +15,4 @@ public interface EavsDataRepository extends MongoRepository<EavsData, String> {
     // Used by EavsController (provisional endpoints)
     @Query("{ 'fipsCode': { $regex: ?0 }, 'electionYear': ?1 }")
     List<EavsData> findByFipsCodeRegexAndElectionYear(String regex, Integer electionYear);
-
 }
-
