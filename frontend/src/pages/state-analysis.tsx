@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import statesJSON from "../../data/us-states.json";
 import countiesJSON from "../../data/counties.geojson.json";
 // import censusBlockDataJSON from "../../data/censusBlockData.json";
-import type { CountyProps, StateProps } from "@/types/map.ts";
+import type { CountyProps, StateProps } from "@/lib/map.ts";
 import {
   DETAILED_STATES,
   hasDetailedVoterData,

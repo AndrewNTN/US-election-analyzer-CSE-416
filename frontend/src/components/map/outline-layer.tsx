@@ -4,7 +4,7 @@ import type { PathOptions, Layer, LeafletMouseEvent } from "leaflet";
 import { useRouter } from "@tanstack/react-router";
 import { DETAILED_STATES } from "@/constants/states.ts";
 import { formatStateNameForUrl } from "@/lib/utils";
-import type { BaseMapProps, MapFeatureProps } from "@/types/map";
+import type { BaseMapProps, MapFeatureProps } from "@/lib/map.ts";
 
 interface OutlineLayerProps<T extends BaseMapProps = MapFeatureProps> {
   data: FeatureCollection<Geometry, T>;

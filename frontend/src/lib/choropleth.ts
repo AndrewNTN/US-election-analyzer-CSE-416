@@ -63,8 +63,8 @@ export const CHOROPLETH_COLORS: string[] = [
 
 // Equipment age scale uses the generic palette; breaks tuned for age (years)
 export const equipmentAgeScale: ColorScale = {
-  colors: CHOROPLETH_COLORS,
-  breaks: [0, 2, 4, 6, 8, 10, 12, 15],
+  colors: CHOROPLETH_COLORS.slice(2, 8),
+  breaks: [2, 4, 6, 8, 10, 100],
 };
 
 // Provisional ballots percentage scale (uses generic palette)
