@@ -15,4 +15,3 @@ public record EavsData(
         MailBallots mailBallots,
         ProvisionalBallots provisionalBallots,
         VotingEquipment votingEquipment) {}
-
