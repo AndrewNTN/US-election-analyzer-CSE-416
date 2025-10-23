@@ -27,7 +27,7 @@ export function ProvisionBallotsTable({
       return [];
     }
 
-    return data.map((record) => {
+    const mappedData = data.map((record) => {
       const provisional = record.provisionalBallots || {};
       return {
         region: record.jurisdictionName || "Unknown",
@@ -40,6 +40,27 @@ export function ProvisionBallotsTable({
         },
       } satisfies ProvisionBallotsData;
     });
+
+    // Calculate totals for each metric
+    const totals = mappedData.reduce(
+      (acc, item) => {
+        acc.E1a += item.metrics.E1a;
+        acc.E1b += item.metrics.E1b;
+        acc.E1c += item.metrics.E1c;
+        acc.E1d += item.metrics.E1d;
+        acc.E1e += item.metrics.E1e;
+        return acc;
+      },
+      { E1a: 0, E1b: 0, E1c: 0, E1d: 0, E1e: 0 },
+    );
+
+    // Add total row at the end
+    const totalRow: ProvisionBallotsData = {
+      region: "TOTAL",
+      metrics: totals,
+    };
+
+    return [...mappedData, totalRow];
   }, [data]);
 
   if (isPending) {
