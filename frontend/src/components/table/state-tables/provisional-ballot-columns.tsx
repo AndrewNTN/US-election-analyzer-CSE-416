@@ -25,19 +25,27 @@ export const provisionalBallotsColumns: ColumnDef<ProvisionBallotsData>[] = [
   {
     accessorKey: "region",
     header: () => <div className="text-left font-semibold">Region</div>,
-    cell: ({ row }: { row: Row<ProvisionBallotsData> }) => (
-      <div className="text-sm text-left text-black font-medium py-0 px-0">
-        {row.getValue("region")}
-      </div>
-    ),
+    cell: ({ row }: { row: Row<ProvisionBallotsData> }) => {
+      const isTotal = row.getValue("region") === "TOTAL";
+      return (
+        <div
+          className={`text-sm text-left py-0 px-0 ${isTotal ? "font-bold text-black" : "text-black font-medium"}`}
+        >
+          {row.getValue("region")}
+        </div>
+      );
+    },
   },
   ...metricKeys.map((key) => ({
     id: key,
     header: () => <div className="text-right">{columnHeaders[key]}</div>,
     cell: ({ row }: { row: Row<ProvisionBallotsData> }) => {
       const metrics = row.original.metrics;
+      const isTotal = row.getValue("region") === "TOTAL";
       return (
-        <div className="text-sm text-right text-black">
+        <div
+          className={`text-sm text-right ${isTotal ? "font-bold text-black" : "text-black"}`}
+        >
           {metrics?.[key]?.toLocaleString?.() ?? "0"}
         </div>
       );
