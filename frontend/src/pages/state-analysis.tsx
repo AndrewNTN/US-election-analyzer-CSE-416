@@ -53,6 +53,8 @@ import {
 } from "@/lib/api/use-eavs-queries.ts";
 import { StateEquipmentSummaryTable } from "@/components/table/state-tables/state-equipment-summary-table.tsx";
 import type { StateEquipmentSummary } from "@/components/table/state-tables/state-equipment-summary-columns.tsx";
+import EquipmentQualityPDF from "@/components/chart/ei-equipment-graph.tsx";
+import RejectedBallotsPDF from "@/components/chart/ei-rejected-ballots.tsx";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
@@ -124,6 +126,10 @@ const AnalysisType = {
   DROP_BOX_VOTING: "drop-box-voting",
   EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS:
     "equipment-quality-vs-rejected-ballots",
+  EI_EQUIPMENT_QUALITY:
+    "EI_Equipment",
+  EI_REJECTED_BALLOTS:
+    "EI_Rejected_Ballots",
 } as const;
 
 type AnalysisTypeValue = (typeof AnalysisType)[keyof typeof AnalysisType];
@@ -138,6 +144,10 @@ const analysisTypeLabels: Record<AnalysisTypeValue, string> = {
   [AnalysisType.DROP_BOX_VOTING]: "Drop Box Voting",
   [AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS]:
     "Equipment vs Rejected Ballots",
+  [AnalysisType.EI_EQUIPMENT_QUALITY]:
+    "EI Equipment Quality",
+  [AnalysisType.EI_REJECTED_BALLOTS]:
+    "EI Rejected Ballots",
 };
 
 // Map analysis types to choropleth options
@@ -157,6 +167,10 @@ const analysisToChoroplethMap: Record<
   [AnalysisType.STATE_EQUIPMENT_SUMMARY]: STATE_CHOROPLETH_OPTIONS.OFF,
   [AnalysisType.DROP_BOX_VOTING]: STATE_CHOROPLETH_OPTIONS.OFF,
   [AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS]:
+    STATE_CHOROPLETH_OPTIONS.OFF,
+  [AnalysisType.EI_EQUIPMENT_QUALITY]:
+    STATE_CHOROPLETH_OPTIONS.OFF,
+  [AnalysisType.EI_REJECTED_BALLOTS]:
     STATE_CHOROPLETH_OPTIONS.OFF,
 };
 
@@ -379,6 +393,63 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     ? (provAggregateError?.message ?? "Unknown error")
     : null;
 
+  const getEquipmentQualityEIData = () => {
+    // Dummy probability data for ecological inference chart
+    // Each row = one quality level (x-axis), with relative probabilities for each demographic group (y-axis)
+    const dummyEIData = [
+      { q: 0,   white: 0.0001, black: 0.0004, hispanic: 0.0002, asian: 0.0001 },
+      { q: 5,   white: 0.001,  black: 0.002,  hispanic: 0.0015, asian: 0.0008 },
+      { q: 10,  white: 0.003,  black: 0.006,  hispanic: 0.004,  asian: 0.002 },
+      { q: 15,  white: 0.008,  black: 0.014,  hispanic: 0.010,  asian: 0.005 },
+      { q: 20,  white: 0.018,  black: 0.028,  hispanic: 0.022,  asian: 0.012 },
+      { q: 25,  white: 0.030,  black: 0.045,  hispanic: 0.035,  asian: 0.022 },
+      { q: 30,  white: 0.045,  black: 0.060,  hispanic: 0.048,  asian: 0.035 },
+      { q: 35,  white: 0.060,  black: 0.068,  hispanic: 0.060,  asian: 0.048 },
+      { q: 40,  white: 0.072,  black: 0.070,  hispanic: 0.065,  asian: 0.060 },
+      { q: 45,  white: 0.080,  black: 0.066,  hispanic: 0.068,  asian: 0.070 },
+      { q: 50,  white: 0.082,  black: 0.058,  hispanic: 0.070,  asian: 0.075 },
+      { q: 55,  white: 0.078,  black: 0.046,  hispanic: 0.068,  asian: 0.078 },
+      { q: 60,  white: 0.068,  black: 0.032,  hispanic: 0.060,  asian: 0.080 },
+      { q: 65,  white: 0.052,  black: 0.018,  hispanic: 0.045,  asian: 0.075 },
+      { q: 70,  white: 0.034,  black: 0.009,  hispanic: 0.028,  asian: 0.060 },
+      { q: 75,  white: 0.018,  black: 0.004,  hispanic: 0.015,  asian: 0.040 },
+      { q: 80,  white: 0.008,  black: 0.0015, hispanic: 0.007,  asian: 0.022 },
+      { q: 85,  white: 0.003,  black: 0.0006, hispanic: 0.003,  asian: 0.010 },
+      { q: 90,  white: 0.001,  black: 0.0002, hispanic: 0.001,  asian: 0.004 },
+      { q: 95,  white: 0.0003, black: 0.0001, hispanic: 0.0004, asian: 0.001 },
+      { q: 100, white: 0.0001, black: 0.0000, hispanic: 0.0001, asian: 0.0001 },
+    ];
+    return dummyEIData;
+  }
+
+  const getRejectedBallotsEIData = () => {
+  // Simulated posterior densities for rejected ballot rates
+  const dummyEIData = [
+    { q: 0,   white: 0.0001, black: 0.0003, hispanic: 0.0004, asian: 0.0001 },
+    { q: 5,   white: 0.0005, black: 0.0012, hispanic: 0.0014, asian: 0.0003 },
+    { q: 10,  white: 0.0015, black: 0.0035, hispanic: 0.0032, asian: 0.0008 },
+    { q: 15,  white: 0.003,  black: 0.0068, hispanic: 0.006,  asian: 0.0018 },
+    { q: 20,  white: 0.006,  black: 0.012,  hispanic: 0.010,  asian: 0.004 },
+    { q: 25,  white: 0.011,  black: 0.020,  hispanic: 0.016,  asian: 0.007 },
+    { q: 30,  white: 0.020,  black: 0.031,  hispanic: 0.025,  asian: 0.012 },
+    { q: 35,  white: 0.034,  black: 0.043,  hispanic: 0.038,  asian: 0.020 },
+    { q: 40,  white: 0.048,  black: 0.054,  hispanic: 0.050,  asian: 0.031 },
+    { q: 45,  white: 0.060,  black: 0.061,  hispanic: 0.058,  asian: 0.043 },
+    { q: 50,  white: 0.065,  black: 0.063,  hispanic: 0.060,  asian: 0.054 },
+    { q: 55,  white: 0.060,  black: 0.059,  hispanic: 0.056,  asian: 0.062 },
+    { q: 60,  white: 0.048,  black: 0.050,  hispanic: 0.050,  asian: 0.066 },
+    { q: 65,  white: 0.034,  black: 0.037,  hispanic: 0.041,  asian: 0.065 },
+    { q: 70,  white: 0.020,  black: 0.025,  hispanic: 0.030,  asian: 0.058 },
+    { q: 75,  white: 0.010,  black: 0.015,  hispanic: 0.020,  asian: 0.044 },
+    { q: 80,  white: 0.004,  black: 0.008,  hispanic: 0.012,  asian: 0.028 },
+    { q: 85,  white: 0.0015, black: 0.004,  hispanic: 0.006,  asian: 0.015 },
+    { q: 90,  white: 0.0006, black: 0.0015, hispanic: 0.0025, asian: 0.007 },
+    { q: 95,  white: 0.0002, black: 0.0005, hispanic: 0.001,  asian: 0.002 },
+    { q: 100, white: 0.0001, black: 0.0001, hispanic: 0.0003, asian: 0.0005 },
+  ];
+  return dummyEIData;
+};
+
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
@@ -547,6 +618,14 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                       barData={mailBallotsRejectedData}
                     />
                   </div>
+                </div>
+              ) :selectedDataset === AnalysisType.EI_EQUIPMENT_QUALITY ? (
+                <div className="text-xs text-muted-foreground text-center">
+                  <EquipmentQualityPDF data = {getEquipmentQualityEIData()} groups = {["white", "hispanic", "black", "asian", "other"]}></EquipmentQualityPDF>
+                </div>
+              ) :selectedDataset === AnalysisType.EI_REJECTED_BALLOTS ? (
+                <div className="text-xs text-muted-foreground text-center">
+                  <RejectedBallotsPDF data = {getRejectedBallotsEIData()} groups = {["white", "hispanic", "black", "asian", "other"]}></RejectedBallotsPDF>
                 </div>
               ) : (
                 <p className="text-xs text-muted-foreground text-center">
