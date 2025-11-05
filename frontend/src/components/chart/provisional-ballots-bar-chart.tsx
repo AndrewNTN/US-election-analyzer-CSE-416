@@ -4,8 +4,8 @@ import { formatNumber } from "@/lib/utils";
 export interface ProvisionBallotsData {
   E2a: number; // Not on List
   E2b: number; // Lacked ID
-  E2c: number; // Challenged Eligibility
-  E2d: number; // Not Eligible
+  E2c: number; // Official Challenged Eligibility
+  E2d: number; // Person Challenged Eligibility
   E2e: number; // Not Resident
   E2f: number; // Registration Not Updated
   E2g: number; // Did Not Surrender Mail Ballot
@@ -36,8 +36,8 @@ type MetricKey = (typeof METRIC_KEYS)[number];
 const METRIC_LABELS: Record<MetricKey, string> = {
   E2a: "E2a – Not on List",
   E2b: "E2b – Lacked ID",
-  E2c: "E2c – Challenged Eligibility",
-  E2d: "E2d – Not Eligible",
+  E2c: "E2c – Official Challenged Eligibility",
+  E2d: "E2d – Person Challenged Eligibility",
   E2e: "E2e – Not Resident",
   E2f: "E2f – Registration Not Updated",
   E2g: "E2g – Did Not Surrender Mail Ballot",
