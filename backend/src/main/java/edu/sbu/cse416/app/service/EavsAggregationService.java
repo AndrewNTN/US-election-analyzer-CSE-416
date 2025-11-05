@@ -12,5 +12,5 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EavsAggregationService {
-    // ts is cooked
+    // function that takes in attribute returns total for state
 }
