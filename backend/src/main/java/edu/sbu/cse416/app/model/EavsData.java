@@ -12,7 +12,12 @@ public record EavsData(
         String stateAbbr,
         Integer electionYear,
         VoterRegistration voterRegistration,
-        MailBallots mailBallots,
+        MailBallotsRejectedReason mailBallotsRejected,
         ProvisionalBallots provisionalBallots,
-        VotingEquipment votingEquipment) {}
+        VoterDeletion voterDeletion,
+        Integer mailTransmittedTotal,
+        Integer dropBoxesTotal,
+        Integer totalDropBoxesEarlyVoting,
+        Integer inPersonEarlyVoting
+        ) {}
 

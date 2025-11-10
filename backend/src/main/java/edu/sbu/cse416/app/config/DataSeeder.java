@@ -14,6 +14,30 @@ import java.io.InputStreamReader;
 @Component
 public class DataSeeder implements CommandLineRunner {
 
+    private static final int COL_FIPS = 0;
+    private static final int COL_JURISDICTION = 1;
+    private static final int COL_STATE_FULL = 2;
+    private static final int COL_STATE_ABBR = 3;
+    // E1a-E1e, 
+    private static final int COL_E1a = 386;
+    private static final int COL_E1b = 387;
+    private static final int COL_E1c = 388;
+    private static final int COL_E1d = 389;
+    private static final int COL_E1e = 391;
+    // E2a-E2i,
+    private static final int COL_E2a = 393;
+    private static final int COL_E2b = 394;
+    private static final int COL_E2c = 395;
+    private static final int COL_E2d = 396;
+    private static final int COL_E2e = 397;
+    private static final int COL_E2f = 398;
+    private static final int COL_E2g = 399;
+    private static final int COL_E2h = 400;
+    private static final int COL_E2i = 401;
+    // (one var) sum of E2j E2k E2l
+
+
+
     @Autowired
     private EavsDataRepository eavsRepo;
 
@@ -56,15 +80,13 @@ public class DataSeeder implements CommandLineRunner {
                 String stateFull = values[2].replace("\"", "");
                 String stateAbbr = values[3].replace("\"", "");
 
-                int E2a = 379;
-                int E2b = 380;
-                int E2c = 381;
-                int E2d = 382;
-                int E2e = 383;
-                int E2f = 384;
-                int E2g = 385;
-                int E2h = 386;
-                int E2i = 387;
+
+                // 
+                
+
+
+                // , A1a-A1c, A12b-A12h, C9b-C9q, C3a, F1f, C5a, C1a, C3a 
+
 
                 edu.sbu.cse416.app.model.ProvisionalBallots prov =
                     new edu.sbu.cse416.app.model.ProvisionalBallots(
