@@ -1,6 +1,6 @@
 [
   {
-    "eavsRegion": "Region 1",
+    "eavsRegion": "Miami-Dade County",
     "C9b": 245,
     "C9c": 180,
     "C9d": 95,
@@ -20,7 +20,7 @@
     "notes": "Higher rejection rate in urban areas"
   },
   {
-    "eavsRegion": "Region 2",
+    "eavsRegion": "Broward County",
     "C9b": 198,
     "C9c": 145,
     "C9d": 76,
@@ -40,7 +40,7 @@
     "notes": "Improved signature verification process"
   },
   {
-    "eavsRegion": "Region 3",
+    "eavsRegion": "Palm Beach County",
     "C9b": 312,
     "C9c": 228,
     "C9d": 121,
@@ -60,7 +60,7 @@
     "notes": "Post-election audit completed"
   },
   {
-    "eavsRegion": "Region 4",
+    "eavsRegion": "Hillsborough County",
     "C9b": 156,
     "C9c": 114,
     "C9d": 60,
@@ -80,7 +80,7 @@
     "notes": "Rural area with consistent patterns"
   },
   {
-    "eavsRegion": "Region 5",
+    "eavsRegion": "Orange County",
     "C9b": 267,
     "C9c": 195,
     "C9d": 103,
@@ -100,7 +100,7 @@
     "notes": "Enhanced voter education efforts"
   },
   {
-    "eavsRegion": "Region 6",
+    "eavsRegion": "Duval County",
     "C9b": 189,
     "C9c": 138,
     "C9d": 73,
@@ -120,7 +120,7 @@
     "notes": "College area with higher turnover"
   },
   {
-    "eavsRegion": "Region 7",
+    "eavsRegion": "Pinellas County",
     "C9b": 298,
     "C9c": 218,
     "C9d": 115,
@@ -140,7 +140,7 @@
     "notes": "Industrial district with shift workers"
   },
   {
-    "eavsRegion": "Region 8",
+    "eavsRegion": "Lee County",
     "C9b": 223,
     "C9c": 163,
     "C9d": 86,
@@ -160,4 +160,3 @@
     "notes": "Coastal retirement communities"
   }
 ]
-

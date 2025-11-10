@@ -5,11 +5,11 @@
     "quantity": 12500,
     "age": 8,
     "operatingSystem": "Windows CE 5.0",
-    "certification": "EAC Certified",
+    "certification": "VVSG 1.1 certified",
     "scanRate": 95.8,
     "errorRate": 0.8,
     "reliability": 94.2,
-    "qualityMeasure": "A"
+    "qualityMeasure": 0.73
   },
   {
     "provider": "ES&S",
@@ -17,11 +17,11 @@
     "quantity": 3200,
     "age": 6,
     "operatingSystem": "Windows CE 6.0",
-    "certification": "EAC Certified",
+    "certification": "VVSG 1.1 certified",
     "scanRate": 97.2,
     "errorRate": 0.5,
     "reliability": 96.5,
-    "qualityMeasure": "A+"
+    "qualityMeasure": 0.82
   },
   {
     "provider": "ES&S",
@@ -29,11 +29,11 @@
     "quantity": 1850,
     "age": 4,
     "operatingSystem": "Windows Embedded",
-    "certification": "EAC Certified",
+    "certification": "VVSG 2.0 applied",
     "scanRate": 98.1,
     "errorRate": 0.3,
     "reliability": 97.8,
-    "qualityMeasure": "A+"
+    "qualityMeasure": 0.91
   },
   {
     "provider": "ES&S",
@@ -41,11 +41,11 @@
     "quantity": 8900,
     "age": 5,
     "operatingSystem": "Embedded Linux",
-    "certification": "EAC Certified",
+    "certification": "VVSG 1.1 certified",
     "scanRate": 96.5,
     "errorRate": 0.6,
     "reliability": 95.8,
-    "qualityMeasure": "A"
+    "qualityMeasure": 0.78
   },
   {
     "provider": "Dominion Voting",
@@ -53,11 +53,11 @@
     "quantity": 9200,
     "age": 7,
     "operatingSystem": "Windows CE 5.0",
-    "certification": "EAC Certified",
+    "certification": "VVSG 1.1 certified",
     "scanRate": 94.5,
     "errorRate": 1.1,
     "reliability": 93.2,
-    "qualityMeasure": "A-"
+    "qualityMeasure": 0.70
   },
   {
     "provider": "Dominion Voting",
@@ -65,11 +65,11 @@
     "quantity": 6750,
     "age": 5,
     "operatingSystem": "Embedded Linux",
-    "certification": "EAC Certified",
+    "certification": "VVSG 2.0 applied",
     "scanRate": 96.8,
     "errorRate": 0.7,
     "reliability": 95.9,
-    "qualityMeasure": "A"
+    "qualityMeasure": 0.85
   },
   {
     "provider": "Dominion Voting",
@@ -77,11 +77,11 @@
     "quantity": 4100,
     "age": 3,
     "operatingSystem": "Custom RTOS",
-    "certification": "EAC Certified",
+    "certification": "VVSG 2.0 certified",
     "scanRate": 98.5,
     "errorRate": 0.2,
     "reliability": 98.3,
-    "qualityMeasure": "A+"
+    "qualityMeasure": 0.94
   },
   {
     "provider": "Dominion Voting",
@@ -89,11 +89,11 @@
     "quantity": 3500,
     "age": 6,
     "operatingSystem": "Windows 10 IoT",
-    "certification": "EAC Certified",
+    "certification": "VVSG 1.1 certified",
     "scanRate": 95.2,
     "errorRate": 0.9,
     "reliability": 94.1,
-    "qualityMeasure": "A-"
+    "qualityMeasure": 0.75
   },
   {
     "provider": "Hart InterCivic",
@@ -101,11 +101,11 @@
     "quantity": 5200,
     "age": 4,
     "operatingSystem": "Embedded Linux",
-    "certification": "EAC Certified",
+    "certification": "VVSG 2.0 applied",
     "scanRate": 97.5,
     "errorRate": 0.4,
     "reliability": 97.1,
-    "qualityMeasure": "A+"
+    "qualityMeasure": 0.90
   },
   {
     "provider": "Hart InterCivic",
@@ -113,11 +113,11 @@
     "quantity": 3800,
     "age": 4,
     "operatingSystem": "Embedded Linux",
-    "certification": "EAC Certified",
+    "certification": "VVSG 2.0 applied",
     "scanRate": 96.9,
     "errorRate": 0.6,
     "reliability": 96.2,
-    "qualityMeasure": "A"
+    "qualityMeasure": 0.87
   },
   {
     "provider": "Hart InterCivic",
@@ -125,11 +125,11 @@
     "quantity": 1200,
     "age": 5,
     "operatingSystem": "Windows Server 2016",
-    "certification": "EAC Certified",
+    "certification": "VVSG 2.0 certified",
     "scanRate": 98.8,
     "errorRate": 0.2,
     "reliability": 98.5,
-    "qualityMeasure": "A+"
+    "qualityMeasure": 0.92
   },
   {
     "provider": "Clear Ballot",
@@ -137,11 +137,11 @@
     "quantity": 2100,
     "age": 3,
     "operatingSystem": "Ubuntu Linux",
-    "certification": "EAC Certified",
+    "certification": "VVSG 2.0 certified",
     "scanRate": 98.9,
     "errorRate": 0.1,
     "reliability": 98.8,
-    "qualityMeasure": "A+"
+    "qualityMeasure": 0.96
   },
   {
     "provider": "Clear Ballot",
@@ -149,11 +149,11 @@
     "quantity": 1500,
     "age": 2,
     "operatingSystem": "Ubuntu Linux",
-    "certification": "EAC Certified",
+    "certification": "VVSG 2.0 certified",
     "scanRate": 99.1,
     "errorRate": 0.1,
     "reliability": 99.0,
-    "qualityMeasure": "A+"
+    "qualityMeasure": 0.97
   },
   {
     "provider": "Unisyn Voting",
@@ -161,11 +161,11 @@
     "quantity": 1850,
     "age": 6,
     "operatingSystem": "Embedded Linux",
-    "certification": "EAC Certified",
+    "certification": "VVSG 1.1 certified",
     "scanRate": 95.8,
     "errorRate": 0.8,
     "reliability": 94.9,
-    "qualityMeasure": "A"
+    "qualityMeasure": 0.76
   },
   {
     "provider": "Unisyn Voting",
@@ -173,11 +173,11 @@
     "quantity": 980,
     "age": 5,
     "operatingSystem": "Embedded Linux",
-    "certification": "EAC Certified",
+    "certification": "VVSG 1.1 certified",
     "scanRate": 96.2,
     "errorRate": 0.7,
     "reliability": 95.4,
-    "qualityMeasure": "A"
+    "qualityMeasure": 0.79
   },
   {
     "provider": "Smartmatic",
@@ -185,11 +185,11 @@
     "quantity": 1200,
     "age": 7,
     "operatingSystem": "Windows CE 6.0",
-    "certification": "EAC Certified",
+    "certification": "not certified",
     "scanRate": 94.1,
     "errorRate": 1.2,
     "reliability": 92.8,
-    "qualityMeasure": "B+"
+    "qualityMeasure": 0.62
   },
   {
     "provider": "Smartmatic",
@@ -197,11 +197,11 @@
     "quantity": 750,
     "age": 4,
     "operatingSystem": "Embedded Linux",
-    "certification": "EAC Certified",
+    "certification": "VVSG 2.0 applied",
     "scanRate": 97.3,
     "errorRate": 0.5,
     "reliability": 96.7,
-    "qualityMeasure": "A"
+    "qualityMeasure": 0.88
   },
   {
     "provider": "Sequoia Voting",
@@ -209,11 +209,11 @@
     "quantity": 2800,
     "age": 12,
     "operatingSystem": "Proprietary OS",
-    "certification": "Legacy Certified",
+    "certification": "VVSG 1.0 certified",
     "scanRate": 89.5,
     "errorRate": 2.3,
     "reliability": 87.1,
-    "qualityMeasure": "C+"
+    "qualityMeasure": 0.42
   },
   {
     "provider": "Sequoia Voting",
@@ -221,11 +221,11 @@
     "quantity": 450,
     "age": 15,
     "operatingSystem": "Windows XP",
-    "certification": "Legacy Certified",
+    "certification": "VVSG 1.0 certified",
     "scanRate": 85.2,
     "errorRate": 3.1,
     "reliability": 82.0,
-    "qualityMeasure": "D+"
+    "qualityMeasure": 0.25
   },
   {
     "provider": "MicroVote",
@@ -233,11 +233,11 @@
     "quantity": 890,
     "age": 9,
     "operatingSystem": "DOS-based",
-    "certification": "Legacy Certified",
+    "certification": "VVSG 1.0 certified",
     "scanRate": 91.3,
     "errorRate": 1.8,
     "reliability": 89.4,
-    "qualityMeasure": "B"
+    "qualityMeasure": 0.52
   },
   {
     "provider": "Premier Election Solutions",
@@ -245,11 +245,11 @@
     "quantity": 1650,
     "age": 11,
     "operatingSystem": "Windows CE 5.0",
-    "certification": "Legacy Certified",
+    "certification": "VVSG 1.0 certified",
     "scanRate": 90.8,
     "errorRate": 1.9,
     "reliability": 88.7,
-    "qualityMeasure": "B-"
+    "qualityMeasure": 0.48
   },
   {
     "provider": "Premier Election Solutions",
@@ -257,11 +257,11 @@
     "quantity": 3200,
     "age": 10,
     "operatingSystem": "Embedded Firmware",
-    "certification": "EAC Certified",
+    "certification": "VVSG 1.1 certified",
     "scanRate": 92.5,
     "errorRate": 1.5,
     "reliability": 90.9,
-    "qualityMeasure": "B+"
+    "qualityMeasure": 0.58
   }
 ]
 

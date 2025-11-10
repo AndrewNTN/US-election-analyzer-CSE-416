@@ -1,7 +1,7 @@
 import { GeoJSON } from "react-leaflet";
 import type { FeatureCollection, Geometry, Feature } from "geojson";
 import type { PathOptions, Layer, LeafletMouseEvent } from "leaflet";
-import type { BaseMapProps, MapFeatureProps } from "@/types/map";
+import type { BaseMapProps, MapFeatureProps } from "@/lib/map.ts";
 import {
   defaultGrayTint,
   getEquipmentAgeColor,
@@ -10,14 +10,12 @@ import {
   getPollbookDeletionsColor,
   getMailBallotsRejectedColor,
   getVoterRegistrationColor,
-  getVotingEquipmentTypeColor,
-  type VotingEquipmentType,
-} from "@/lib/colors";
+} from "@/lib/choropleth";
 import {
   SPLASH_CHOROPLETH_OPTIONS,
   STATE_CHOROPLETH_OPTIONS,
   type ChoroplethOption,
-} from "@/constants/choropleth";
+} from "@/lib/choropleth";
 
 interface ChoroplethLayerProps<T extends BaseMapProps = MapFeatureProps> {
   data: FeatureCollection<Geometry, T>;
@@ -100,15 +98,6 @@ export default function ChoroplethLayer<
               ? (props.VOTER_REGISTRATION_PCT as number) || 0
               : 0;
           fillColor = getVoterRegistrationColor(voterRegistrationPct);
-          break;
-        }
-
-        case STATE_CHOROPLETH_OPTIONS.VOTING_EQUIPMENT_TYPE: {
-          const equipmentType =
-            "VOTING_EQUIPMENT_TYPE" in props
-              ? (props.VOTING_EQUIPMENT_TYPE as VotingEquipmentType)
-              : "scanner";
-          fillColor = getVotingEquipmentTypeColor(equipmentType);
           break;
         }
       }

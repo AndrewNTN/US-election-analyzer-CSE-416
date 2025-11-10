@@ -1,25 +1,37 @@
 import { useMemo, useState } from "react";
-import { GeoJSON } from "react-leaflet";
 import BaseMap from "@/components/map/base-map.tsx";
 import OutlineLayer from "@/components/map/outline-layer.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
-import BubbleChartLayer, {
-  type CensusBlockData,
-} from "@/components/map/bubble-chart-layer.tsx";
+// import BubbleChartLayer, {
+//   type CensusBlockData,
+// } from "@/components/map/bubble-chart-layer.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
-import type { StateProps, CountyProps } from "@/types/map.ts";
-import type { StateChoroplethOption } from "@/constants/choropleth.ts";
-import { ChoroplethLegend } from "@/components/choropleth-legend.tsx";
+import type { StateProps, CountyProps } from "@/lib/map.ts";
+import type { StateChoroplethOption } from "@/lib/choropleth.ts";
+import { ChoroplethLegend } from "@/components/map/choropleth-legend";
+import { CvapRegistrationLegend } from "@/components/map/cvap-registration-legend";
+import type { ActiveVotersData as ActiveVotersTableData } from "@/components/table/state-tables/active-voters-columns";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DataTable } from "@/components/table/data-table";
+import {
+  sampleVotersColumns,
+  type SampleVoterRow,
+} from "@/components/table/county-modal-columns";
 
 /** ---------- Types ---------- */
 interface StateMapProps {
@@ -27,13 +39,11 @@ interface StateMapProps {
   currentCountiesData: FeatureCollection<Geometry, CountyProps> | null;
   isDetailedState: boolean;
   choroplethOption?: StateChoroplethOption;
-  censusBlockData?: CensusBlockData[];
+  // censusBlockData?: CensusBlockData[];
   showBubbleChart?: boolean;
-  votingEquipmentData?: Array<{
-    eavsRegion: string;
-    equipmentTypes: string[];
-    primaryEquipment: string;
-  }>;
+  showCvapLegend?: boolean;
+  cvapLegendData?: ActiveVotersTableData[];
+  hasDetailedVoterData?: boolean;
 }
 
 type SafeCounty = {
@@ -43,7 +53,7 @@ type SafeCounty = {
   geoid: string; // e.g., "01001"
 };
 
-type Party = "Democrat" | "Republican" | "Other";
+type Party = "Democrat" | "Republican";
 
 type Voter = {
   id: string;
@@ -58,14 +68,14 @@ type Voter = {
 type PartyStats = {
   party: Party;
   count: number;
-  pct: number; // 0-100
+  pct: number;
 };
 
 type DummyVoterData = {
   geoid: string;
   total: number;
   byParty: PartyStats[];
-  votersSample: Voter[]; // subset to show in modal
+  votersSample: Voter[];
 };
 
 /** ---------- Utils: schema-safe, seeded RNG, dummy gen ---------- */
@@ -215,10 +225,9 @@ function generateDummyVoters(geoid: string, countHint = 180): DummyVoterData {
   // Total voters between ~120 and ~420
   const total = Math.floor(countHint * (0.7 + r() * 1.6));
 
-  const [demPct, repPct, othPct] = partyMix(r);
+  const [demPct, repPct] = partyMix(r);
   const demCount = Math.round((demPct / 100) * total);
   const repCount = Math.round((repPct / 100) * total);
-  const othCount = total - demCount - repCount;
 
   const voters: Voter[] = [];
   const mkVoter = (party: Party): Voter => {
@@ -238,7 +247,6 @@ function generateDummyVoters(geoid: string, countHint = 180): DummyVoterData {
 
   for (let i = 0; i < demCount; i++) voters.push(mkVoter("Democrat"));
   for (let i = 0; i < repCount; i++) voters.push(mkVoter("Republican"));
-  for (let i = 0; i < othCount; i++) voters.push(mkVoter("Other"));
 
   // Stable shuffle based on seed (Fisher–Yates using r)
   for (let i = voters.length - 1; i > 0; i--) {
@@ -251,7 +259,6 @@ function generateDummyVoters(geoid: string, countHint = 180): DummyVoterData {
   const byParty: PartyStats[] = [
     { party: "Democrat", count: demCount, pct: demPct },
     { party: "Republican", count: repCount, pct: repPct },
-    { party: "Other", count: othCount, pct: othPct },
   ];
 
   return { geoid, total, byParty, votersSample: sample };
@@ -263,18 +270,14 @@ export default function StateMap({
   currentCountiesData,
   isDetailedState,
   choroplethOption,
-  censusBlockData = [],
-  showBubbleChart = false,
-  votingEquipmentData = [],
+  // censusBlockData = [],
+  // showBubbleChart = false,
+  showCvapLegend = false,
+  cvapLegendData = [],
+  hasDetailedVoterData = false,
 }: StateMapProps) {
   const [selectedCounty, setSelectedCounty] = useState<SafeCounty | null>(null);
-  const [currentPage, setCurrentPage] = useState(0);
-  const pageSize = 5;
-
-  const transparentStyle = useMemo(
-    () => ({ color: "#000000", weight: 0, opacity: 0, fillOpacity: 0 }),
-    [],
-  );
+  const [partyFilter, setPartyFilter] = useState<string>("all");
 
   // Generate dummy voter data whenever county changes
   const voterData = useMemo<DummyVoterData | null>(() => {
@@ -282,34 +285,25 @@ export default function StateMap({
     return generateDummyVoters(selectedCounty.geoid);
   }, [selectedCounty?.geoid]);
 
-  // Reset pagination when county changes
   const handleCountyChange = (county: SafeCounty | null) => {
     setSelectedCounty(county);
-    setCurrentPage(0);
+    setPartyFilter("all"); // Reset filter when county changes
   };
 
-  // Calculate pagination for sample voters
-  const totalPages = voterData
-    ? Math.ceil(voterData.votersSample.length / pageSize)
-    : 0;
-  const paginatedVoters = voterData
-    ? voterData.votersSample.slice(
-        currentPage * pageSize,
-        (currentPage + 1) * pageSize,
-      )
-    : [];
+  // Prepare data for Sample Voters table - filter by registered voters and party
+  const sampleVotersData: SampleVoterRow[] = useMemo(() => {
+    if (!voterData) return [];
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
+    // Filter for registered voters only
+    let filtered = voterData.votersSample.filter((voter) => voter.registered);
+
+    // Apply party filter
+    if (partyFilter === "Republican" || partyFilter === "Democrat") {
+      filtered = filtered.filter((voter) => voter.party === partyFilter);
     }
-  };
 
-  const handlePrevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+    return filtered;
+  }, [voterData, partyFilter]);
 
   return (
     <div className="relative overflow-hidden h-screen">
@@ -327,22 +321,18 @@ export default function StateMap({
                 choroplethOption={choroplethOption}
                 stateView
               />
-              <OutlineLayer data={currentCountiesData} stateView />
-
-              {/* Click-only overlay */}
-              <GeoJSON
+              <OutlineLayer
                 data={currentCountiesData}
-                style={() => transparentStyle}
-                eventHandlers={{
-                  click: (e) => {
-                    const props =
-                      e?.sourceTarget?.feature?.properties ??
-                      e?.layer?.feature?.properties ??
-                      e?.target?.feature?.properties ??
-                      null;
-                    handleCountyChange(props ? toSafeCounty(props) : null);
-                  },
-                }}
+                stateView
+                enableCountyInteractions={hasDetailedVoterData}
+                onFeatureClick={
+                  hasDetailedVoterData
+                    ? (feature) => {
+                        const props = feature?.properties ?? null;
+                        handleCountyChange(props ? toSafeCounty(props) : null);
+                      }
+                    : undefined
+                }
               />
             </>
           ) : (
@@ -356,18 +346,20 @@ export default function StateMap({
             </>
           )}
 
-          <BubbleChartLayer data={censusBlockData} visible={showBubbleChart} />
+          {/* <BubbleChartLayer data={censusBlockData} visible={showBubbleChart} /> */}
         </BaseMap>
 
         {/* Choropleth Legend - positioned on the map */}
         {choroplethOption && choroplethOption !== "off" && (
           <div className="absolute bottom-32 left-4 z-10 max-w-xs">
-            <ChoroplethLegend
-              choroplethOption={choroplethOption}
-              votingEquipmentData={votingEquipmentData}
-            />
+            <ChoroplethLegend choroplethOption={choroplethOption} />
           </div>
         )}
+        {showCvapLegend && cvapLegendData.length > 0 ? (
+          <div className="absolute bottom-32 right-4 z-10 max-w-xs">
+            <CvapRegistrationLegend data={cvapLegendData} />
+          </div>
+        ) : null}
       </div>
 
       {/* Modal */}
@@ -375,141 +367,49 @@ export default function StateMap({
         open={!!selectedCounty}
         onOpenChange={(open) => !open && handleCountyChange(null)}
       >
-        <DialogContent className="sm:max-w-3xl">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
               {selectedCounty?.name ?? "County Details"}
             </DialogTitle>
-            <DialogDescription>
-              GEOID: {selectedCounty?.geoid ?? "N/A"} • StateFP:{" "}
-              {selectedCounty?.statefp ?? "N/A"} • CountyFP:{" "}
-              {selectedCounty?.countyfp ?? "N/A"}
-            </DialogDescription>
           </DialogHeader>
 
-          {/* Party breakdown */}
-          <div className="mt-2">
-            <h3 className="text-sm font-semibold mb-2">Party Breakdown</h3>
-            <div className="overflow-x-auto rounded-2xl border">
-              <table className="min-w-full text-sm">
-                <thead className="bg-muted/50">
-                  <tr>
-                    <th className="px-3 py-2 text-left">Party</th>
-                    <th className="px-3 py-2 text-right">Count</th>
-                    <th className="px-3 py-2 text-right">Percent</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {voterData?.byParty.map((row) => (
-                    <tr key={row.party} className="border-t">
-                      <td className="px-3 py-2">{row.party}</td>
-                      <td className="px-3 py-2 text-right">
-                        {row.count.toLocaleString()}
-                      </td>
-                      <td className="px-3 py-2 text-right">{row.pct}%</td>
-                    </tr>
-                  ))}
-                  <tr className="border-t font-semibold">
-                    <td className="px-3 py-2">Total</td>
-                    <td className="px-3 py-2 text-right">
-                      {voterData?.total.toLocaleString() ?? "—"}
-                    </td>
-                    <td className="px-3 py-2 text-right">100%</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
           {/* Sample voters */}
-          <div className="mt-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold">
-                Sample Voters ({voterData?.votersSample.length ?? 0})
-              </h3>
-              {voterData && totalPages > 1 && (
-                <div className="text-xs text-muted-foreground">
-                  Page {currentPage + 1} of {totalPages}
-                </div>
-              )}
+          <div className="flex flex-col mt-2 gap-4">
+            <div className="flex items-center justify-end gap-2 mb-2">
+              <label className="text-sm">Filter by Party:</label>
+              <Select value={partyFilter} onValueChange={setPartyFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="All Parties" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Parties</SelectItem>
+                  <SelectItem value="Republican">Republican</SelectItem>
+                  <SelectItem value="Democrat">Democratic</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="overflow-x-auto rounded-2xl border">
-              <table className="min-w-full text-sm">
-                <thead className="bg-muted/50">
-                  <tr>
-                    <th className="px-3 py-2 text-left">Name</th>
-                    <th className="px-3 py-2 text-left">Email</th>
-                    <th className="px-3 py-2 text-left">Party</th>
-                    <th className="px-3 py-2 text-left">ZIP</th>
-                    <th className="px-3 py-2 text-left">Registered</th>
-                    <th className="px-3 py-2 text-left">Mail-in</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedVoters.map((v) => (
-                    <tr key={v.id} className="border-t">
-                      <td className="px-3 py-2">{v.name}</td>
-                      <td className="px-3 py-2">{v.email}</td>
-                      <td className="px-3 py-2">{v.party}</td>
-                      <td className="px-3 py-2">{v.zip}</td>
-                      <td className="px-3 py-2">
-                        {v.registered ? "Yes" : "No"}
-                      </td>
-                      <td className="px-3 py-2">
-                        {v.mailInVote ? "Yes" : "No"}
-                      </td>
-                    </tr>
-                  ))}
-                  {!voterData && (
-                    <tr>
-                      <td
-                        className="px-3 py-6 text-center text-muted-foreground"
-                        colSpan={6}
-                      >
-                        Click a county to generate sample voters.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination controls */}
-            {voterData && totalPages > 1 && (
-              <div className="flex items-center justify-between mt-3">
-                <div className="text-xs text-muted-foreground">
-                  Showing {currentPage * pageSize + 1}-
-                  {Math.min(
-                    (currentPage + 1) * pageSize,
-                    voterData.votersSample.length,
-                  )}{" "}
-                  of {voterData.votersSample.length} voters
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handlePrevPage}
-                    disabled={currentPage === 0}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleNextPage}
-                    disabled={currentPage >= totalPages - 1}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-            )}
+            <DataTable
+              data={sampleVotersData}
+              columns={sampleVotersColumns}
+              pageSize={10}
+              showPagination={true}
+              bodyClassName="text-sm"
+              tableContainerClassName="rounded-lg"
+              emptyMessage="No registered voters match the selected criteria."
+              toolbar={
+                <h3 className="text-sm font-semibold mb-2">
+                  Registered Voters
+                </h3>
+              }
+            />
           </div>
 
-          <DialogFooter className="mt-4">
+          <DialogFooter className="mt-2">
             <DialogClose asChild>
-              <Button variant="secondary">Close</Button>
+              <Button variant="outline" size="sm">
+                Close
+              </Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>

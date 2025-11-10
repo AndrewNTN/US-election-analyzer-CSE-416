@@ -6,7 +6,7 @@ import BaseMap from "@/components/map/base-map.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
 import OutlineLayer from "@/components/map/outline-layer.tsx";
 import AnalysisDrawer from "@/components/analysis-drawer.tsx";
-import { ChoroplethLegend } from "@/components/choropleth-legend.tsx";
+import { ChoroplethLegend } from "@/components/map/choropleth-legend";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Select,
@@ -16,12 +16,12 @@ import {
   SelectValue,
 } from "@/components/ui/select.tsx";
 import statesJSON from "../../data/us-states.json";
-import type { StateProps } from "@/types/map.ts";
+import type { StateProps } from "@/lib/map.ts";
 import {
   SPLASH_CHOROPLETH_OPTIONS,
   SPLASH_CHOROPLETH_LABELS,
   type SplashChoroplethOption,
-} from "@/constants/choropleth.ts";
+} from "@/lib/choropleth.ts";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 

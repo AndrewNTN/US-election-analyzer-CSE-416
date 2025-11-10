@@ -9,6 +9,7 @@ function RouteComponent() {
   return (
     <div>
       <SplashPage />
+      <div className="mt-6 border-t pt-4"></div>
     </div>
   );
 }

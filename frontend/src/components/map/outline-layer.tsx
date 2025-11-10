@@ -4,7 +4,7 @@ import type { PathOptions, Layer, LeafletMouseEvent } from "leaflet";
 import { useRouter } from "@tanstack/react-router";
 import { DETAILED_STATES } from "@/constants/states.ts";
 import { formatStateNameForUrl } from "@/lib/utils";
-import type { BaseMapProps, MapFeatureProps } from "@/types/map";
+import type { BaseMapProps, MapFeatureProps } from "@/lib/map.ts";
 
 interface OutlineLayerProps<T extends BaseMapProps = MapFeatureProps> {
   data: FeatureCollection<Geometry, T>;
@@ -15,6 +15,7 @@ interface OutlineLayerProps<T extends BaseMapProps = MapFeatureProps> {
   hoverColor?: string;
   hoverWeight?: number;
   stateView?: boolean;
+  enableCountyInteractions?: boolean;
 }
 
 export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
@@ -25,6 +26,7 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
   hoverColor = "#1a1a1a",
   hoverWeight = 4,
   stateView = false,
+  enableCountyInteractions = true,
 }: OutlineLayerProps<T>) {
   const router = useRouter();
 
@@ -50,17 +52,25 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
 
   const onEachFeature = (feature: Feature<Geometry, T>, layer: Layer) => {
     if (feature.properties) {
+      const isCounty = feature.properties && "STATEFP" in feature.properties;
+      const shouldEnableHover =
+        !stateView || (isCounty && enableCountyInteractions);
+
       layer.on({
         mouseover: (e: LeafletMouseEvent) => {
-          const targetLayer = e.target;
-          targetLayer.setStyle({
-            weight: hoverWeight,
-            color: hoverColor,
-          });
+          if (shouldEnableHover) {
+            const targetLayer = e.target;
+            targetLayer.setStyle({
+              weight: hoverWeight,
+              color: hoverColor,
+            });
+          }
         },
         mouseout: (e: LeafletMouseEvent) => {
-          const targetLayer = e.target;
-          targetLayer.setStyle(getFeatureStyle(feature));
+          if (shouldEnableHover) {
+            const targetLayer = e.target;
+            targetLayer.setStyle(getFeatureStyle(feature));
+          }
         },
         click: () => {
           // Only handle navigation for state features and when not in state view
@@ -69,7 +79,8 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
             router.navigate({ to: `/state/${stateName}` });
           }
 
-          if (onFeatureClick) {
+          // Only handle county clicks if interactions are enabled
+          if (onFeatureClick && (!isCounty || enableCountyInteractions)) {
             onFeatureClick(feature);
           }
         },

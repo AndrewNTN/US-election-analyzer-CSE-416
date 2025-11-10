@@ -1,14 +1,5 @@
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
+import { BaseBarChart } from "./base-bar-chart";
+import { formatNumber } from "@/lib/utils";
 
 export interface PollbookDeletionsData {
   eavsRegion: string;
@@ -39,72 +30,28 @@ const METRIC_KEYS = [
 type MetricKey = (typeof METRIC_KEYS)[number];
 
 const METRIC_LABELS: Record<MetricKey, string> = {
-  A12b: "A12b – Death",
-  A12c: "A12c – Felony conviction",
-  A12d: "A12d – Mental incapacity",
-  A12e: "A12e – Moved out of jurisdiction",
-  A12f: "A12f – Voter request",
-  A12g: "A12g – Failed to respond",
-  A12h: "A12h – Other",
+  A12b: "A12b – Moved",
+  A12c: "A12c – Death",
+  A12d: "A12d – Felony",
+  A12e: "A12e – Fail Response",
+  A12f: "A12f – Incompetent to Vote",
+  A12g: "A12g – Voter Request",
+  A12h: "A12h – Duplicate Record",
 };
-
-// 🎨 Custom color palette
-const BAR_COLORS = [
-  "#8e51ff", // purple
-  "#8e51ff", // purple
-  "#8e51ff", // purple
-  "#8e51ff", // purple
-  "#8e51ff", // purple
-  "#8e51ff", // purple
-  "#8e51ff", // purple
-];
 
 export function PollbookDeletionsBarChart({
   stateName,
   barData,
 }: PollbookDeletionsBarChartProps) {
-  const totals = METRIC_KEYS.reduce(
-    (acc, key) => {
-      acc[key] = barData.reduce((sum, row) => sum + (row[key] ?? 0), 0);
-      return acc;
-    },
-    {} as Record<MetricKey, number>,
-  );
-
-  const data = METRIC_KEYS.map((key) => ({
-    code: key,
-    name: METRIC_LABELS[key],
-    value: totals[key],
-  }));
-
   return (
-    <div className="w-full h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={data}
-          margin={{ top: 8, right: 16, left: 8, bottom: 8 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="name"
-            interval={0}
-            angle={-15}
-            textAnchor="end"
-            height={60}
-          />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="value" name={stateName}>
-            {data.map((_, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={BAR_COLORS[index % BAR_COLORS.length]}
-              />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+    <BaseBarChart
+      stateName={stateName}
+      barData={barData}
+      metricKeys={METRIC_KEYS}
+      metricLabels={METRIC_LABELS}
+      metricAccessor={(data, key) => data[key]}
+      yAxisLabel="Number of Deletions"
+      yAxisTickFormatter={formatNumber}
+    />
   );
 }

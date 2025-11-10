@@ -3,110 +3,87 @@ import type { StateComparisonRow } from "@/components/table/state-comparison-col
 
 // Transform state comparison data into table rows
 const stateComparisonRaw = stateComparisonDataJson as {
-  republicanState: Record<string, string | number>;
-  democraticState: Record<string, string | number>;
+  republicanState: {
+    state: string;
+    felonyVotingRights: string;
+    mailBallots: number;
+    mailBallotsPercentage: number;
+    dropBoxBallots: number;
+    dropBoxBallotsPercentage: number;
+    totalVotesCast: number;
+    turnoutPercentage: number;
+    registeredVoters: number;
+    voterRegistrationRate: number;
+  };
+  democraticState: {
+    state: string;
+    felonyVotingRights: string;
+    mailBallots: number;
+    mailBallotsPercentage: number;
+    dropBoxBallots: number;
+    dropBoxBallotsPercentage: number;
+    totalVotesCast: number;
+    turnoutPercentage: number;
+    registeredVoters: number;
+    voterRegistrationRate: number;
+  };
 };
 
 export const stateComparisonData: StateComparisonRow[] = [
-  {
-    metric: "State",
-    republicanValue: stateComparisonRaw.republicanState.state,
-    democraticValue: stateComparisonRaw.democraticState.state,
-  },
   {
     metric: "Felony Voting Rights",
     republicanValue: stateComparisonRaw.republicanState.felonyVotingRights,
     democraticValue: stateComparisonRaw.democraticState.felonyVotingRights,
   },
   {
-    metric: "Mail Ballot Percentage",
-    republicanValue: `${stateComparisonRaw.republicanState.mailBallotPercentage}%`,
-    democraticValue: `${stateComparisonRaw.democraticState.mailBallotPercentage}%`,
+    metric: "Mail Ballots (Votes)",
+    republicanValue:
+      stateComparisonRaw.republicanState.mailBallots.toLocaleString(),
+    democraticValue:
+      stateComparisonRaw.democraticState.mailBallots.toLocaleString(),
   },
   {
-    metric: "Drop Box Ballot Percentage",
-    republicanValue: `${stateComparisonRaw.republicanState.dropBoxBallotPercentage}%`,
-    democraticValue: `${stateComparisonRaw.democraticState.dropBoxBallotPercentage}%`,
+    metric: "Mail Ballots (%)",
+    republicanValue: `${stateComparisonRaw.republicanState.mailBallotsPercentage}%`,
+    democraticValue: `${stateComparisonRaw.democraticState.mailBallotsPercentage}%`,
   },
   {
-    metric: "Turnout",
-    republicanValue: `${stateComparisonRaw.republicanState.turnout}%`,
-    democraticValue: `${stateComparisonRaw.democraticState.turnout}%`,
+    metric: "Drop Box Ballots (Votes)",
+    republicanValue:
+      stateComparisonRaw.republicanState.dropBoxBallots.toLocaleString(),
+    democraticValue:
+      stateComparisonRaw.democraticState.dropBoxBallots.toLocaleString(),
   },
   {
-    metric: "Registered Voters",
-    republicanValue: (
-      stateComparisonRaw.republicanState.registeredVoters as number
-    ).toLocaleString(),
-    democraticValue: (
-      stateComparisonRaw.democraticState.registeredVoters as number
-    ).toLocaleString(),
+    metric: "Drop Box Ballots (%)",
+    republicanValue: `${stateComparisonRaw.republicanState.dropBoxBallotsPercentage}%`,
+    democraticValue: `${stateComparisonRaw.democraticState.dropBoxBallotsPercentage}%`,
   },
   {
-    metric: "Total Votes Cast",
-    republicanValue: (
-      stateComparisonRaw.republicanState.totalVotes as number
-    ).toLocaleString(),
-    democraticValue: (
-      stateComparisonRaw.democraticState.totalVotes as number
-    ).toLocaleString(),
+    metric: "Turnout (Votes)",
+    republicanValue:
+      stateComparisonRaw.republicanState.totalVotesCast.toLocaleString(),
+    democraticValue:
+      stateComparisonRaw.democraticState.totalVotesCast.toLocaleString(),
   },
   {
-    metric: "Early Voting Percentage",
-    republicanValue: `${stateComparisonRaw.republicanState.earlyVotingPercentage}%`,
-    democraticValue: `${stateComparisonRaw.democraticState.earlyVotingPercentage}%`,
+    metric: "Turnout (%)",
+    republicanValue: `${stateComparisonRaw.republicanState.turnoutPercentage}%`,
+    democraticValue: `${stateComparisonRaw.democraticState.turnoutPercentage}%`,
   },
   {
-    metric: "Same-Day Registration",
-    republicanValue: stateComparisonRaw.republicanState.sameDayRegistration,
-    democraticValue: stateComparisonRaw.democraticState.sameDayRegistration,
+    metric: "Voter Registration (Count)",
+    republicanValue:
+      stateComparisonRaw.republicanState.registeredVoters.toLocaleString(),
+    democraticValue:
+      stateComparisonRaw.democraticState.registeredVoters.toLocaleString(),
   },
   {
-    metric: "Voter ID Required",
-    republicanValue: stateComparisonRaw.republicanState.voterIdRequired,
-    democraticValue: stateComparisonRaw.democraticState.voterIdRequired,
-  },
-  {
-    metric: "Polls Open Time",
-    republicanValue: stateComparisonRaw.republicanState.pollsOpenTime,
-    democraticValue: stateComparisonRaw.democraticState.pollsOpenTime,
-  },
-  {
-    metric: "Polls Close Time",
-    republicanValue: stateComparisonRaw.republicanState.pollsCloseTime,
-    democraticValue: stateComparisonRaw.democraticState.pollsCloseTime,
-  },
-  {
-    metric: "Absentee Ballot Deadline",
-    republicanValue: stateComparisonRaw.republicanState.absenteeBallotDeadline,
-    democraticValue: stateComparisonRaw.democraticState.absenteeBallotDeadline,
-  },
-  {
-    metric: "Provisional Ballots Cast",
-    republicanValue: (
-      stateComparisonRaw.republicanState.provisionalBallotsCast as number
-    ).toLocaleString(),
-    democraticValue: (
-      stateComparisonRaw.democraticState.provisionalBallotsCast as number
-    ).toLocaleString(),
-  },
-  {
-    metric: "Rejected Ballots",
-    republicanValue: (
-      stateComparisonRaw.republicanState.rejectedBallots as number
-    ).toLocaleString(),
-    democraticValue: (
-      stateComparisonRaw.democraticState.rejectedBallots as number
-    ).toLocaleString(),
-  },
-  {
-    metric: "Average Wait Time (minutes)",
-    republicanValue: stateComparisonRaw.republicanState.averageWaitTime,
-    democraticValue: stateComparisonRaw.democraticState.averageWaitTime,
+    metric: "Voter Registration (%)",
+    republicanValue: `${stateComparisonRaw.republicanState.voterRegistrationRate}%`,
+    democraticValue: `${stateComparisonRaw.democraticState.voterRegistrationRate}%`,
   },
 ];
 
-export const republicanStateName = stateComparisonRaw.republicanState
-  .state as string;
-export const democraticStateName = stateComparisonRaw.democraticState
-  .state as string;
+export const republicanStateName = stateComparisonRaw.republicanState.state;
+export const democraticStateName = stateComparisonRaw.democraticState.state;

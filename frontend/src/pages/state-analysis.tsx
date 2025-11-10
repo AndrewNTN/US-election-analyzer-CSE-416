@@ -1,45 +1,45 @@
-import { useState, useEffect } from "react"; // ⬅ make sure useEffect is imported
-import { stateNameToAbbr } from "@/constants/stateFips";
+import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import statesJSON from "../../data/us-states.json";
 import countiesJSON from "../../data/counties.geojson.json";
-import censusBlockDataJSON from "../../data/censusBlockData.json";
-import type { CountyProps, StateProps } from "@/types/map.ts";
+// import censusBlockDataJSON from "../../data/censusBlockData.json";
+import type { CountyProps, StateProps } from "@/lib/map.ts";
 import {
   DETAILED_STATES,
   hasDetailedVoterData,
   hasDropBoxVoting,
+  getStateDetails,
 } from "@/constants/states.ts";
 import { getStateFipsCode } from "@/constants/stateFips.ts";
 import { Button } from "@/components/ui/button.tsx";
 import {
   STATE_CHOROPLETH_OPTIONS,
   type StateChoroplethOption,
-} from "@/constants/choropleth.ts";
+} from "@/lib/choropleth.ts";
 import StateMap from "@/components/map/state-map.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
-import type { CensusBlockData } from "@/components/map/bubble-chart-layer.tsx";
+// import type { CensusBlockData } from "@/components/map/bubble-chart-layer.tsx";
 
 //table imports
-import { VoterRegistrationTable } from "../components/table/voter-registration-table";
+import { VoterRegistrationTable } from "../components/table/state-tables/voter-registration-table.tsx";
 import eavsRegionVoterDataJson from "../../data/eavsRegionVoterData.json" with { type: "json" };
-import { ProvisionBallotsTable } from "../components/table/provisional-ballot-table";
-import provisionalBallotsDataJson from "../../data/provisionalBallotsData.json" with { type: "json" };
-import { ActiveVotersTable } from "../components/table/active-voters-table";
+import { ProvisionBallotsTable } from "../components/table/state-tables/provisional-ballot-table.tsx";
+import { ActiveVotersTable } from "../components/table/state-tables/active-voters-table.tsx";
 import activeVotersDataJson from "../../data/activeVotersData.json" with { type: "json" };
 import activeVotersDataCaliforniaJson from "../../data/activeVotersData-california.json" with { type: "json" };
 import activeVotersDataFloridaJson from "../../data/activeVotersData-florida.json" with { type: "json" };
-import { PollbookDeletionsTable } from "../components/table/pollbook-deletions-table";
 import pollbookDeletionsDataJson from "../../data/pollbookDeletionsData.json" with { type: "json" };
-import { MailBallotsRejectedTable } from "../components/table/mail-ballots-rejected-table";
+import { MailBallotsRejectedTable } from "../components/table/state-tables/mail-ballots-rejected-table.tsx";
 import mailBallotsRejectedDataJson from "../../data/mailBallotsRejectedData.json" with { type: "json" };
-import { StateEquipmentSummaryCards } from "../components/equipment/state-equipment-summary-cards";
 import stateEquipmentSummaryJson from "../../data/stateEquipmentSummary.json" with { type: "json" };
 
 //chart imports
 import { VoterRegistrationLineChart } from "../components/chart/voter-registration-line-chart";
 import voterRegistrationDataJson from "../../data/voterRegistrationChanges.json" with { type: "json" };
-import { ProvisionalBallotsBarChart } from "../components/chart/provisional-ballots-bar-chart";
+import {
+  ProvisionalBallotsBarChart,
+  type ProvisionBallotsData,
+} from "../components/chart/provisional-ballots-bar-chart";
 import { ActiveVotersBarChart } from "../components/chart/active-voters-bar-chart";
 import { PollbookDeletionsBarChart } from "../components/chart/pollbook-deletions-bar-chart";
 import { MailBallotsRejectedBarChart } from "../components/chart/mail-ballots-rejected-bar-chart";
@@ -47,14 +47,16 @@ import { DropBoxVotingBubbleChart } from "../components/chart/drop-box-voting-bu
 import dropBoxVotingDataJson from "../../data/dropBoxVotingData.json" with { type: "json" };
 import { EquipmentQualityBubbleChart } from "../components/chart/equipment-quality-bubble-chart";
 import equipmentQualityDataJson from "../../data/equipmentQualityVsRejectedBallots.json" with { type: "json" };
-import votingEquipmentTypeCaliforniaJson from "../../data/votingEquipmentType-california.json" with { type: "json" };
-import votingEquipmentTypeFloridaJson from "../../data/votingEquipmentType-florida.json" with { type: "json" };
-import votingEquipmentTypeColoradoJson from "../../data/votingEquipmentType-colorado.json" with { type: "json" };
-import type { VotingEquipmentType } from "@/lib/colors";
+import {
+  useProvisionalAggregateQuery,
+  useProvisionalStateQuery,
+} from "@/lib/api/use-eavs-queries.ts";
+import { StateEquipmentSummaryTable } from "@/components/table/state-tables/state-equipment-summary-table.tsx";
+import type { StateEquipmentSummary } from "@/components/table/state-tables/state-equipment-summary-columns.tsx";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
-const censusBlockData = censusBlockDataJSON as CensusBlockData[];
+// const censusBlockData = censusBlockDataJSON as CensusBlockData[];
 
 // Voter registration data - already sorted by 2024 registered voters in ascending order
 const voterRegistrationData = voterRegistrationDataJson as {
@@ -75,19 +77,6 @@ const eavsRegionVoterData = eavsRegionVoterDataJson as {
   registrationRate: number;
   activeVoters: number;
   inactiveVoters: number;
-}[];
-
-//Provisional Ballot Data
-const provisionalBallotsData = provisionalBallotsDataJson as {
-  E2a: number; // Total provisional ballots issued
-  E2b: number; // Counted (fully/partially)
-  E2c: number; // Rejected
-  E2d: number; // Pending
-  E2e: number; // Rejection: not registered
-  E2f: number; // Rejection: wrong jurisdiction
-  E2g: number; // Rejection: missing signature / ID
-  E2h: number; // Rejection: other reasons
-  E2i: string; // Notes / remarks
 }[];
 
 // Mail Ballots Rejected Data
@@ -131,7 +120,6 @@ const AnalysisType = {
   POLLBOOK_DELETIONS_2024: "pb-deletions-2024",
   MAIL_BALLOTS_REJECTED: "mail-balots-rejected",
   VOTER_REGISTRATION: "voter-registration",
-  VOTER_REGISTRATION_CHANGES: "voter-registration-changes",
   STATE_EQUIPMENT_SUMMARY: "state-equip-summary",
   DROP_BOX_VOTING: "drop-box-voting",
   EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS:
@@ -146,7 +134,6 @@ const analysisTypeLabels: Record<AnalysisTypeValue, string> = {
   [AnalysisType.POLLBOOK_DELETIONS_2024]: "2024 EAVS Pollbook Deletions",
   [AnalysisType.MAIL_BALLOTS_REJECTED]: "Mail Ballots Rejected",
   [AnalysisType.VOTER_REGISTRATION]: "Voter Registration",
-  [AnalysisType.VOTER_REGISTRATION_CHANGES]: "Voter Registration Changes",
   [AnalysisType.STATE_EQUIPMENT_SUMMARY]: "State Equipment Summary",
   [AnalysisType.DROP_BOX_VOTING]: "Drop Box Voting",
   [AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS]:
@@ -167,10 +154,7 @@ const analysisToChoroplethMap: Record<
     STATE_CHOROPLETH_OPTIONS.MAIL_BALLOTS_REJECTED,
   [AnalysisType.VOTER_REGISTRATION]:
     STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION,
-  [AnalysisType.VOTER_REGISTRATION_CHANGES]:
-    STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION,
-  [AnalysisType.STATE_EQUIPMENT_SUMMARY]:
-    STATE_CHOROPLETH_OPTIONS.VOTING_EQUIPMENT_TYPE,
+  [AnalysisType.STATE_EQUIPMENT_SUMMARY]: STATE_CHOROPLETH_OPTIONS.OFF,
   [AnalysisType.DROP_BOX_VOTING]: STATE_CHOROPLETH_OPTIONS.OFF,
   [AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS]:
     STATE_CHOROPLETH_OPTIONS.OFF,
@@ -178,51 +162,77 @@ const analysisToChoroplethMap: Record<
 
 interface StateAnalysisProps {
   stateName: string;
-  mockData?: any[]; // added this line
 }
 
-export default function StateAnalysis({ stateName, mockData }: StateAnalysisProps) {
+export default function StateAnalysis({ stateName }: StateAnalysisProps) {
   const navigate = useNavigate();
-
 
   const [selectedDataset, setSelectedDataset] = useState<AnalysisTypeValue>(
     AnalysisType.PROVISIONAL_BALLOT,
   );
 
   // Check if current state is a detailed state
-  const isDetailedState = (): boolean => {
-    const urlStateName = stateName.toLowerCase().replace(/\s+/g, "-");
-    return Object.keys(DETAILED_STATES).includes(urlStateName);
-  };
+  const normalizedStateKey = useMemo(
+    () => stateName.toLowerCase().replace(/\s+/g, "-"),
+    [stateName],
+  );
+
+  const formattedStateName = useMemo(
+    () => formatStateName(stateName),
+    [stateName],
+  );
+
+  const stateFipsPrefix = useMemo(
+    () => getStateFipsCode(formattedStateName),
+    [formattedStateName],
+  );
+
+  const isDetailedState = useMemo(
+    () => Object.keys(DETAILED_STATES).includes(normalizedStateKey),
+    [normalizedStateKey],
+  );
+
+  const stateDetails = useMemo(
+    () => getStateDetails(normalizedStateKey),
+    [normalizedStateKey],
+  );
+
+  const isPoliticalPartyState = stateDetails?.politicalPartyState ?? false;
 
   // Set choropleth option based on selected dataset, but only for detailed states
-  const choroplethOption = isDetailedState()
-    ? analysisToChoroplethMap[selectedDataset]
-    : STATE_CHOROPLETH_OPTIONS.OFF;
+  const choroplethOption = useMemo(() => {
+    if (!isDetailedState) {
+      return STATE_CHOROPLETH_OPTIONS.OFF;
+    }
+
+    // For voter registration, only show choropleth if state has detailed voter data
+    if (
+      selectedDataset === AnalysisType.VOTER_REGISTRATION &&
+      !hasDetailedVoterData(normalizedStateKey)
+    ) {
+      return STATE_CHOROPLETH_OPTIONS.OFF;
+    }
+
+    return analysisToChoroplethMap[selectedDataset];
+  }, [isDetailedState, selectedDataset, normalizedStateKey]);
 
   const handleBackToMainMap = () => {
     navigate({ to: "/" });
   };
 
   // Get available analysis options based on state capabilities
-  const getAvailableAnalysisOptions = (): AnalysisTypeValue[] => {
-    const urlStateName = stateName.toLowerCase().replace(/\s+/g, "-");
-    return Object.values(AnalysisType).filter((option) => {
-      // Exclude voter registration if this state doesn't have detailed voter data
-      if (option === AnalysisType.VOTER_REGISTRATION) {
-        return hasDetailedVoterData(urlStateName);
-      }
-      // Exclude drop box voting if this state doesn't support it
-      if (option === AnalysisType.DROP_BOX_VOTING) {
-        return hasDropBoxVoting(urlStateName);
-      }
-      return true;
-    });
+  const availableAnalysisOptions = useMemo<AnalysisTypeValue[]>(
+    () =>
+      Object.values(AnalysisType).filter((option) => {
+        if (option === AnalysisType.DROP_BOX_VOTING) {
+          return hasDropBoxVoting(normalizedStateKey);
+        }
+        return true;
+      }),
+    [normalizedStateKey],
+  );
 
-    
-  };
-
-  const formatStateName = (stateName: string): string => {
+  function formatStateName(stateName: string): string {
     if (
       stateName === stateName.toLowerCase() ||
       stateName === stateName.toUpperCase()
@@ -242,12 +252,10 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ")
       .trim();
-  };
+  }
 
   // Filter states data to only include the current state
   const getCurrentStateData = (): FeatureCollection<Geometry, StateProps> => {
-    const formattedStateName = formatStateName(stateName);
-
     const filteredFeatures = statesData.features.filter(
       (feature) => feature.properties?.NAME === formattedStateName,
     );
@@ -263,12 +271,11 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
     Geometry,
     CountyProps
   > | null => {
-    if (!isDetailedState()) {
+    if (!isDetailedState) {
       return null;
     }
 
-    const formattedStateName = formatStateName(stateName);
-    const stateFips = getStateFipsCode(formattedStateName);
+    const stateFips = stateFipsPrefix;
 
     if (!stateFips) {
       return null;
@@ -286,16 +293,16 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
 
   const currentStateData = getCurrentStateData();
   const currentCountiesData = getCurrentCountiesData();
-  const detailedState = isDetailedState();
+  const detailedState = isDetailedState;
 
-  const urlStateName = stateName.toLowerCase().replace(/\s+/g, "-");
+  const urlStateName = normalizedStateKey;
   const showBubbleChart =
     selectedDataset === AnalysisType.VOTER_REGISTRATION &&
     hasDetailedVoterData(urlStateName);
 
   // Get drop box voting data for current state
   const getDropBoxVotingData = (): DropBoxVotingData[] => {
-    const stateKey = urlStateName as keyof typeof dropBoxVotingDataJson;
+    const stateKey = normalizedStateKey as keyof typeof dropBoxVotingDataJson;
     return (dropBoxVotingDataJson[stateKey] || []) as DropBoxVotingData[];
   };
 
@@ -324,200 +331,53 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
     };
   };
 
-  // Get active voters data based on the state
-  const getActiveVotersData = () => {
-    const normalizedStateName = urlStateName.toLowerCase();
-
-    if (normalizedStateName === "california") {
+  const activeVotersData = useMemo(() => {
+    if (normalizedStateKey === "california") {
       return activeVotersDataCaliforniaJson;
-    } else if (normalizedStateName === "florida") {
+    } else if (normalizedStateKey === "florida") {
       return activeVotersDataFloridaJson;
     }
-
-    // Default data for other states
     return activeVotersDataJson;
-  };
+  }, [normalizedStateKey]);
 
-  // Get voting equipment type data for current state
-  const getVotingEquipmentTypeData = () => {
-    const normalizedStateName = urlStateName.toLowerCase();
+  const {
+    data: provAggregateData,
+    isPending: provLoading,
+    isError: provAggregateHasError,
+    error: provAggregateError,
+  } = useProvisionalAggregateQuery(stateFipsPrefix);
 
-    if (normalizedStateName === "california") {
-      return votingEquipmentTypeCaliforniaJson;
-    } else if (normalizedStateName === "florida") {
-      return votingEquipmentTypeFloridaJson;
-    } else if (normalizedStateName === "colorado") {
-      return votingEquipmentTypeColoradoJson;
+  const {
+    data: provStateData,
+    isPending: provStateLoading,
+    isError: provStateHasError,
+    error: provStateError,
+  } = useProvisionalStateQuery(stateFipsPrefix);
+
+  const provChartData: ProvisionBallotsData[] = useMemo(() => {
+    if (!provAggregateData) {
+      return [];
     }
 
-    // Default to empty array for other states
-    return [];
-  };
-
-  // Enrich county data with voting equipment type information
-  const getEnrichedCountiesData = (): FeatureCollection<
-    Geometry,
-    CountyProps
-  > | null => {
-    if (!currentCountiesData) {
-      return currentCountiesData;
-    }
-
-    // Only enrich when we have equipment data and the right dataset is selected
-    if (selectedDataset !== AnalysisType.STATE_EQUIPMENT_SUMMARY) {
-      return currentCountiesData;
-    }
-
-    const equipmentData = getVotingEquipmentTypeData();
-
-    if (equipmentData.length === 0) {
-      return currentCountiesData;
-    }
-
-    // Create a map of region name to equipment type (with normalized keys)
-    const equipmentMap = new Map<string, VotingEquipmentType>();
-
-    equipmentData.forEach(
-      (item: {
-        eavsRegion: string;
-        equipmentTypes: string[];
-        primaryEquipment: string;
-      }) => {
-        const equipmentType =
-          item.equipmentTypes.length > 1 ? "mixed" : item.primaryEquipment;
-
-        // Store with original key (e.g., "Los Angeles County")
-        equipmentMap.set(item.eavsRegion, equipmentType as VotingEquipmentType);
-
-        // Also store normalized version (e.g., "losangelescounty")
-        const normalized = item.eavsRegion.toLowerCase().replace(/\s+/g, "");
-        equipmentMap.set(normalized, equipmentType as VotingEquipmentType);
+    return [
+      {
+        E2a: provAggregateData.E2a ?? 0,
+        E2b: provAggregateData.E2b ?? 0,
+        E2c: provAggregateData.E2c ?? 0,
+        E2d: provAggregateData.E2d ?? 0,
+        E2e: provAggregateData.E2e ?? 0,
+        E2f: provAggregateData.E2f ?? 0,
+        E2g: provAggregateData.E2g ?? 0,
+        E2h: provAggregateData.E2h ?? 0,
+        E2i: provAggregateData.E2i ?? 0,
+        Other: provAggregateData.Other ?? 0,
       },
-    );
+    ];
+  }, [provAggregateData]);
 
-    // Debug: Log available equipment regions
-    console.log("Equipment data regions:", Array.from(equipmentMap.keys()));
-
-    // Enrich the county features with equipment type
-    const enrichedFeatures = currentCountiesData.features.map((feature) => {
-      const countyName = feature.properties?.NAME;
-
-      let equipmentType: VotingEquipmentType = "scanner"; // Default
-
-      if (countyName) {
-        // Debug: Log county name
-        console.log("Processing county:", countyName);
-
-        // Try 1: Exact match with " County" suffix (e.g., "Los Angeles" -> "Los Angeles County")
-        let match = equipmentMap.get(`${countyName} County`);
-
-        // Try 2: Exact match without modification
-        if (!match) {
-          match = equipmentMap.get(countyName);
-        }
-
-        // Try 3: Normalized matching (e.g., "Los Angeles" -> "losangelescounty")
-        if (!match) {
-          const normalizedCounty = countyName.toLowerCase().replace(/\s+/g, "");
-          match = equipmentMap.get(normalizedCounty + "county");
-        }
-
-        // Try 4: If county name already has "County", try without it
-        if (!match && countyName.toLowerCase().includes("county")) {
-          const withoutCounty = countyName.replace(/\s*County\s*/i, "").trim();
-          match = equipmentMap.get(`${withoutCounty} County`);
-        }
-
-        if (match) {
-          equipmentType = match;
-          console.log(`✓ Matched ${countyName} to ${equipmentType}`);
-        } else {
-          console.log(`✗ No match for ${countyName}, using default: scanner`);
-        }
-      }
-
-      return {
-        ...feature,
-        properties: {
-          ...feature.properties,
-          VOTING_EQUIPMENT_TYPE: equipmentType,
-        },
-      };
-    });
-
-    return {
-      ...currentCountiesData,
-      features: enrichedFeatures,
-    };
-  };
-
-  const enrichedCountiesData = getEnrichedCountiesData();
-
-  // Get equipment data for legend
-  const votingEquipmentData =
-    selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY
-      ? getVotingEquipmentTypeData()
-      : [];
-
-
-      const [provChartData, setProvChartData] = useState<any[]>([]);
-      const [provLoading, setProvLoading] = useState(false);
-      const [provError, setProvError] = useState<string | null>(null);
-      
-      useEffect(() => {
-        async function fetchProvChartData() {
-          try {
-            setProvLoading(true);
-            setProvError(null);
-      
-            const formattedState = formatStateName(stateName);
-            const fipsPrefix = getStateFipsCode(formattedState);
-            const stateAbbr =
-              stateNameToAbbr[formattedState] ||
-              formattedState.slice(0, 2).toUpperCase(); // fallback
-      
-            // ✅ Prefer FIPS for backend aggregation endpoint
-            if (!fipsPrefix) throw new Error("No FIPS prefix found for " + formattedState);
-      
-            console.log(`Fetching provisional ballot data for ${formattedState} (${stateAbbr}) with FIPS ${fipsPrefix}`);
-      
-            const res = await fetch(
-              `http://localhost:8080/api/eavs/provisional/aggregate/${fipsPrefix}`
-            );
-      
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      
-            const json = await res.json();
-      
-            const formatted = [
-              {
-                region: json.jurisdictionName,
-                E2a: json.E2a,
-                E2b: json.E2b,
-                E2c: json.E2c,
-                E2d: json.E2d,
-                E2e: json.E2e,
-                E2f: json.E2f,
-                E2g: json.E2g,
-                E2h: json.E2h,
-                E2i: "",
-              },
-            ];
-      
-            setProvChartData(formatted);
-          } catch (err: any) {
-            console.error("Error loading provisional chart data:", err);
-            setProvError(err.message);
-            setProvChartData([]);
-          } finally {
-            setProvLoading(false);
-          }
-        }
-      
-        fetchProvChartData();
-      }, [stateName]);
-      
-      
+  const provErrorMessage = provAggregateHasError
+    ? (provAggregateError?.message ?? "Unknown error")
+    : null;
 
   return (
     <div className="h-screen flex flex-col">
@@ -536,12 +396,12 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
       {/* Main content */}
       <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Left - Dataset Selector */}
-        <div className="w-64 bg-gray-50 border-r p-4 overflow-y-auto flex-shrink-0">
+        <div className="w-64 bg-gray-50 border-r p-4 flex-shrink-0">
           <p className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
             Select Dataset
           </p>
           <div className="space-y-1.5">
-            {getAvailableAnalysisOptions().map((analysisType) => (
+            {availableAnalysisOptions.map((analysisType) => (
               <Button
                 key={analysisType}
                 variant={
@@ -557,74 +417,90 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
         </div>
 
         {/* Middle - Map */}
-        <div className="w-[35%] relative flex-shrink-0">
+        <div className="w-[30%] relative flex-shrink-0">
           <StateMap
             currentStateData={currentStateData}
-            currentCountiesData={enrichedCountiesData}
+            currentCountiesData={currentCountiesData}
             isDetailedState={detailedState}
             choroplethOption={choroplethOption}
-            censusBlockData={censusBlockData}
+            // censusBlockData={censusBlockData}
             showBubbleChart={showBubbleChart}
-            votingEquipmentData={votingEquipmentData}
+            showCvapLegend={isPoliticalPartyState}
+            cvapLegendData={activeVotersData}
+            hasDetailedVoterData={hasDetailedVoterData(normalizedStateKey)}
           />
         </div>
 
         {/* Right - Analysis Content */}
-        <div className="flex-1 bg-white border-l overflow-y-auto min-w-0">
-          <div className="p-3">
-            <h2 className="text-sm font-semibold text-gray-900 mb-2">
+        <div className="flex-1 bg-white border-l min-w-0">
+          <div className="p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b">
               {analysisTypeLabels[selectedDataset]}
             </h2>
-            <div className="bg-gray-50 rounded-lg p-3">
-              {selectedDataset === AnalysisType.VOTER_REGISTRATION_CHANGES ? (
-                <div className="h-[400px]">
-                  <VoterRegistrationLineChart data={voterRegistrationData} />
-                </div>
-              ) : selectedDataset === AnalysisType.VOTER_REGISTRATION ? (
-                <div className="overflow-y-auto">
-                  <VoterRegistrationTable data={eavsRegionVoterData} />
+            <div className="mt-4">
+              {selectedDataset === AnalysisType.VOTER_REGISTRATION ? (
+                <div>
+                  {hasDetailedVoterData(normalizedStateKey) && (
+                    <VoterRegistrationTable data={eavsRegionVoterData} />
+                  )}
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-2 text-center text-gray-900">
+                      Changes in Voter Registration by County
+                    </h3>
+                    <div className="h-[350px]">
+                      <VoterRegistrationLineChart
+                        data={voterRegistrationData}
+                      />
+                    </div>
+                  </div>
                 </div>
               ) : selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY ? (
                 <div className="h-full">
-                  <StateEquipmentSummaryCards
-                    data={stateEquipmentSummaryJson}
+                  <StateEquipmentSummaryTable
+                    data={stateEquipmentSummaryJson as StateEquipmentSummary[]}
                   />
                 </div>
               ) : selectedDataset === AnalysisType.PROVISIONAL_BALLOT ? (
-                <div className="text-xs text-muted-foreground text-center py-8">
-                  {/* ✅ dynamically load backend provisional ballot data */}
+                <div className="text-xs text-muted-foreground text-center">
                   {provLoading ? (
                     <p>Loading provisional ballot data...</p>
-                  ) : provError ? (
-                    <>
-                      <p>Error loading {stateName} data: {provError}</p>
-                      <ProvisionBallotsTable
-                        fipsPrefix={getStateFipsCode(formatStateName(stateName)) ?? "00"}
-                      />
-                      <ProvisionalBallotsBarChart
-                        stateName={formatStateName(stateName)}
-                        barData={provisionalBallotsData}
-                      />
-                    </>
+                  ) : provErrorMessage ? (
+                    <p className="py-8">
+                      Error loading {stateName} data: {provErrorMessage}
+                    </p>
                   ) : (
                     <>
                       <ProvisionBallotsTable
-                        fipsPrefix={getStateFipsCode(formatStateName(stateName)) ?? "00"}
+                        data={provStateData}
+                        isPending={provStateLoading}
+                        isError={provStateHasError}
+                        error={provStateError}
                       />
-                      <ProvisionalBallotsBarChart
-                        stateName={formatStateName(stateName)}
-                        barData={provChartData}
-                      />
+                      <div className="mt-4">
+                        <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
+                          Provisional Ballots by Reason -{" "}
+                          {formatStateName(stateName)}
+                        </h3>
+                        <ProvisionalBallotsBarChart
+                          stateName={formatStateName(stateName)}
+                          barData={provChartData}
+                        />
+                      </div>
                     </>
                   )}
                 </div>
               ) : selectedDataset === AnalysisType.ACTIVE_VOTERS_2024 ? (
-                <div className="text-xs text-muted-foreground text-center py-8">
-                  <ActiveVotersTable data={getActiveVotersData()} />
-                  <ActiveVotersBarChart
-                    stateName={formatStateName(stateName)}
-                    barData={getActiveVotersData()}
-                  />
+                <div className="text-xs text-muted-foreground text-center">
+                  <ActiveVotersTable data={activeVotersData} />
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
+                      Active Voters Status - {formatStateName(stateName)}
+                    </h3>
+                    <ActiveVotersBarChart
+                      stateName={formatStateName(stateName)}
+                      barData={activeVotersData}
+                    />
+                  </div>
                 </div>
               ) : selectedDataset === AnalysisType.DROP_BOX_VOTING ? (
                 <div className="h-[600px]">
@@ -645,23 +521,35 @@ export default function StateAnalysis({ stateName, mockData }: StateAnalysisProp
                   />
                 </div>
               ) : selectedDataset === AnalysisType.POLLBOOK_DELETIONS_2024 ? (
-                <div className="text-xs text-muted-foreground text-center py-8">
-                  <PollbookDeletionsTable data={pollbookDeletionsDataJson} />
-                  <PollbookDeletionsBarChart
-                    stateName={formatStateName(stateName)}
-                    barData={pollbookDeletionsDataJson}
-                  />
+                <div className="text-xs text-muted-foreground text-center">
+                  <ActiveVotersTable data={activeVotersData} />
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
+                      Pollbook Deletions by Reason -{" "}
+                      {formatStateName(stateName)}
+                    </h3>
+                    <PollbookDeletionsBarChart
+                      stateName={formatStateName(stateName)}
+                      barData={pollbookDeletionsDataJson}
+                    />
+                  </div>
                 </div>
               ) : selectedDataset === AnalysisType.MAIL_BALLOTS_REJECTED ? (
-                <div className="text-xs text-muted-foreground text-center py-8">
+                <div className="text-xs text-muted-foreground text-center">
                   <MailBallotsRejectedTable data={mailBallotsRejectedData} />
-                  <MailBallotsRejectedBarChart
-                    stateName={formatStateName(stateName)}
-                    barData={mailBallotsRejectedData}
-                  />
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
+                      Mail Ballots Rejected by Reason -{" "}
+                      {formatStateName(stateName)}
+                    </h3>
+                    <MailBallotsRejectedBarChart
+                      stateName={formatStateName(stateName)}
+                      barData={mailBallotsRejectedData}
+                    />
+                  </div>
                 </div>
               ) : (
-                <p className="text-xs text-muted-foreground text-center py-8">
+                <p className="text-xs text-muted-foreground text-center">
                   {analysisTypeLabels[selectedDataset]} visualization will be
                   displayed here.
                 </p>

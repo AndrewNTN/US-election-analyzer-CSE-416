@@ -8,6 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { formatNumber } from "@/lib/utils";
 
 type VoterRegistrationData = {
   jurisdiction: string;
@@ -59,13 +60,13 @@ export function VoterRegistrationLineChart({
           <p className="font-medium text-sm mb-2">
             {tooltipData.jurisdictionName}
           </p>
-          <p className="text-sm text-blue-600">
+          <p className="text-sm text-cyan-600">
             2016: {tooltipData["2016"].toLocaleString()} registered voters
           </p>
-          <p className="text-sm text-green-600">
+          <p className="text-sm text-fuchsia-700">
             2020: {tooltipData["2020"].toLocaleString()} registered voters
           </p>
-          <p className="text-sm text-orange-600">
+          <p className="text-sm text-orange-500">
             2024: {tooltipData["2024"].toLocaleString()} registered voters
           </p>
         </div>
@@ -79,7 +80,7 @@ export function VoterRegistrationLineChart({
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={chartData}
-          margin={{ top: 50, right: 30, left: 30, bottom: 60 }}
+          margin={{ top: 8, right: 30, left: 30, bottom: 60 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
@@ -100,7 +101,7 @@ export function VoterRegistrationLineChart({
               style: { textAnchor: "middle" },
             }}
             tick={{ fontSize: 12 }}
-            tickFormatter={(value) => value.toLocaleString()}
+            tickFormatter={formatNumber}
             width={80}
           />
           <Tooltip content={<CustomTooltip />} />
@@ -112,7 +113,7 @@ export function VoterRegistrationLineChart({
           <Line
             type="monotone"
             dataKey="2016"
-            stroke="#2563eb"
+            stroke="#0891b2"
             strokeWidth={3}
             dot={false}
             name="2016 Registered Voters"
@@ -121,7 +122,7 @@ export function VoterRegistrationLineChart({
           <Line
             type="monotone"
             dataKey="2020"
-            stroke="#16a34a"
+            stroke="#a21caf"
             strokeWidth={3}
             dot={false}
             name="2020 Registered Voters"
@@ -130,7 +131,7 @@ export function VoterRegistrationLineChart({
           <Line
             type="monotone"
             dataKey="2024"
-            stroke="#ea580c"
+            stroke="#f97316"
             strokeWidth={3}
             dot={false}
             name="2024 Registered Voters"

@@ -7,7 +7,11 @@ export type OptInOptOutRow = {
   optOutWithoutSameDayValue: string | number;
 };
 
-export const optInOptOutColumns: ColumnDef<OptInOptOutRow>[] = [
+export const getOptInOptOutColumns = (
+  optInState: string,
+  optOutWithSameDayState: string,
+  optOutWithoutSameDayState: string,
+): ColumnDef<OptInOptOutRow>[] => [
   {
     accessorKey: "metric",
     header: "Metric",
@@ -17,17 +21,31 @@ export const optInOptOutColumns: ColumnDef<OptInOptOutRow>[] = [
   },
   {
     accessorKey: "optInValue",
-    header: "Opt-in State",
-    cell: ({ row }) => <div>{row.getValue("optInValue")}</div>,
+    header: () => <div className="text-right">{optInState} (Opt-in)</div>,
+    cell: ({ row }) => (
+      <div className="text-right">{row.getValue("optInValue")}</div>
+    ),
   },
   {
     accessorKey: "optOutWithSameDayValue",
-    header: "Opt-out (Same-Day)",
-    cell: ({ row }) => <div>{row.getValue("optOutWithSameDayValue")}</div>,
+    header: () => (
+      <div className="text-right">
+        {optOutWithSameDayState} (Opt-out, Same-Day)
+      </div>
+    ),
+    cell: ({ row }) => (
+      <div className="text-right">{row.getValue("optOutWithSameDayValue")}</div>
+    ),
   },
   {
     accessorKey: "optOutWithoutSameDayValue",
-    header: "Opt-out (No Same-Day)",
-    cell: ({ row }) => <div>{row.getValue("optOutWithoutSameDayValue")}</div>,
+    header: () => (
+      <div className="text-right">{optOutWithoutSameDayState} (Opt-out)</div>
+    ),
+    cell: ({ row }) => (
+      <div className="text-right">
+        {row.getValue("optOutWithoutSameDayValue")}
+      </div>
+    ),
   },
 ];

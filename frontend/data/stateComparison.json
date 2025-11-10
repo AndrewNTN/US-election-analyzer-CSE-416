@@ -1,39 +1,27 @@
 {
   "republicanState": {
-    "state": "Texas",
+    "state": "Florida",
     "felonyVotingRights": "Completed Sentence",
-    "mailBallotPercentage": 12.5,
-    "dropBoxBallotPercentage": 3.2,
-    "turnout": 66.8,
+    "mailBallots": 1352700,
+    "mailBallotsPercentage": 12.5,
+    "dropBoxBallots": 346290,
+    "dropBoxBallotsPercentage": 3.2,
+    "totalVotesCast": 10821600,
+    "turnoutPercentage": 66.8,
     "registeredVoters": 16200000,
-    "totalVotes": 10821600,
-    "earlyVotingPercentage": 45.3,
-    "sameDayRegistration": "No",
-    "voterIdRequired": "Strict Photo ID",
-    "pollsOpenTime": "7:00 AM",
-    "pollsCloseTime": "7:00 PM",
-    "absenteeBallotDeadline": "Must be received by Election Day",
-    "provisionalBallotsCast": 18500,
-    "rejectedBallots": 2340,
-    "averageWaitTime": 18
+    "voterRegistrationRate": 78.5
   },
   "democraticState": {
     "state": "California",
     "felonyVotingRights": "Rights Restored After Prison",
-    "mailBallotPercentage": 87.6,
-    "dropBoxBallotPercentage": 24.8,
-    "turnout": 71.2,
+    "mailBallots": 13721664,
+    "mailBallotsPercentage": 87.6,
+    "dropBoxBallots": 3884672,
+    "dropBoxBallotsPercentage": 24.8,
+    "totalVotesCast": 15664000,
+    "turnoutPercentage": 71.2,
     "registeredVoters": 22000000,
-    "totalVotes": 15664000,
-    "earlyVotingPercentage": 68.9,
-    "sameDayRegistration": "Yes",
-    "voterIdRequired": "No ID Required",
-    "pollsOpenTime": "7:00 AM",
-    "pollsCloseTime": "8:00 PM",
-    "absenteeBallotDeadline": "Postmarked by Election Day",
-    "provisionalBallotsCast": 42100,
-    "rejectedBallots": 3890,
-    "averageWaitTime": 8
+    "voterRegistrationRate": 82.1
   }
 }
 

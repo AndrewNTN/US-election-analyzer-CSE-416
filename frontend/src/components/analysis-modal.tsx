@@ -7,7 +7,8 @@ import {
 } from "@/components/ui/dialog.tsx";
 import { VotingEquipmentTable } from "@/components/table/voting-equipment-table.tsx";
 import type { VotingEquipment } from "@/components/table/voting-equipment-columns.tsx";
-import { EquipmentSummaryCards } from "@/components/equipment/equipment-summary-cards.tsx";
+import { EquipmentSummaryTable } from "@/components/table/equipment-summary-table";
+import type { EquipmentSummary } from "@/components/table/equipment-summary-columns.tsx";
 import { StateComparisonTable } from "@/components/table/state-comparison-table.tsx";
 import { OptInOptOutTable } from "@/components/table/opt-in-opt-out-table.tsx";
 import { EarlyVotingTable } from "@/components/table/early-voting-table.tsx";
@@ -31,10 +32,10 @@ import {
 } from "@/lib/early-voting-data.ts";
 
 import type { AnalysisItem } from "./analysis-drawer";
-import type { EquipmentSummary } from "@/components/equipment/equipment-cards-base.tsx";
 
 const votingEquipmentData: VotingEquipment[] =
   votingEquipmentDataJson as VotingEquipment[];
+
 const equipmentSummaryData: EquipmentSummary[] =
   equipmentSummaryDataJson as EquipmentSummary[];
 
@@ -67,7 +68,7 @@ export default function AnalysisModal({
       case AnalysisOption.US_VOTING_EQUIPMENT:
         return <VotingEquipmentTable data={votingEquipmentData} />;
       case AnalysisOption.EQUIPMENT_SUMMARY:
-        return <EquipmentSummaryCards data={equipmentSummaryData} />;
+        return <EquipmentSummaryTable data={equipmentSummaryData} />;
       case AnalysisOption.REPUBLICAN_VS_DEMOCRATIC:
         return (
           <StateComparisonTable
@@ -129,9 +130,27 @@ export default function AnalysisModal({
     }
   };
 
+  // Set taller height for US Voting Equipment to accommodate bar charts
+  const isVotingEquipmentAnalysis =
+    selectedAnalysis?.title === AnalysisOption.US_VOTING_EQUIPMENT;
+  const dialogHeightClass = isVotingEquipmentAnalysis
+    ? "h-auto h-[47vw] max-h-[85vw]"
+    : "h-auto max-h-[95vw]";
+
+  // Set narrower width for comparison tables
+  const isComparisonTable =
+    selectedAnalysis?.title === AnalysisOption.REPUBLICAN_VS_DEMOCRATIC ||
+    selectedAnalysis?.title === AnalysisOption.EARLY_VOTING_COMPARISON ||
+    selectedAnalysis?.title === AnalysisOption.OPT_IN_VS_OPT_OUT;
+  const dialogWidthClass = isComparisonTable
+    ? "min-w-[45rem] max-w-[90%]"
+    : "min-w-[77rem] max-w-[95%]";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[90vw] sm:max-w-[90vw] w-[90vw] h-[95vh] flex flex-col p-4">
+      <DialogContent
+        className={`${dialogHeightClass} ${dialogWidthClass} flex flex-col p-5 w-auto`}
+      >
         <DialogHeader className="flex-shrink-0 pb-2">
           <DialogTitle className="text-xl">
             {selectedAnalysis?.title}

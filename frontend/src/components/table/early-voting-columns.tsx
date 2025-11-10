@@ -6,7 +6,10 @@ export type EarlyVotingRow = {
   democraticValue: string | number;
 };
 
-export const earlyVotingColumns: ColumnDef<EarlyVotingRow>[] = [
+export const getEarlyVotingColumns = (
+  republicanState: string,
+  democraticState: string,
+): ColumnDef<EarlyVotingRow>[] => [
   {
     accessorKey: "metric",
     header: "Metric",
@@ -16,12 +19,16 @@ export const earlyVotingColumns: ColumnDef<EarlyVotingRow>[] = [
   },
   {
     accessorKey: "republicanValue",
-    header: "Republican State",
-    cell: ({ row }) => <div>{row.getValue("republicanValue")}</div>,
+    header: () => <div className="text-right">{republicanState} (R)</div>,
+    cell: ({ row }) => (
+      <div className="text-right">{row.getValue("republicanValue")}</div>
+    ),
   },
   {
     accessorKey: "democraticValue",
-    header: "Democratic State",
-    cell: ({ row }) => <div>{row.getValue("democraticValue")}</div>,
+    header: () => <div className="text-right">{democraticState} (D)</div>,
+    cell: ({ row }) => (
+      <div className="text-right">{row.getValue("democraticValue")}</div>
+    ),
   },
 ];

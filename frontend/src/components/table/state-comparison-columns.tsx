@@ -2,11 +2,14 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 export type StateComparisonRow = {
   metric: string;
-  republicanValue: string | number;
-  democraticValue: string | number;
+  republicanValue: string;
+  democraticValue: string;
 };
 
-export const stateComparisonColumns: ColumnDef<StateComparisonRow>[] = [
+export const getStateComparisonColumns = (
+  republicanState: string,
+  democraticState: string,
+): ColumnDef<StateComparisonRow>[] => [
   {
     accessorKey: "metric",
     header: "Metric",
@@ -16,12 +19,16 @@ export const stateComparisonColumns: ColumnDef<StateComparisonRow>[] = [
   },
   {
     accessorKey: "republicanValue",
-    header: "Republican State",
-    cell: ({ row }) => <div>{row.getValue("republicanValue")}</div>,
+    header: () => <div className="text-center">{republicanState} (R)</div>,
+    cell: ({ row }) => (
+      <div className="text-center">{row.getValue("republicanValue")}</div>
+    ),
   },
   {
     accessorKey: "democraticValue",
-    header: "Democratic State",
-    cell: ({ row }) => <div>{row.getValue("democraticValue")}</div>,
+    header: () => <div className="text-center">{democraticState} (D)</div>,
+    cell: ({ row }) => (
+      <div className="text-center">{row.getValue("democraticValue")}</div>
+    ),
   },
 ];
