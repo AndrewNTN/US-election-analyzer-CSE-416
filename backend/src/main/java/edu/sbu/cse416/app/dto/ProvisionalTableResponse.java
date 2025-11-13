@@ -1,12 +1,13 @@
 package edu.sbu.cse416.app.dto;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * DTO representing list of provisional ballot table data and associated metric labels.
  */
 public record ProvisionalTableResponse(
-        ProvisionalTableData provisionalTableData,
+        List<ProvisionalTableData> data,
         Map<String, String> metricLabels) {
 
     public static Map<String, String> getDefaultMetricLabels() {

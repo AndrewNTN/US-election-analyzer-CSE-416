@@ -15,14 +15,14 @@ export interface ProvisionalChartResponse {
 }
 
 export interface ProvisionalTableResponse {
-  provisionalTableData: {
+  data: {
     jurisdictionName: string;
     totalProv?: number;
     provCountFullyCounted?: number;
     provCountPartialCounted?: number;
     provRejected?: number;
     provisionalOtherStatus?: number;
-  };
+  }[];
   metricLabels?: Record<string, string>;
 }
 

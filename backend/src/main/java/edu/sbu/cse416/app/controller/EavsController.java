@@ -19,9 +19,9 @@ public class EavsController {
     }
 
     @GetMapping("/provisional/table/{fipsPrefix}")
-    public ResponseEntity<List<ProvisionalTableResponse>> getProvisionalTable(@PathVariable String fipsPrefix) {
+    public ResponseEntity<ProvisionalTableResponse> getProvisionalTable(@PathVariable String fipsPrefix) {
         var response = eavsService.getProvisionalTable(fipsPrefix);
-        return response.isEmpty() ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
+        return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 
     @GetMapping("/provisional/chart/{fipsPrefix}")

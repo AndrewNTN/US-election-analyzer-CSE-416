@@ -33,24 +33,23 @@ public class EavsService {
      * Get provisional ballot table data for a FIPS prefix.
      */
     @Cacheable(value = "provisionalTable", key = "#fipsPrefix")
-    public List<ProvisionalTableResponse> getProvisionalTable(String fipsPrefix) {
+    public ProvisionalTableResponse getProvisionalTable(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
         List<EavsData> data = repo.findByFipsCode("^0*" + prefix);
-        return data.stream()
+        List<ProvisionalTableData> tableData = data.stream()
                 .map(record -> {
                     ProvisionalBallots p = record.provisionalBallots();
-                    return new ProvisionalTableResponse(
-                            new ProvisionalTableData(
-                                    record.jurisdictionName(),
-                                    nz(p == null ? null : p.totalProv()),
-                                    nz(p == null ? null : p.provCountFullyCounted()),
-                                    nz(p == null ? null : p.provCountPartialCounted()),
-                                    nz(p == null ? null : p.provRejected()),
-                                    nz(p == null ? null : p.provisionalOtherStatus())
-                                    ),
-                            ProvisionalTableResponse.getDefaultMetricLabels());
+                    return new ProvisionalTableData(
+                            record.jurisdictionName(),
+                            nz(p == null ? null : p.totalProv()),
+                            nz(p == null ? null : p.provCountFullyCounted()),
+                            nz(p == null ? null : p.provCountPartialCounted()),
+                            nz(p == null ? null : p.provRejected()),
+                            nz(p == null ? null : p.provisionalOtherStatus())
+                    );
                 })
                 .toList();
+        return new ProvisionalTableResponse(tableData, ProvisionalTableResponse.getDefaultMetricLabels());
     }
 
     /**
@@ -78,15 +77,3 @@ public class EavsService {
         );
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
