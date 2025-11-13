@@ -33,5 +33,5 @@ export const getProvisionalChart = async (
 
 export const getProvisionalTable = async (
   fipsPrefix: string,
-): Promise<ProvisionalTableResponse[]> =>
+): Promise<ProvisionalTableResponse> =>
   fetchJson(`/eavs/provisional/table/${fipsPrefix}`);

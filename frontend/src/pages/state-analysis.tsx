@@ -502,8 +502,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                   <ActiveVotersTable data={activeVotersData} />
                   <div className="mt-4">
                     <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
-                      Pollbook Deletions by Reason -{" "}
-                      {formatStateName(stateName)}
+                      Pollbook Deletions by Reason
                     </h3>
                     <PollbookDeletionsBarChart
                       stateName={formatStateName(stateName)}
@@ -516,8 +515,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                   <MailBallotsRejectedTable data={mailBallotsRejectedData} />
                   <div className="mt-4">
                     <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
-                      Mail Ballots Rejected by Reason -{" "}
-                      {formatStateName(stateName)}
+                      Mail Ballots Rejected by Reason
                     </h3>
                     <MailBallotsRejectedBarChart
                       stateName={formatStateName(stateName)}

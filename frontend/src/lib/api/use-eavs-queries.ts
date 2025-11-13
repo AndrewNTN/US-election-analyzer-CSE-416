@@ -23,7 +23,7 @@ export const useProvisionalChartQuery = (
 
 export const useProvisionalTableQuery = (
   fipsPrefix: string | null | undefined,
-): UseQueryResult<ProvisionalTableResponse[], Error> =>
+): UseQueryResult<ProvisionalTableResponse, Error> =>
   useQuery({
     queryKey: ["provisional-table", fipsPrefix ?? "no-fips"],
     queryFn: async () => {
