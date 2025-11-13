@@ -1,58 +1,43 @@
-import { useMemo, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import {useMemo, useState} from "react";
+import {useNavigate} from "@tanstack/react-router";
 import statesJSON from "../../data/us-states.json";
 import countiesJSON from "../../data/counties.geojson.json";
 // import censusBlockDataJSON from "../../data/censusBlockData.json";
-import type { CountyProps, StateProps } from "@/lib/map.ts";
-import {
-  DETAILED_STATES,
-  hasDetailedVoterData,
-  hasDropBoxVoting,
-  getStateDetails,
-} from "@/constants/states.ts";
-import { getStateFipsCode } from "@/constants/stateFips.ts";
-import { Button } from "@/components/ui/button.tsx";
-import {
-  STATE_CHOROPLETH_OPTIONS,
-  type StateChoroplethOption,
-} from "@/lib/choropleth.ts";
+import type {CountyProps, StateProps} from "@/lib/map.ts";
+import {DETAILED_STATES, getStateDetails, hasDetailedVoterData, hasDropBoxVoting,} from "@/constants/states.ts";
+import {getStateFipsCode} from "@/constants/stateFips.ts";
+import {Button} from "@/components/ui/button.tsx";
+import {STATE_CHOROPLETH_OPTIONS, type StateChoroplethOption,} from "@/lib/choropleth.ts";
 import StateMap from "@/components/map/state-map.tsx";
-import type { FeatureCollection, Geometry } from "geojson";
+import type {FeatureCollection, Geometry} from "geojson";
 // import type { CensusBlockData } from "@/components/map/bubble-chart-layer.tsx";
-
 //table imports
-import { VoterRegistrationTable } from "../components/table/state-tables/voter-registration-table.tsx";
-import eavsRegionVoterDataJson from "../../data/eavsRegionVoterData.json" with { type: "json" };
-import { ProvisionBallotsTable } from "../components/table/state-tables/provisional-ballot-table.tsx";
-import { ActiveVotersTable } from "../components/table/state-tables/active-voters-table.tsx";
-import activeVotersDataJson from "../../data/activeVotersData.json" with { type: "json" };
-import activeVotersDataCaliforniaJson from "../../data/activeVotersData-california.json" with { type: "json" };
-import activeVotersDataFloridaJson from "../../data/activeVotersData-florida.json" with { type: "json" };
-import pollbookDeletionsDataJson from "../../data/pollbookDeletionsData.json" with { type: "json" };
-import { MailBallotsRejectedTable } from "../components/table/state-tables/mail-ballots-rejected-table.tsx";
-import mailBallotsRejectedDataJson from "../../data/mailBallotsRejectedData.json" with { type: "json" };
-import stateEquipmentSummaryJson from "../../data/stateEquipmentSummary.json" with { type: "json" };
+import {VoterRegistrationTable} from "../components/table/state-tables/voter-registration-table.tsx";
+import eavsRegionVoterDataJson from "../../data/eavsRegionVoterData.json" with {type: "json"};
+import {ProvisionBallotsTable} from "../components/table/state-tables/provisional-ballot-table.tsx";
+import {ActiveVotersTable} from "../components/table/state-tables/active-voters-table.tsx";
+import activeVotersDataJson from "../../data/activeVotersData.json" with {type: "json"};
+import activeVotersDataCaliforniaJson from "../../data/activeVotersData-california.json" with {type: "json"};
+import activeVotersDataFloridaJson from "../../data/activeVotersData-florida.json" with {type: "json"};
+import pollbookDeletionsDataJson from "../../data/pollbookDeletionsData.json" with {type: "json"};
+import {MailBallotsRejectedTable} from "../components/table/state-tables/mail-ballots-rejected-table.tsx";
+import mailBallotsRejectedDataJson from "../../data/mailBallotsRejectedData.json" with {type: "json"};
+import stateEquipmentSummaryJson from "../../data/stateEquipmentSummary.json" with {type: "json"};
 
 //chart imports
-import { VoterRegistrationLineChart } from "../components/chart/voter-registration-line-chart";
-import voterRegistrationDataJson from "../../data/voterRegistrationChanges.json" with { type: "json" };
-import {
-  ProvisionalBallotsBarChart,
-  type ProvisionBallotsData,
-} from "../components/chart/provisional-ballots-bar-chart";
-import { ActiveVotersBarChart } from "../components/chart/active-voters-bar-chart";
-import { PollbookDeletionsBarChart } from "../components/chart/pollbook-deletions-bar-chart";
-import { MailBallotsRejectedBarChart } from "../components/chart/mail-ballots-rejected-bar-chart";
-import { DropBoxVotingBubbleChart } from "../components/chart/drop-box-voting-bubble-chart";
-import dropBoxVotingDataJson from "../../data/dropBoxVotingData.json" with { type: "json" };
-import { EquipmentQualityBubbleChart } from "../components/chart/equipment-quality-bubble-chart";
-import equipmentQualityDataJson from "../../data/equipmentQualityVsRejectedBallots.json" with { type: "json" };
-import {
-  useProvisionalAggregateQuery,
-  useProvisionalStateQuery,
-} from "@/lib/api/use-eavs-queries.ts";
-import { StateEquipmentSummaryTable } from "@/components/table/state-tables/state-equipment-summary-table.tsx";
-import type { StateEquipmentSummary } from "@/components/table/state-tables/state-equipment-summary-columns.tsx";
+import {VoterRegistrationLineChart} from "../components/chart/voter-registration-line-chart";
+import voterRegistrationDataJson from "../../data/voterRegistrationChanges.json" with {type: "json"};
+import {ProvisionalBallotsBarChart} from "../components/chart/provisional-ballots-bar-chart";
+import {ActiveVotersBarChart} from "../components/chart/active-voters-bar-chart";
+import {PollbookDeletionsBarChart} from "../components/chart/pollbook-deletions-bar-chart";
+import {MailBallotsRejectedBarChart} from "../components/chart/mail-ballots-rejected-bar-chart";
+import {DropBoxVotingBubbleChart} from "../components/chart/drop-box-voting-bubble-chart";
+import dropBoxVotingDataJson from "../../data/dropBoxVotingData.json" with {type: "json"};
+import {EquipmentQualityBubbleChart} from "../components/chart/equipment-quality-bubble-chart";
+import equipmentQualityDataJson from "../../data/equipmentQualityVsRejectedBallots.json" with {type: "json"};
+import {useProvisionalChartQuery, useProvisionalTableQuery,} from "@/lib/api/use-eavs-queries.ts";
+import {StateEquipmentSummaryTable} from "@/components/table/state-tables/state-equipment-summary-table.tsx";
+import type {StateEquipmentSummary} from "@/components/table/state-tables/state-equipment-summary-columns.tsx";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
@@ -295,10 +280,9 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
   const currentCountiesData = getCurrentCountiesData();
   const detailedState = isDetailedState;
 
-  const urlStateName = normalizedStateKey;
   const showBubbleChart =
     selectedDataset === AnalysisType.VOTER_REGISTRATION &&
-    hasDetailedVoterData(urlStateName);
+    hasDetailedVoterData(normalizedStateKey);
 
   // Get drop box voting data for current state
   const getDropBoxVotingData = (): DropBoxVotingData[] => {
@@ -341,42 +325,21 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
   }, [normalizedStateKey]);
 
   const {
-    data: provAggregateData,
+    data: provChartData,
     isPending: provLoading,
-    isError: provAggregateHasError,
-    error: provAggregateError,
-  } = useProvisionalAggregateQuery(stateFipsPrefix);
+    isError: provChartHasError,
+    error: provChartError,
+  } = useProvisionalChartQuery(stateFipsPrefix);
 
   const {
-    data: provStateData,
-    isPending: provStateLoading,
-    isError: provStateHasError,
-    error: provStateError,
-  } = useProvisionalStateQuery(stateFipsPrefix);
+    data: provTableData,
+    isPending: provTableLoading,
+    isError: provTableHasError,
+    error: provTableError,
+  } = useProvisionalTableQuery(stateFipsPrefix);
 
-  const provChartData: ProvisionBallotsData[] = useMemo(() => {
-    if (!provAggregateData) {
-      return [];
-    }
-
-    return [
-      {
-        E2a: provAggregateData.E2a ?? 0,
-        E2b: provAggregateData.E2b ?? 0,
-        E2c: provAggregateData.E2c ?? 0,
-        E2d: provAggregateData.E2d ?? 0,
-        E2e: provAggregateData.E2e ?? 0,
-        E2f: provAggregateData.E2f ?? 0,
-        E2g: provAggregateData.E2g ?? 0,
-        E2h: provAggregateData.E2h ?? 0,
-        E2i: provAggregateData.E2i ?? 0,
-        Other: provAggregateData.Other ?? 0,
-      },
-    ];
-  }, [provAggregateData]);
-
-  const provErrorMessage = provAggregateHasError
-    ? (provAggregateError?.message ?? "Unknown error")
+  const provErrorMessage = provChartHasError
+    ? (provChartError?.message ?? "Unknown error")
     : null;
 
   return (
@@ -470,22 +433,26 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                     </p>
                   ) : (
                     <>
-                      <ProvisionBallotsTable
-                        data={provStateData}
-                        isPending={provStateLoading}
-                        isError={provStateHasError}
-                        error={provStateError}
-                      />
-                      <div className="mt-4">
-                        <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
-                          Provisional Ballots by Reason -{" "}
-                          {formatStateName(stateName)}
-                        </h3>
-                        <ProvisionalBallotsBarChart
-                          stateName={formatStateName(stateName)}
-                          barData={provChartData}
+                      {provTableData && (
+                        <ProvisionBallotsTable
+                          data={provTableData}
+                          isPending={provTableLoading}
+                          isError={provTableHasError}
+                          error={provTableError}
                         />
-                      </div>
+                      )}
+                      {provChartData && (
+                        <div className="mt-4">
+                          <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
+                            Provisional Ballots by Reason -{" "}
+                            {formatStateName(stateName)}
+                          </h3>
+                          <ProvisionalBallotsBarChart
+                            stateName={formatStateName(stateName)}
+                            barData={provChartData}
+                          />
+                        </div>
+                      )}
                     </>
                   )}
                 </div>

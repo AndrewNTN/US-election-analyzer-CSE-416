@@ -3,14 +3,11 @@
 import { useMemo } from "react";
 
 import { DataTable, DataTablePagination } from "../data-table.tsx";
-import {
-  provisionalBallotsColumns,
-  type ProvisionBallotsData,
-} from "./provisional-ballot-columns.tsx";
-import type { ProvisionalBallotsApiResponse } from "@/lib/api/eavs-requests";
+import { provisionalBallotsColumns } from "./provisional-ballot-columns.tsx";
+import type { ProvisionalTableResponse } from "@/lib/api/eavs-requests";
 
 interface ProvisionalBallotsTableProps {
-  data: ProvisionalBallotsApiResponse[] | undefined;
+  data: ProvisionalTableResponse[];
   isPending: boolean;
   isError: boolean;
   error: Error | null;
@@ -22,42 +19,41 @@ export function ProvisionBallotsTable({
   isError,
   error,
 }: ProvisionalBallotsTableProps) {
-  const tableData = useMemo<ProvisionBallotsData[]>(() => {
-    if (!data) {
-      return [];
-    }
-
+  const tableData = useMemo<ProvisionalTableResponse[]>(() => {
     const mappedData = data.map((record) => {
-      const provisional = record.provisionalBallots || {};
       return {
-        region: record.jurisdictionName || "Unknown",
-        metrics: {
-          E1a: provisional.E1a ?? 0,
-          E1b: provisional.E1b ?? 0,
-          E1c: provisional.E1c ?? 0,
-          E1d: provisional.E1d ?? 0,
-          E1e: provisional.E1e ?? 0,
-        },
-      } satisfies ProvisionBallotsData;
+        jurisdictionName: record.jurisdictionName || "Unknown",
+        totalProv: record.totalProv ?? 0,
+        provCountFullyCounted: record.provCountFullyCounted ?? 0,
+        provCountPartialCounted: record.provCountPartialCounted ?? 0,
+        provRejected: record.provRejected ?? 0,
+        provisionalOtherStatus: record.provisionalOtherStatus ?? 0,
+      } satisfies ProvisionalTableResponse;
     });
 
     // Calculate totals for each metric
     const totals = mappedData.reduce(
       (acc, item) => {
-        acc.E1a += item.metrics.E1a;
-        acc.E1b += item.metrics.E1b;
-        acc.E1c += item.metrics.E1c;
-        acc.E1d += item.metrics.E1d;
-        acc.E1e += item.metrics.E1e;
+        acc.totalProv += item.totalProv ?? 0;
+        acc.provCountFullyCounted += item.provCountFullyCounted ?? 0;
+        acc.provCountPartialCounted += item.provCountPartialCounted ?? 0;
+        acc.provRejected += item.provRejected ?? 0;
+        acc.provisionalOtherStatus += item.provisionalOtherStatus ?? 0;
         return acc;
       },
-      { E1a: 0, E1b: 0, E1c: 0, E1d: 0, E1e: 0 },
+      {
+        totalProv: 0,
+        provCountFullyCounted: 0,
+        provCountPartialCounted: 0,
+        provRejected: 0,
+        provisionalOtherStatus: 0,
+      },
     );
 
     // Add total row at the end
-    const totalRow: ProvisionBallotsData = {
-      region: "TOTAL",
-      metrics: totals,
+    const totalRow: ProvisionalTableResponse = {
+      jurisdictionName: "TOTAL",
+      ...totals,
     };
 
     return [...mappedData, totalRow];

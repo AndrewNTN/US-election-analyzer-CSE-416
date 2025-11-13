@@ -1,54 +1,43 @@
 import type { ColumnDef, Row } from "@tanstack/react-table";
+import type { ProvisionalTableResponse } from "@/lib/api/eavs-requests.ts";
 
-export interface ProvisionBallotsData {
-  region: string;
-  metrics: Record<string, number>;
-}
-
-const metricKeys = [
-  "E1a", // Total Provisional Ballots Cast
-  "E1b", // Provisional Ballots Fully Counted
-  "E1c", // Provisional Ballots Partially Counted
-  "E1d", // Provisional Ballots Rejected
-  "E1e", // Provisional Ballots Other Status
+const METRICS = [
+  { key: "totalProv", label: "Ballots Cast" },
+  { key: "provCountFullyCounted", label: "Fully Counted" },
+  { key: "provCountPartialCounted", label: "Partially Counted" },
+  { key: "provRejected", label: "Rejected" },
+  { key: "provisionalOtherStatus", label: "Other" },
 ] as const;
 
-const columnHeaders = {
-  E1a: "Ballots Cast",
-  E1b: "Fully Counted",
-  E1c: "Partially Counted",
-  E1d: "Rejected",
-  E1e: "Other Status",
-} as const;
-
-export const provisionalBallotsColumns: ColumnDef<ProvisionBallotsData>[] = [
-  {
-    accessorKey: "region",
-    header: () => <div className="text-left font-semibold">Region</div>,
-    cell: ({ row }: { row: Row<ProvisionBallotsData> }) => {
-      const isTotal = row.getValue("region") === "TOTAL";
-      return (
-        <div
-          className={`text-sm text-left py-0 px-0 ${isTotal ? "font-bold text-black" : "text-black font-medium"}`}
-        >
-          {row.getValue("region")}
-        </div>
-      );
+export const provisionalBallotsColumns: ColumnDef<ProvisionalTableResponse>[] =
+  [
+    {
+      accessorKey: "jurisdictionName",
+      header: () => <div className="text-left font-semibold">Region</div>,
+      cell: ({ row }: { row: Row<ProvisionalTableResponse> }) => {
+        const isTotal = row.getValue("jurisdictionName") === "TOTAL";
+        return (
+          <div
+            className={`text-sm text-left py-0 px-0 ${isTotal ? "font-bold text-black" : "text-black font-medium"}`}
+          >
+            {row.getValue("jurisdictionName")}
+          </div>
+        );
+      },
     },
-  },
-  ...metricKeys.map((key) => ({
-    id: key,
-    header: () => <div className="text-right">{columnHeaders[key]}</div>,
-    cell: ({ row }: { row: Row<ProvisionBallotsData> }) => {
-      const metrics = row.original.metrics;
-      const isTotal = row.getValue("region") === "TOTAL";
-      return (
-        <div
-          className={`text-sm text-right ${isTotal ? "font-bold text-black" : "text-black"}`}
-        >
-          {metrics?.[key]?.toLocaleString?.() ?? "0"}
-        </div>
-      );
-    },
-  })),
-];
+    ...METRICS.map((metric) => ({
+      id: metric.key,
+      header: () => <div className="text-right">{metric.label}</div>,
+      cell: ({ row }: { row: Row<ProvisionalTableResponse> }) => {
+        const isTotal = row.getValue("jurisdictionName") === "TOTAL";
+        const value = row.original[metric.key] ?? 0;
+        return (
+          <div
+            className={`text-sm text-right ${isTotal ? "font-bold text-black" : "text-black"}`}
+          >
+            {value.toLocaleString()}
+          </div>
+        );
+      },
+    })),
+  ];

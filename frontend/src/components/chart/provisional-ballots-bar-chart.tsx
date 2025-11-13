@@ -1,50 +1,39 @@
 import { BaseBarChart } from "./base-bar-chart";
 import { formatNumber } from "@/lib/utils";
-
-export interface ProvisionBallotsData {
-  E2a: number; // Not on List
-  E2b: number; // Lacked ID
-  E2c: number; // Official Challenged Eligibility
-  E2d: number; // Person Challenged Eligibility
-  E2e: number; // Not Resident
-  E2f: number; // Registration Not Updated
-  E2g: number; // Did Not Surrender Mail Ballot
-  E2h: number; // Judge Extended Hours
-  E2i: number; // Used SDR
-  Other: number; // Other
-}
+import type { ProvisionalChartResponse } from "@/lib/api/eavs-requests.ts";
 
 export interface ProvisionalBallotsBarChartProps {
   stateName: string;
-  barData: ProvisionBallotsData[];
+  barData: ProvisionalChartResponse;
 }
 
-const METRIC_KEYS = [
-  "E2a",
-  "E2b",
-  "E2c",
-  "E2d",
-  "E2e",
-  "E2f",
-  "E2g",
-  "E2h",
-  "E2i",
-  "Other",
+const METRICS = [
+  { key: "provReasonVoterNotOnList", label: "E2a – Not on List" },
+  { key: "provReasonVoterLackedID", label: "E2b – Lacked ID" },
+  {
+    key: "provReasonElectionOfficialChallengedEligibility",
+    label: "E2c – Official Challenged Eligibility",
+  },
+  {
+    key: "provReasonAnotherPersonChallengedEligibility",
+    label: "E2d – Person Challenged Eligibility",
+  },
+  { key: "provReasonVoterNotResident", label: "E2e – Not Resident" },
+  {
+    key: "provReasonVoterRegistrationNotUpdated",
+    label: "E2f – Registration Not Updated",
+  },
+  {
+    key: "provReasonVoterDidNotSurrenderMailBallot",
+    label: "E2g – Did Not Surrender Mail Ballot",
+  },
+  {
+    key: "provReasonJudgeExtendedVotingHours",
+    label: "E2h – Judge Extended Hours",
+  },
+  { key: "provReasonVoterUsedSDR", label: "E2i – Used SDR" },
+  { key: "provReasonOtherSum", label: "Other" },
 ] as const;
-type MetricKey = (typeof METRIC_KEYS)[number];
-
-const METRIC_LABELS: Record<MetricKey, string> = {
-  E2a: "E2a – Not on List",
-  E2b: "E2b – Lacked ID",
-  E2c: "E2c – Official Challenged Eligibility",
-  E2d: "E2d – Person Challenged Eligibility",
-  E2e: "E2e – Not Resident",
-  E2f: "E2f – Registration Not Updated",
-  E2g: "E2g – Did Not Surrender Mail Ballot",
-  E2h: "E2h – Judge Extended Hours",
-  E2i: "E2i – Used SDR",
-  Other: "Other",
-};
 
 export function ProvisionalBallotsBarChart({
   stateName,
@@ -53,10 +42,17 @@ export function ProvisionalBallotsBarChart({
   return (
     <BaseBarChart
       stateName={stateName}
-      barData={barData}
-      metricKeys={METRIC_KEYS}
-      metricLabels={METRIC_LABELS}
-      metricAccessor={(data, key) => data[key]}
+      barData={[barData]}
+      metricKeys={METRICS.map((m) => m.key)}
+      metricLabels={
+        Object.fromEntries(METRICS.map((m) => [m.key, m.label])) as Record<
+          (typeof METRICS)[number]["key"],
+          string
+        >
+      }
+      metricAccessor={(data, key) =>
+        data[key as keyof ProvisionalChartResponse] ?? 0
+      }
       yAxisLabel="Number of Ballots"
       yAxisTickFormatter={formatNumber}
     />
