@@ -41,7 +41,7 @@ package "edu.sbu.cse416.app.controller" {
     + org.springframework.http.ResponseEntity<java.util.List<java.lang.Object>> getAllStatesPlaceholder()
 
     ' visible in file (signatures reconstructed from the visible annotations/params)
-    + org.springframework.http.ResponseEntity<java.util.List<edu.sbu.cse416.app.model.EavsData>> getProvisionalByStateFipsPrefix(
+    + org.springframework.http.ResponseEntity<java.util.List<edu.sbu.cse416.app.model.eavs.EavsData>> getProvisionalByStateFipsPrefix(
         @org.springframework.web.bind.annotation.PathVariable String fipsPrefix,
         @org.springframework.web.bind.annotation.RequestParam(defaultValue="2024") Integer electionYear)
 
@@ -62,8 +62,8 @@ package "edu.sbu.cse416.app.service" {
 ' ================== REPOSITORY ==================
 package "edu.sbu.cse416.app.repository" {
   interface EavsDataRepository {
-    + java.util.List<edu.sbu.cse416.app.model.EavsData> findByStateAbbrAndElectionYear(String stateAbbr, Integer electionYear)
-    + java.util.List<edu.sbu.cse416.app.model.EavsData> findByFipsCodeRegexAndElectionYear(String regex, Integer electionYear)
+    + java.util.List<edu.sbu.cse416.app.model.eavs.EavsData> findByStateAbbrAndElectionYear(String stateAbbr, Integer electionYear)
+    + java.util.List<edu.sbu.cse416.app.model.eavs.EavsData> findByFipsCodeRegexAndElectionYear(String regex, Integer electionYear)
   }
 }
 

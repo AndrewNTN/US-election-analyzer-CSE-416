@@ -1,4 +1,4 @@
-package edu.sbu.cse416.app.model;
+package edu.sbu.cse416.app.model.geojson;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

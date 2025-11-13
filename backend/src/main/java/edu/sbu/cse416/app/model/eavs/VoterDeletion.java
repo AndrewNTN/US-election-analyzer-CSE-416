@@ -1,4 +1,4 @@
-package edu.sbu.cse416.app.model;
+package edu.sbu.cse416.app.model.eavs;
 
 public record VoterDeletion(
         // A12b-A12h

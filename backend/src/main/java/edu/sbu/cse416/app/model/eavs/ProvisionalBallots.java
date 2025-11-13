@@ -1,4 +1,4 @@
-package edu.sbu.cse416.app.model;
+package edu.sbu.cse416.app.model.eavs;
 
 public record ProvisionalBallots(
         // E1a-E1e

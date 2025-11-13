@@ -1,6 +1,6 @@
 package edu.sbu.cse416.app.repository;
 
-import edu.sbu.cse416.app.model.EavsData;
+import edu.sbu.cse416.app.model.eavs.EavsData;
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

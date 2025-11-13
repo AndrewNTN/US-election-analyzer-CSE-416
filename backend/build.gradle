@@ -67,32 +67,51 @@ task installPythonDependencies(type: Exec) {
     ignoreExitValue = false
 }
 
-// Task to run Python preprocessing script
-task runPythonPreprocessing(type: Exec) {
+// Task to run Python preprocessing script for counties
+task runCountiesPreprocessing(type: Exec) {
     description = 'Run Python preprocessing script to load counties GeoJSON into MongoDB'
     group = 'application'
 
-    // Use 'python' command on Windows
     workingDir file('preprocessing')
     commandLine 'python', 'load_counties_geojson.py'
 
     doFirst {
         println '================================================'
-        println 'Running Python preprocessing script...'
+        println 'Running Counties preprocessing script...'
         println 'Loading counties GeoJSON data into MongoDB...'
         println '================================================'
     }
 
     doLast {
         println '================================================'
-        println 'Python preprocessing completed successfully!'
+        println 'Counties preprocessing completed successfully!'
+        println '================================================'
+    }
+}
+
+// Task to run Python preprocessing script for states
+task runStatesPreprocessing(type: Exec) {
+    description = 'Run Python preprocessing script to load states GeoJSON into MongoDB'
+    group = 'application'
+
+    workingDir file('preprocessing')
+    commandLine 'python', 'load_states_geojson.py'
+
+    doFirst {
+        println '================================================'
+        println 'Running States preprocessing script...'
+        println 'Loading states GeoJSON data into MongoDB...'
         println '================================================'
     }
 
-    // Optional: uncomment if you want bootRun to proceed even if the script fails
-    // ignoreExitValue = true
+    doLast {
+        println '================================================'
+        println 'States preprocessing completed successfully!'
+        println '================================================'
+    }
 }
 
-// Make bootRun depend on the Python preprocessing task
-runPythonPreprocessing.dependsOn installPythonDependencies
-bootRun.dependsOn runPythonPreprocessing
+// Make bootRun depend on the Python preprocessing tasks
+runCountiesPreprocessing.dependsOn installPythonDependencies
+runStatesPreprocessing.dependsOn runCountiesPreprocessing
+bootRun.dependsOn runStatesPreprocessing

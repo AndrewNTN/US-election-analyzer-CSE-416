@@ -1,6 +1,8 @@
 package edu.sbu.cse416.app.controller;
 
-import edu.sbu.cse416.app.model.CountyGeoJson;
+import edu.sbu.cse416.app.dto.geojson.GeoJsonResponse;
+import edu.sbu.cse416.app.model.geojson.CountyGeoJson;
+import edu.sbu.cse416.app.model.geojson.StateGeoJson;
 import edu.sbu.cse416.app.service.GeoJsonService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +20,21 @@ public class GeoJsonController {
 
     /**
      * Get all counties for a specific state.
-     * GET /geojson/counties/{fipsPrefix}
+     * GET /geojson/counties/state/{fipsPrefix}
      */
     @GetMapping("/counties/state/{fipsPrefix}")
-    public ResponseEntity<List<CountyGeoJson>> getCountiesByState(@PathVariable String fipsPrefix) {
+    public ResponseEntity<GeoJsonResponse<CountyGeoJson>> getCountiesByState(@PathVariable String fipsPrefix) {
         List<CountyGeoJson> counties = geoJsonService.getCountiesByState(fipsPrefix);
-        return ResponseEntity.ok(counties);
+        return ResponseEntity.ok(GeoJsonResponse.of(counties));
+    }
+
+    /**
+     * Get all state geoJSON data.
+     * GET /geojson/states
+     */
+    @GetMapping("/states")
+    public ResponseEntity<GeoJsonResponse<StateGeoJson>> getAllStates() {
+        List<StateGeoJson> states = geoJsonService.getAllStates();
+        return ResponseEntity.ok(GeoJsonResponse.of(states));
     }
 }

@@ -1,10 +1,10 @@
 package edu.sbu.cse416.app.config;
 
-import edu.sbu.cse416.app.model.EavsData;
-import edu.sbu.cse416.app.model.MailBallotsRejectedReason;
-import edu.sbu.cse416.app.model.ProvisionalBallots;
-import edu.sbu.cse416.app.model.VoterDeletion;
-import edu.sbu.cse416.app.model.VoterRegistration;
+import edu.sbu.cse416.app.model.eavs.EavsData;
+import edu.sbu.cse416.app.model.eavs.MailBallotsRejectedReason;
+import edu.sbu.cse416.app.model.eavs.ProvisionalBallots;
+import edu.sbu.cse416.app.model.eavs.VoterDeletion;
+import edu.sbu.cse416.app.model.eavs.VoterRegistration;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
