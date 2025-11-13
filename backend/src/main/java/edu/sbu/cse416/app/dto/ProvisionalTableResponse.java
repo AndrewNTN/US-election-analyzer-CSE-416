@@ -1,12 +1,21 @@
 package edu.sbu.cse416.app.dto;
 
+import java.util.Map;
+
 /**
- * Combined DTO representing one row of provisional ballot table data.
+ * DTO representing list of provisional ballot table data and associated metric labels.
  */
 public record ProvisionalTableResponse(
-        String jurisdictionName,
-        Integer totalProv,
-        Integer provCountFullyCounted,
-        Integer provCountPartialCounted,
-        Integer provRejected,
-        Integer provisionalOtherStatus) {}
+        ProvisionalTableData provisionalTableData,
+        Map<String, String> metricLabels) {
+
+    public static Map<String, String> getDefaultMetricLabels() {
+        return Map.of(
+                "totalProv", "Ballots Cast",
+                "provCountFullyCounted", "Fully Counted",
+                "provCountPartialCounted", "Partially Counted",
+                "provRejected", "Rejected",
+                "provisionalOtherStatus", "Other"
+        );
+    }
+}

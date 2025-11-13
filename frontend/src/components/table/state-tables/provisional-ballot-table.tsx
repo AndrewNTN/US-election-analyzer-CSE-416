@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 
 import { DataTable, DataTablePagination } from "../data-table.tsx";
-import { provisionalBallotsColumns } from "./provisional-ballot-columns.tsx";
+import { createProvisionalBallotsColumns } from "./provisional-ballot-columns.tsx";
 import type { ProvisionalTableResponse } from "@/lib/api/eavs-requests";
 
 interface ProvisionalBallotsTableProps {
@@ -22,23 +22,33 @@ export function ProvisionBallotsTable({
   const tableData = useMemo<ProvisionalTableResponse[]>(() => {
     const mappedData = data.map((record) => {
       return {
-        jurisdictionName: record.jurisdictionName || "Unknown",
-        totalProv: record.totalProv ?? 0,
-        provCountFullyCounted: record.provCountFullyCounted ?? 0,
-        provCountPartialCounted: record.provCountPartialCounted ?? 0,
-        provRejected: record.provRejected ?? 0,
-        provisionalOtherStatus: record.provisionalOtherStatus ?? 0,
+        provisionalTableData: {
+          jurisdictionName:
+            record.provisionalTableData.jurisdictionName || "Unknown",
+          totalProv: record.provisionalTableData.totalProv ?? 0,
+          provCountFullyCounted:
+            record.provisionalTableData.provCountFullyCounted ?? 0,
+          provCountPartialCounted:
+            record.provisionalTableData.provCountPartialCounted ?? 0,
+          provRejected: record.provisionalTableData.provRejected ?? 0,
+          provisionalOtherStatus:
+            record.provisionalTableData.provisionalOtherStatus ?? 0,
+        },
+        metricLabels: record.metricLabels,
       } satisfies ProvisionalTableResponse;
     });
 
     // Calculate totals for each metric
     const totals = mappedData.reduce(
       (acc, item) => {
-        acc.totalProv += item.totalProv ?? 0;
-        acc.provCountFullyCounted += item.provCountFullyCounted ?? 0;
-        acc.provCountPartialCounted += item.provCountPartialCounted ?? 0;
-        acc.provRejected += item.provRejected ?? 0;
-        acc.provisionalOtherStatus += item.provisionalOtherStatus ?? 0;
+        acc.totalProv += item.provisionalTableData.totalProv ?? 0;
+        acc.provCountFullyCounted +=
+          item.provisionalTableData.provCountFullyCounted ?? 0;
+        acc.provCountPartialCounted +=
+          item.provisionalTableData.provCountPartialCounted ?? 0;
+        acc.provRejected += item.provisionalTableData.provRejected ?? 0;
+        acc.provisionalOtherStatus +=
+          item.provisionalTableData.provisionalOtherStatus ?? 0;
         return acc;
       },
       {
@@ -52,12 +62,19 @@ export function ProvisionBallotsTable({
 
     // Add total row at the end
     const totalRow: ProvisionalTableResponse = {
-      jurisdictionName: "TOTAL",
-      ...totals,
+      provisionalTableData: {
+        jurisdictionName: "TOTAL",
+        ...totals,
+      },
     };
 
     return [...mappedData, totalRow];
   }, [data]);
+
+  const columns = useMemo(
+    () => createProvisionalBallotsColumns(data[0]?.metricLabels ?? {}),
+    [data],
+  );
 
   if (isPending) {
     return <p className="text-xs text-muted-foreground">Loading…</p>;
@@ -76,7 +93,7 @@ export function ProvisionBallotsTable({
     <div className="space-y-2">
       <DataTable
         data={tableData}
-        columns={provisionalBallotsColumns}
+        columns={columns}
         paginationSlot={(table) => (
           <DataTablePagination
             table={table}

@@ -48,7 +48,8 @@ public class RecordAggregator {
             } else if (type == Double.class) {
                 accumulator[i] = 0.0;
             } else {
-                throw new IllegalArgumentException("Unsupported field type: " + type.getName());
+                // Skip unsupported types - they will be set to null
+                accumulator[i] = null;
             }
         }
 
@@ -62,6 +63,11 @@ public class RecordAggregator {
             for (int i = 0; i < components.length; i++) {
                 String fieldName = components[i].getName();
                 Class<?> fieldType = components[i].getType();
+
+                // Skip non-numeric types
+                if (fieldType != Integer.class && fieldType != Long.class && fieldType != Double.class) {
+                    continue;
+                }
 
                 // Find matching field in source record
                 RecordComponent sourceComponent = Arrays.stream(sourceComponents)

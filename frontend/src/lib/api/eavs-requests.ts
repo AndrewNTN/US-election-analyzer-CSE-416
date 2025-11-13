@@ -11,15 +11,19 @@ export interface ProvisionalChartResponse {
   provReasonJudgeExtendedVotingHours?: number;
   provReasonVoterUsedSDR?: number;
   provReasonOtherSum?: number;
+  metricLabels?: Record<string, string>;
 }
 
 export interface ProvisionalTableResponse {
-  jurisdictionName: string;
-  totalProv?: number;
-  provCountFullyCounted?: number;
-  provCountPartialCounted?: number;
-  provRejected?: number;
-  provisionalOtherStatus?: number;
+  provisionalTableData: {
+    jurisdictionName: string;
+    totalProv?: number;
+    provCountFullyCounted?: number;
+    provCountPartialCounted?: number;
+    provRejected?: number;
+    provisionalOtherStatus?: number;
+  };
+  metricLabels?: Record<string, string>;
 }
 
 export const getProvisionalChart = async (
