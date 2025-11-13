@@ -1,15 +1,13 @@
 package edu.sbu.cse416.app.service;
 
-import edu.sbu.cse416.app.dto.ProvisionalChartResponse;
-import edu.sbu.cse416.app.dto.ProvisionalTableData;
-import edu.sbu.cse416.app.dto.ProvisionalTableResponse;
+import edu.sbu.cse416.app.dto.provisional.ProvisionalChartResponse;
+import edu.sbu.cse416.app.dto.provisional.ProvisionalTableData;
+import edu.sbu.cse416.app.dto.provisional.ProvisionalTableResponse;
 import edu.sbu.cse416.app.model.EavsData;
 import edu.sbu.cse416.app.model.ProvisionalBallots;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
 import edu.sbu.cse416.app.util.RecordAggregator;
-
 import java.util.List;
-
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -45,8 +43,7 @@ public class EavsService {
                             nz(p == null ? null : p.provCountFullyCounted()),
                             nz(p == null ? null : p.provCountPartialCounted()),
                             nz(p == null ? null : p.provRejected()),
-                            nz(p == null ? null : p.provisionalOtherStatus())
-                    );
+                            nz(p == null ? null : p.provisionalOtherStatus()));
                 })
                 .toList();
         return new ProvisionalTableResponse(tableData, ProvisionalTableResponse.getDefaultMetricLabels());
@@ -60,7 +57,8 @@ public class EavsService {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
         List<EavsData> data = repo.findByFipsCode("0*" + prefix);
 
-        ProvisionalChartResponse response = RecordAggregator.aggregate(data, EavsData::provisionalBallots, ProvisionalChartResponse.class);
+        ProvisionalChartResponse response =
+                RecordAggregator.aggregate(data, EavsData::provisionalBallots, ProvisionalChartResponse.class);
 
         return new ProvisionalChartResponse(
                 response.provReasonVoterNotOnList(),
@@ -73,7 +71,6 @@ public class EavsService {
                 response.provReasonJudgeExtendedVotingHours(),
                 response.provReasonVoterUsedSDR(),
                 response.provReasonOtherSum(),
-                ProvisionalChartResponse.getDefaultMetricLabels()
-        );
+                ProvisionalChartResponse.getDefaultMetricLabels());
     }
 }

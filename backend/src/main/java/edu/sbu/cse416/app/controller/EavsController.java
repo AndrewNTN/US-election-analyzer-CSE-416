@@ -1,9 +1,8 @@
 package edu.sbu.cse416.app.controller;
 
-import edu.sbu.cse416.app.dto.ProvisionalChartResponse;
-import edu.sbu.cse416.app.dto.ProvisionalTableResponse;
+import edu.sbu.cse416.app.dto.provisional.ProvisionalChartResponse;
+import edu.sbu.cse416.app.dto.provisional.ProvisionalTableResponse;
 import edu.sbu.cse416.app.service.EavsService;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

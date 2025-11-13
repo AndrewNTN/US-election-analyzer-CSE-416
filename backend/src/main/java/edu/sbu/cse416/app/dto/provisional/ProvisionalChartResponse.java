@@ -1,4 +1,4 @@
-package edu.sbu.cse416.app.dto;
+package edu.sbu.cse416.app.dto.provisional;
 
 import java.util.Map;
 
@@ -29,7 +29,6 @@ public record ProvisionalChartResponse(
                 "provReasonVoterDidNotSurrenderMailBallot", "E2g – Did Not Surrender Mail Ballot",
                 "provReasonJudgeExtendedVotingHours", "E2h – Judge Extended Hours",
                 "provReasonVoterUsedSDR", "E2i – Used SDR",
-                "provReasonOtherSum", "Other"
-        );
+                "provReasonOtherSum", "Other");
     }
 }

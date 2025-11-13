@@ -1,6 +1,4 @@
-package edu.sbu.cse416.app.dto;
-
-import java.util.Map;
+package edu.sbu.cse416.app.dto.provisional;
 
 /**
  * DTO representing one row of provisional ballot table data.
@@ -11,5 +9,4 @@ public record ProvisionalTableData(
         Integer provCountFullyCounted,
         Integer provCountPartialCounted,
         Integer provRejected,
-        Integer provisionalOtherStatus) {
-}
+        Integer provisionalOtherStatus) {}
