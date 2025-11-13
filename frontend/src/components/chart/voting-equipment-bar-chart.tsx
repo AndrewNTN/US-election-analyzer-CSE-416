@@ -22,7 +22,6 @@ interface VotingEquipmentBarChartProps {
 }
 
 export function VotingEquipmentBarChart({
-  stateName,
   data,
 }: VotingEquipmentBarChartProps) {
   const categories = [
@@ -51,7 +50,7 @@ export function VotingEquipmentBarChart({
   return (
     <div className="space-y-1">
       <h3 className="text-sm font-semibold text-center py-2">
-        Voting Equipment by State - {stateName}
+        Voting Equipment by State
       </h3>
       <div className="grid grid-cols-2 gap-2">
         {categories.map((category) => (

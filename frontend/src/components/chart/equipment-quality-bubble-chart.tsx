@@ -58,7 +58,6 @@ interface TooltipData {
 export function EquipmentQualityBubbleChart({
   data,
   regressionCoefficients,
-  stateName,
 }: EquipmentQualityBubbleChartProps) {
   // Split data by party dominance for different colored bubbles
   const { republicanData, democraticData, regressionLines } = useMemo(() => {
@@ -171,7 +170,7 @@ export function EquipmentQualityBubbleChart({
   return (
     <div className="w-full h-full min-h-[600px]">
       <h3 className="text-lg font-semibold mb-2 text-center">
-        Voting Equipment Quality vs Rejected Ballots - {stateName}
+        Voting Equipment Quality vs Rejected Ballots
       </h3>
       <p className="text-sm text-gray-600 mb-4 text-center">
         Bubble size represents total ballots. Color indicates county party

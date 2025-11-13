@@ -40,7 +40,6 @@ interface TooltipData {
 
 export function DropBoxVotingBubbleChart({
   data,
-  stateName,
 }: DropBoxVotingBubbleChartProps) {
   // Split data by party dominance for different colored bubbles
   const { republicanData, democraticData } = useMemo(() => {
@@ -107,7 +106,7 @@ export function DropBoxVotingBubbleChart({
   return (
     <div className="w-full h-full min-h-[600px]">
       <h3 className="text-lg font-semibold mb-2 text-center">
-        Drop Box Voting by EAVS Region - {stateName}
+        Drop Box Voting by EAVS Region
       </h3>
       <p className="text-sm text-gray-600 mb-4 text-center">
         Bubble size represents total drop box votes. Color indicates party
