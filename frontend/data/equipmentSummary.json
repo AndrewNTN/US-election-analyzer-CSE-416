@@ -1,6 +1,6 @@
 [
   {
-    "provider": "ES&S",
+    "make": "ES&S",
     "model": "DS200",
     "quantity": 12500,
     "age": 8,
@@ -12,7 +12,7 @@
     "qualityMeasure": 0.73
   },
   {
-    "provider": "ES&S",
+    "make": "ES&S",
     "model": "DS450",
     "quantity": 3200,
     "age": 6,
@@ -24,7 +24,7 @@
     "qualityMeasure": 0.82
   },
   {
-    "provider": "ES&S",
+    "make": "ES&S",
     "model": "DS850",
     "quantity": 1850,
     "age": 4,
@@ -36,7 +36,7 @@
     "qualityMeasure": 0.91
   },
   {
-    "provider": "ES&S",
+    "make": "ES&S",
     "model": "ExpressVote",
     "quantity": 8900,
     "age": 5,
@@ -48,7 +48,7 @@
     "qualityMeasure": 0.78
   },
   {
-    "provider": "Dominion Voting",
+    "make": "Dominion Voting",
     "model": "ImageCast Evolution",
     "quantity": 9200,
     "age": 7,
@@ -60,7 +60,7 @@
     "qualityMeasure": 0.70
   },
   {
-    "provider": "Dominion Voting",
+    "make": "Dominion Voting",
     "model": "ImageCast Precinct",
     "quantity": 6750,
     "age": 5,
@@ -72,7 +72,7 @@
     "qualityMeasure": 0.85
   },
   {
-    "provider": "Dominion Voting",
+    "make": "Dominion Voting",
     "model": "ImageCast X",
     "quantity": 4100,
     "age": 3,
@@ -84,7 +84,7 @@
     "qualityMeasure": 0.94
   },
   {
-    "provider": "Dominion Voting",
+    "make": "Dominion Voting",
     "model": "Democracy Suite",
     "quantity": 3500,
     "age": 6,
@@ -96,7 +96,7 @@
     "qualityMeasure": 0.75
   },
   {
-    "provider": "Hart InterCivic",
+    "make": "Hart InterCivic",
     "model": "Verity Scan",
     "quantity": 5200,
     "age": 4,
@@ -108,7 +108,7 @@
     "qualityMeasure": 0.90
   },
   {
-    "provider": "Hart InterCivic",
+    "make": "Hart InterCivic",
     "model": "Verity Touch",
     "quantity": 3800,
     "age": 4,
@@ -120,7 +120,7 @@
     "qualityMeasure": 0.87
   },
   {
-    "provider": "Hart InterCivic",
+    "make": "Hart InterCivic",
     "model": "Verity Central",
     "quantity": 1200,
     "age": 5,
@@ -132,7 +132,7 @@
     "qualityMeasure": 0.92
   },
   {
-    "provider": "Clear Ballot",
+    "make": "Clear Ballot",
     "model": "ClearVote 2.0",
     "quantity": 2100,
     "age": 3,
@@ -144,7 +144,7 @@
     "qualityMeasure": 0.96
   },
   {
-    "provider": "Clear Ballot",
+    "make": "Clear Ballot",
     "model": "ClearAccess",
     "quantity": 1500,
     "age": 2,
@@ -156,7 +156,7 @@
     "qualityMeasure": 0.97
   },
   {
-    "provider": "Unisyn Voting",
+    "make": "Unisyn Voting",
     "model": "OpenElect OVO",
     "quantity": 1850,
     "age": 6,
@@ -168,7 +168,7 @@
     "qualityMeasure": 0.76
   },
   {
-    "provider": "Unisyn Voting",
+    "make": "Unisyn Voting",
     "model": "OpenElect OVI",
     "quantity": 980,
     "age": 5,
@@ -180,7 +180,7 @@
     "qualityMeasure": 0.79
   },
   {
-    "provider": "Smartmatic",
+    "make": "Smartmatic",
     "model": "SAES 1800",
     "quantity": 1200,
     "age": 7,
@@ -192,7 +192,7 @@
     "qualityMeasure": 0.62
   },
   {
-    "provider": "Smartmatic",
+    "make": "Smartmatic",
     "model": "SAES 3000",
     "quantity": 750,
     "age": 4,
@@ -204,7 +204,7 @@
     "qualityMeasure": 0.88
   },
   {
-    "provider": "Sequoia Voting",
+    "make": "Sequoia Voting",
     "model": "AVC Edge",
     "quantity": 2800,
     "age": 12,
@@ -216,7 +216,7 @@
     "qualityMeasure": 0.42
   },
   {
-    "provider": "Sequoia Voting",
+    "make": "Sequoia Voting",
     "model": "WinVote",
     "quantity": 450,
     "age": 15,
@@ -228,7 +228,7 @@
     "qualityMeasure": 0.25
   },
   {
-    "provider": "MicroVote",
+    "make": "MicroVote",
     "model": "Infinity",
     "quantity": 890,
     "age": 9,
@@ -240,7 +240,7 @@
     "qualityMeasure": 0.52
   },
   {
-    "provider": "Premier Election Solutions",
+    "make": "Premier Election Solutions",
     "model": "AccuVote TSX",
     "quantity": 1650,
     "age": 11,
@@ -252,7 +252,7 @@
     "qualityMeasure": 0.48
   },
   {
-    "provider": "Premier Election Solutions",
+    "make": "Premier Election Solutions",
     "model": "AccuVote OS",
     "quantity": 3200,
     "age": 10,

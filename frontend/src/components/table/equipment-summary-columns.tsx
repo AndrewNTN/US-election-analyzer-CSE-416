@@ -1,7 +1,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
 export type EquipmentSummary = {
-  provider: string;
+  make: string;
   model: string;
   quantity: number;
   age: number;
@@ -15,10 +15,10 @@ export type EquipmentSummary = {
 
 export const equipmentSummaryColumns: ColumnDef<EquipmentSummary>[] = [
   {
-    accessorKey: "provider",
-    header: "Provider",
+    accessorKey: "make",
+    header: "Make",
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("provider")}</div>
+      <div className="font-medium">{row.getValue("make")}</div>
     ),
   },
   {
