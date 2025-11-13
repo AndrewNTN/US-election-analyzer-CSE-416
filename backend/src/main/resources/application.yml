@@ -4,3 +4,8 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/cse416
+  cache:
+    type: caffeine
+    cache-names: provisionalByFips,provisionalAggregates
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=24h

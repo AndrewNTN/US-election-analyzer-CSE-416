@@ -9,5 +9,4 @@ public record VoterDeletion(
         Integer removedFailResponse,
         Integer removedIncompetentToVote,
         Integer removedVoterRequest,
-        Integer removedDuplicateRecords
-        ) {}
+        Integer removedDuplicateRecords) {}

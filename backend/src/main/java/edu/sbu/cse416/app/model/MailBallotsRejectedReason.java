@@ -17,5 +17,4 @@ public record MailBallotsRejectedReason(
         Integer voterAlreadyVoted,
         Integer missingDocumentation,
         Integer voterNotEligible,
-        Integer noBallotApplication
-        ) {}
+        Integer noBallotApplication) {}

@@ -103,7 +103,6 @@ public class DataSeeder implements CommandLineRunner {
     );
      */
 
-
     @Autowired
     private EavsDataRepository eavsRepo;
 
@@ -131,7 +130,7 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         if (eavsRepo.count() > 0) {
             System.out.println("✅ EAVS data already seeded, skipping.");
             return;
@@ -139,12 +138,8 @@ public class DataSeeder implements CommandLineRunner {
 
         int counter = 0;
 
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(
-                        new ClassPathResource("eavs_trimmed.csv")
-                                .getInputStream()
-                )
-        )) {
+        try (BufferedReader br =
+                new BufferedReader(new InputStreamReader(new ClassPathResource("eavs_trimmed.csv").getInputStream()))) {
             String line;
             boolean isHeader = true;
 
@@ -172,21 +167,26 @@ public class DataSeeder implements CommandLineRunner {
 
                 // --- VoterRegistration: A1a–A1c ---
                 VoterRegistration voterRegistration = new VoterRegistration(
-                        getInt(values, COL_A1a),  // totalRegistered
-                        getInt(values, COL_A1b),  // totalActive
-                        getInt(values, COL_A1c)  // totalInactive
-                );
+                        getInt(values, COL_A1a), // totalRegistered
+                        getInt(values, COL_A1b), // totalActive
+                        getInt(values, COL_A1c) // totalInactive
+                        );
 
                 // --- VoterDeletion: A12b–A12h (and compute total) ---
-                int removedMoved          = getInt(values, COL_A12b);
-                int removedDeath          = getInt(values, COL_A12c);
-                int removedFelony         = getInt(values, COL_A12d);
-                int removedFailResponse   = getInt(values, COL_A12e);
-                int removedIncompetent    = getInt(values, COL_A12f);
-                int removedVoterRequest   = getInt(values, COL_A12g);
-                int removedDuplicate      = getInt(values, COL_A12h);
-                int removedTotal          = removedMoved + removedDeath + removedFelony
-                        + removedFailResponse + removedIncompetent + removedVoterRequest + removedDuplicate;
+                int removedMoved = getInt(values, COL_A12b);
+                int removedDeath = getInt(values, COL_A12c);
+                int removedFelony = getInt(values, COL_A12d);
+                int removedFailResponse = getInt(values, COL_A12e);
+                int removedIncompetent = getInt(values, COL_A12f);
+                int removedVoterRequest = getInt(values, COL_A12g);
+                int removedDuplicate = getInt(values, COL_A12h);
+                int removedTotal = removedMoved
+                        + removedDeath
+                        + removedFelony
+                        + removedFailResponse
+                        + removedIncompetent
+                        + removedVoterRequest
+                        + removedDuplicate;
 
                 VoterDeletion voterDeletion = new VoterDeletion(
                         removedTotal,
@@ -196,28 +196,27 @@ public class DataSeeder implements CommandLineRunner {
                         removedFailResponse,
                         removedIncompetent,
                         removedVoterRequest,
-                        removedDuplicate
-                );
+                        removedDuplicate);
 
                 // --- MailBallotsRejectedReason: C9b–C9q ---
                 MailBallotsRejectedReason mailRejected = new MailBallotsRejectedReason(
-                        getInt(values, COL_C9b),  // late
-                        getInt(values, COL_C9c),  // missingVoterSignature
-                        getInt(values, COL_C9d),  // missingWitnessSignature
-                        getInt(values, COL_C9e),  // nonMatchingVoterSignature
-                        getInt(values, COL_C9f),  // unofficialEnvelope
-                        getInt(values, COL_C9g),  // ballotMissingFromEnvelope
-                        getInt(values, COL_C9h),  // noSecrecyEnvelope
-                        getInt(values, COL_C9i),  // multipleBallotsInOneEnvelope
-                        getInt(values, COL_C9j),  // envelopeNotSealed
-                        getInt(values, COL_C9k),  // noPostmark
-                        getInt(values, COL_C9l),  // noResidentAddressOnEnvelope
-                        getInt(values, COL_C9m),  // voterDeceased
-                        getInt(values, COL_C9n),  // voterAlreadyVoted
-                        getInt(values, COL_C9o),  // missingDocumentation
-                        getInt(values, COL_C9p),  // voterNotEligible
-                        getInt(values, COL_C9q)   // noBallotApplication
-                );
+                        getInt(values, COL_C9b), // late
+                        getInt(values, COL_C9c), // missingVoterSignature
+                        getInt(values, COL_C9d), // missingWitnessSignature
+                        getInt(values, COL_C9e), // nonMatchingVoterSignature
+                        getInt(values, COL_C9f), // unofficialEnvelope
+                        getInt(values, COL_C9g), // ballotMissingFromEnvelope
+                        getInt(values, COL_C9h), // noSecrecyEnvelope
+                        getInt(values, COL_C9i), // multipleBallotsInOneEnvelope
+                        getInt(values, COL_C9j), // envelopeNotSealed
+                        getInt(values, COL_C9k), // noPostmark
+                        getInt(values, COL_C9l), // noResidentAddressOnEnvelope
+                        getInt(values, COL_C9m), // voterDeceased
+                        getInt(values, COL_C9n), // voterAlreadyVoted
+                        getInt(values, COL_C9o), // missingDocumentation
+                        getInt(values, COL_C9p), // voterNotEligible
+                        getInt(values, COL_C9q) // noBallotApplication
+                        );
 
                 // --- ProvisionalBallots: E1a–E1e, E2a–E2i, (E2j + E2k + E2l) ---
                 int e1a = getInt(values, COL_E1a);
@@ -236,45 +235,41 @@ public class DataSeeder implements CommandLineRunner {
                 int e2h = getInt(values, COL_E2h);
                 int e2i = getInt(values, COL_E2i);
 
-                int otherReasonsSum =
-                        getInt(values, COL_E2j)
-                      + getInt(values, COL_E2k)
-                      + getInt(values, COL_E2l);
+                int otherReasonsSum = getInt(values, COL_E2j) + getInt(values, COL_E2k) + getInt(values, COL_E2l);
 
                 ProvisionalBallots provisional = new ProvisionalBallots(
                         // E1a–E1e
-                        e1a,  // totalProv
-                        e1b,  // provCountFullyCounted
-                        e1c,  // provCountPartialCounted
-                        e1d,  // provRejected
-                        e1e,  // provisionalOtherStatus
+                        e1a, // totalProv
+                        e1b, // provCountFullyCounted
+                        e1c, // provCountPartialCounted
+                        e1d, // provRejected
+                        e1e, // provisionalOtherStatus
                         // E2a–E2i
-                        e2a,  // provReasonVoterNotOnList
-                        e2b,  // provReasonVoterLackedID
-                        e2c,  // provReasonElectionOfficialChallengedEligibility
-                        e2d,  // provReasonAnotherPersonChallengedEligibility
-                        e2e,  // provReasonVoterNotResident
-                        e2f,  // provReasonVoterRegistrationNotUpdated
-                        e2g,  // provReasonVoterDidNotSurrenderMailBallot
-                        e2h,  // provReasonJudgeExtendedVotingHours
-                        e2i,  // provReasonVoterUsedSDR
+                        e2a, // provReasonVoterNotOnList
+                        e2b, // provReasonVoterLackedID
+                        e2c, // provReasonElectionOfficialChallengedEligibility
+                        e2d, // provReasonAnotherPersonChallengedEligibility
+                        e2e, // provReasonVoterNotResident
+                        e2f, // provReasonVoterRegistrationNotUpdated
+                        e2g, // provReasonVoterDidNotSurrenderMailBallot
+                        e2h, // provReasonJudgeExtendedVotingHours
+                        e2i, // provReasonVoterUsedSDR
                         // E2j–E2l sum
-                        otherReasonsSum
-                );
+                        otherReasonsSum);
 
                 // --- Top-level mail / early-voting aggregates ---
-                Integer mailTransmittedTotal      = getInt(values, COL_C1a);
-                Integer dropBoxesTotal            = getInt(values, COL_C3a);
+                Integer mailTransmittedTotal = getInt(values, COL_C1a);
+                Integer dropBoxesTotal = getInt(values, COL_C3a);
                 Integer totalDropBoxesEarlyVoting = getInt(values, COL_C5a);
-                Integer inPersonEarlyVoting       = getInt(values, COL_F1f);
+                Integer inPersonEarlyVoting = getInt(values, COL_F1f);
 
                 EavsData row = new EavsData(
-                        null,               // id – Mongo will fill
+                        null, // id – Mongo will fill
                         fipsCode,
                         jurisdictionName,
                         stateFull,
                         stateAbbr,
-                        2024,               // electionYear
+                        2024, // electionYear
                         voterRegistration,
                         mailRejected,
                         provisional,
@@ -282,8 +277,7 @@ public class DataSeeder implements CommandLineRunner {
                         mailTransmittedTotal,
                         dropBoxesTotal,
                         totalDropBoxesEarlyVoting,
-                        inPersonEarlyVoting
-                );
+                        inPersonEarlyVoting);
 
                 eavsRepo.save(row);
                 counter++;

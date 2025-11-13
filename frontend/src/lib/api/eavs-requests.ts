@@ -1,48 +1,33 @@
 import { fetchJson } from "@/lib/api/api-client";
 
-// caching keys
-export const eavsKeys = {
-  all: () => ["eavs"] as const,
-  provisional: {
-    root: () => [...eavsKeys.all(), "provisional"] as const,
-    aggregate: (fipsPrefix: string) =>
-      [...eavsKeys.provisional.root(), "aggregate", fipsPrefix] as const,
-    state: (fipsPrefix: string) =>
-      [...eavsKeys.provisional.root(), "state", fipsPrefix] as const,
-  },
-};
-
-export interface ProvisionalAggregateResponse {
-  E2a?: number;
-  E2b?: number;
-  E2c?: number;
-  E2d?: number;
-  E2e?: number;
-  E2f?: number;
-  E2g?: number;
-  E2h?: number;
-  E2i?: number;
-  Other?: number;
+export interface ProvisionalChartResponse {
+  provReasonVoterNotOnList?: number;
+  provReasonVoterLackedID?: number;
+  provReasonElectionOfficialChallengedEligibility?: number;
+  provReasonAnotherPersonChallengedEligibility?: number;
+  provReasonVoterNotResident?: number;
+  provReasonVoterRegistrationNotUpdated?: number;
+  provReasonVoterDidNotSurrenderMailBallot?: number;
+  provReasonJudgeExtendedVotingHours?: number;
+  provReasonVoterUsedSDR?: number;
+  provReasonOtherSum?: number;
 }
 
-export interface ProvisionalBallotsApiResponse {
+export interface ProvisionalTableResponse {
   jurisdictionName: string;
-  provisionalBallots?: {
-    E1a?: number;
-    E1b?: number;
-    E1c?: number;
-    E1d?: number;
-    E1e?: number;
-    E1e_Other?: string;
-  };
+  totalProv?: number;
+  provCountFullyCounted?: number;
+  provCountPartialCounted?: number;
+  provRejected?: number;
+  provisionalOtherStatus?: number;
 }
 
-export const getProvisionalAggregate = async (
+export const getProvisionalChart = async (
   fipsPrefix: string,
-): Promise<ProvisionalAggregateResponse> =>
-  fetchJson(`/eavs/provisional/aggregate/${fipsPrefix}`);
+): Promise<ProvisionalChartResponse> =>
+  fetchJson(`/eavs/provisional/chart/${fipsPrefix}`);
 
-export const getProvisionalState = async (
+export const getProvisionalTable = async (
   fipsPrefix: string,
-): Promise<ProvisionalBallotsApiResponse[]> =>
-  fetchJson(`/eavs/provisional/state/${fipsPrefix}`);
+): Promise<ProvisionalTableResponse[]> =>
+  fetchJson(`/eavs/provisional/table/${fipsPrefix}`);

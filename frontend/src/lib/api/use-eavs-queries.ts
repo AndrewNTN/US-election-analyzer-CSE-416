@@ -1,41 +1,36 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 
 import {
-  eavsKeys,
-  getProvisionalAggregate,
-  getProvisionalState,
-  type ProvisionalAggregateResponse,
-  type ProvisionalBallotsApiResponse,
+  getProvisionalChart,
+  getProvisionalTable,
+  type ProvisionalChartResponse,
+  type ProvisionalTableResponse,
 } from "@/lib/api/eavs-requests";
 
-export const useProvisionalAggregateQuery = (
+export const useProvisionalChartQuery = (
   fipsPrefix: string | null | undefined,
-): UseQueryResult<ProvisionalAggregateResponse, Error> =>
+): UseQueryResult<ProvisionalChartResponse, Error> =>
   useQuery({
-    queryKey: fipsPrefix
-      ? eavsKeys.provisional.aggregate(fipsPrefix)
-      : [...eavsKeys.provisional.root(), "aggregate", "no-fips"],
+    queryKey: ["provisional-chart", fipsPrefix ?? "no-fips"],
     queryFn: async () => {
       if (!fipsPrefix) {
-        throw new Error("Missing FIPS prefix for provisional aggregate query");
+        throw new Error("Missing FIPS prefix for provisional chart query");
       }
-      return getProvisionalAggregate(fipsPrefix);
+      return getProvisionalChart(fipsPrefix);
     },
     enabled: Boolean(fipsPrefix),
   });
 
-export const useProvisionalStateQuery = (
+export const useProvisionalTableQuery = (
   fipsPrefix: string | null | undefined,
-): UseQueryResult<ProvisionalBallotsApiResponse[], Error> =>
+): UseQueryResult<ProvisionalTableResponse[], Error> =>
   useQuery({
-    queryKey: fipsPrefix
-      ? eavsKeys.provisional.state(fipsPrefix)
-      : [...eavsKeys.provisional.root(), "state", "no-fips"],
+    queryKey: ["provisional-table", fipsPrefix ?? "no-fips"],
     queryFn: async () => {
       if (!fipsPrefix) {
-        throw new Error("Missing FIPS prefix for provisional state query");
+        throw new Error("Missing FIPS prefix for provisional table query");
       }
-      return getProvisionalState(fipsPrefix);
+      return getProvisionalTable(fipsPrefix);
     },
     enabled: Boolean(fipsPrefix),
   });
