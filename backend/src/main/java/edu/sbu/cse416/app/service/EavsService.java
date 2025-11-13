@@ -1,13 +1,17 @@
 package edu.sbu.cse416.app.service;
 
+import edu.sbu.cse416.app.dto.ProvisionalStateTableMetrics;
+import edu.sbu.cse416.app.dto.ProvisionalStateTableResponse;
 import edu.sbu.cse416.app.model.EavsData;
 import edu.sbu.cse416.app.model.ProvisionalBallots;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.ToIntFunction;
-import org.springframework.stereotype.Service;
 
 @Service
 public class EavsService {
@@ -18,11 +22,17 @@ public class EavsService {
         this.repo = repo;
     }
 
-    /** Fetch rows by FIPS prefix with optional anchoring and standard 0* normalization. */
-    public List<EavsData> findByFipsPrefix(String fipsPrefix, Integer electionYear, boolean anchorStart) {
+    /** Helper to normalize and anchor FIPS regex. */
+    private String buildFipsRegex(String fipsPrefix, boolean anchorStart) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        String regex = (anchorStart ? "^" : "") + "0*" + prefix;
-        return repo.findByFipsCodeRegexAndElectionYear(regex, electionYear);
+        return (anchorStart ? "^" : "") + "0*" + prefix;
+    }
+
+    /** Fetch rows by FIPS prefix. */
+    @Cacheable(value = "provisionalByFips", key = "#fipsPrefix + '-' + #anchorStart")
+    public List<EavsData> findByFipsPrefix(String fipsPrefix, boolean anchorStart) {
+        String regex = buildFipsRegex(fipsPrefix, anchorStart);
+        return repo.findByFipsCode(regex);
     }
 
     /** Null-safe helper. */
@@ -47,7 +57,14 @@ public class EavsService {
         return totals;
     }
 
-    /** Aggregation for E2a–E2i + Other (E2j+E2k+E2l) used by the bar chart/table. */
+    /** Aggregation for E2a–E2i + Other (E2j+E2k+E2l). */
+    @Cacheable(value = "provisionalAggregates", key = "#fipsPrefix")
+    public Map<String, Integer> getCachedAggregateProvisionalReasons(String fipsPrefix) {
+        List<EavsData> rows = findByFipsPrefix(fipsPrefix, false);
+        return aggregateProvisionalReasons(rows);
+    }
+
+    /** Core aggregation logic. */
     public Map<String, Integer> aggregateProvisionalReasons(List<EavsData> rows) {
         LinkedHashMap<String, ToIntFunction<ProvisionalBallots>> fields = new LinkedHashMap<>();
         fields.put("E2a", pb -> nz(pb.provReasonVoterNotOnList()));
@@ -63,10 +80,34 @@ public class EavsService {
         return sumProvisionalFields(rows, fields);
     }
 
-    /** Example: if you need a general-purpose “sum over rows” for any field in EavsData. */
-    public int sum(List<EavsData> rows, java.util.function.ToIntFunction<EavsData> getter) {
-        int total = 0;
-        for (EavsData row : rows) total += getter.applyAsInt(row);
-        return total;
+    /** Generate per-record DTOs for table view. */
+    public List<ProvisionalStateTableResponse> getProvisionalStateTable(String fipsPrefix) {
+        List<EavsData> data = findByFipsPrefix(fipsPrefix, true);
+        return data.stream().map(record -> {
+            var p = record.provisionalBallots();
+            if (p == null) {
+                return new ProvisionalStateTableResponse(
+                        record.jurisdictionName(),
+                        record.stateAbbr(),
+                        new ProvisionalStateTableMetrics(0, 0, 0, 0, 0, null)
+                );
+            }
+            return new ProvisionalStateTableResponse(
+                    record.jurisdictionName(),
+                    record.stateAbbr(),
+                    new ProvisionalStateTableMetrics(
+                            nz(p.totalProv()),
+                            nz(p.provCountFullyCounted()),
+                            nz(p.provCountPartialCounted()),
+                            nz(p.provRejected()),
+                            nz(p.provisionalOtherStatus()),
+                            null
+                    )
+            );
+        }).toList();
     }
+
+    /** Manual cache clear (optional). */
+    @CacheEvict(value = { "provisionalByFips", "provisionalAggregates" }, allEntries = true)
+    public void clearCaches() {}
 }
