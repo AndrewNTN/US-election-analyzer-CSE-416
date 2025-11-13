@@ -17,70 +17,91 @@ import org.springframework.stereotype.Component;
 public class DataSeeder implements CommandLineRunner {
 
     private static final int COL_FIPS = 0;
-private static final int COL_JURISDICTION = 1;
-private static final int COL_STATE_FULL = 2;
-private static final int COL_STATE_ABBR = 3;
+    private static final int COL_JURISDICTION = 1;
+    private static final int COL_STATE_FULL = 2;
+    private static final int COL_STATE_ABBR = 3;
 
-// A1a–A1c
-private static final int COL_A1a = 4;
-private static final int COL_A1b = 5;
-private static final int COL_A1c = 6;
+    // A1a–A1c
+    private static final int COL_A1a = 4;
+    private static final int COL_A1b = 5;
+    private static final int COL_A1c = 6;
 
-// A12b–A12h
-private static final int COL_A12b = 7;
-private static final int COL_A12c = 8;
-private static final int COL_A12d = 9;
-private static final int COL_A12e = 10;
-private static final int COL_A12f = 11;
-private static final int COL_A12g = 12;
-private static final int COL_A12h = 13;
+    // A12b–A12h
+    private static final int COL_A12b = 7;
+    private static final int COL_A12c = 8;
+    private static final int COL_A12d = 9;
+    private static final int COL_A12e = 10;
+    private static final int COL_A12f = 11;
+    private static final int COL_A12g = 12;
+    private static final int COL_A12h = 13;
 
-// C1a, C3a, C5a, F1f
-private static final int COL_C1a = 14;
-private static final int COL_C3a = 15;
-private static final int COL_C5a = 16;
-private static final int COL_F1f = 50;
+    // C1a, C3a, C5a, F1f
+    private static final int COL_C1a = 14;
+    private static final int COL_C3a = 15;
+    private static final int COL_C5a = 16;
+    private static final int COL_F1f = 50;
 
-// C9b–C9q
-private static final int COL_C9b = 17;
-private static final int COL_C9c = 18;
-private static final int COL_C9d = 19;
-private static final int COL_C9e = 20;
-private static final int COL_C9f = 21;
-private static final int COL_C9g = 22;
-private static final int COL_C9h = 23;
-private static final int COL_C9i = 24;
-private static final int COL_C9j = 25;
-private static final int COL_C9k = 26;
-private static final int COL_C9l = 27;
-private static final int COL_C9m = 28;
-private static final int COL_C9n = 29;
-private static final int COL_C9o = 30;
-private static final int COL_C9p = 31;
-private static final int COL_C9q = 32;
+    // C9b–C9q
+    private static final int COL_C9b = 17;
+    private static final int COL_C9c = 18;
+    private static final int COL_C9d = 19;
+    private static final int COL_C9e = 20;
+    private static final int COL_C9f = 21;
+    private static final int COL_C9g = 22;
+    private static final int COL_C9h = 23;
+    private static final int COL_C9i = 24;
+    private static final int COL_C9j = 25;
+    private static final int COL_C9k = 26;
+    private static final int COL_C9l = 27;
+    private static final int COL_C9m = 28;
+    private static final int COL_C9n = 29;
+    private static final int COL_C9o = 30;
+    private static final int COL_C9p = 31;
+    private static final int COL_C9q = 32;
 
-// E1a–E1e
-private static final int COL_E1a = 33;
-private static final int COL_E1b = 34;
-private static final int COL_E1c = 35;
-private static final int COL_E1d = 36;
-private static final int COL_E1e = 37;
+    // E1a–E1e
+    private static final int COL_E1a = 33;
+    private static final int COL_E1b = 34;
+    private static final int COL_E1c = 35;
+    private static final int COL_E1d = 36;
+    private static final int COL_E1e = 37;
 
-// E2a–E2i
-private static final int COL_E2a = 38;
-private static final int COL_E2b = 39;
-private static final int COL_E2c = 40;
-private static final int COL_E2d = 41;
-private static final int COL_E2e = 42;
-private static final int COL_E2f = 43;
-private static final int COL_E2g = 44;
-private static final int COL_E2h = 45;
-private static final int COL_E2i = 46;
+    // E2a–E2i
+    private static final int COL_E2a = 38;
+    private static final int COL_E2b = 39;
+    private static final int COL_E2c = 40;
+    private static final int COL_E2d = 41;
+    private static final int COL_E2e = 42;
+    private static final int COL_E2f = 43;
+    private static final int COL_E2g = 44;
+    private static final int COL_E2h = 45;
+    private static final int COL_E2i = 46;
 
-// E2j–E2l
-private static final int COL_E2j = 47;
-private static final int COL_E2k = 48;
-private static final int COL_E2l = 49;
+    // E2j–E2l
+    private static final int COL_E2j = 47;
+    private static final int COL_E2k = 48;
+    private static final int COL_E2l = 49;
+
+    /*
+     * Replace above with this later:
+     *     private static final Map<String, Integer> COL = Map.ofEntries(
+            Map.entry("FIPS", 0),
+            Map.entry("JURISDICTION", 1),
+            Map.entry("STATE_FULL", 2),
+            Map.entry("STATE_ABBR", 3),
+            Map.entry("A1a", 4),
+            Map.entry("A1b", 5),
+            Map.entry("A1c", 6),
+            Map.entry("A12b", 7),
+            Map.entry("A12h", 13),
+            Map.entry("C1a", 14),
+            Map.entry("C3a", 15),
+            Map.entry("C5a", 16),
+            Map.entry("F1f", 50),
+            Map.entry("E1a", 33),
+            Map.entry("E2l", 49)
+    );
+     */
 
 
     @Autowired

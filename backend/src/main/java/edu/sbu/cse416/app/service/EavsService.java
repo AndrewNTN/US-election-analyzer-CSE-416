@@ -1,7 +1,7 @@
 package edu.sbu.cse416.app.service;
 
-import edu.sbu.cse416.app.dto.ProvisionalStateTableMetrics;
-import edu.sbu.cse416.app.dto.ProvisionalStateTableResponse;
+import edu.sbu.cse416.app.dto.ProvisionalStateTableDto;
+import edu.sbu.cse416.app.dto.ProvisionalChartDto;
 import edu.sbu.cse416.app.model.EavsData;
 import edu.sbu.cse416.app.model.ProvisionalBallots;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
@@ -22,7 +22,8 @@ public class EavsService {
         this.repo = repo;
     }
 
-    /** Helper to normalize and anchor FIPS regex. */
+    private static int nz(Integer v) { return v == null ? 0 : v; }
+
     private String buildFipsRegex(String fipsPrefix, boolean anchorStart) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
         return (anchorStart ? "^" : "") + "0*" + prefix;
@@ -35,10 +36,25 @@ public class EavsService {
         return repo.findByFipsCode(regex);
     }
 
-    /** Null-safe helper. */
-    private static int nz(Integer v) { return v == null ? 0 : v; }
+    /** Build DTO list for table view. */
+    public List<ProvisionalStateTableDto> getProvisionalStateTable(String fipsPrefix) {
+        List<EavsData> data = findByFipsPrefix(fipsPrefix, true);
+        return data.stream().map(record -> {
+            ProvisionalBallots p = record.provisionalBallots();
+            return new ProvisionalStateTableDto(
+                    record.jurisdictionName(),
+                    record.stateAbbr(),
+                    nz(p == null ? null : p.totalProv()),
+                    nz(p == null ? null : p.provCountFullyCounted()),
+                    nz(p == null ? null : p.provCountPartialCounted()),
+                    nz(p == null ? null : p.provRejected()),
+                    nz(p == null ? null : p.provisionalOtherStatus()),
+                    null
+            );
+        }).toList();
+    }
 
-    /** Generic aggregator for any set of ProvisionalBallots integer fields. */
+    /** Generic aggregator for any ProvisionalBallots integer fields. */
     private Map<String, Integer> sumProvisionalFields(
             List<EavsData> rows,
             LinkedHashMap<String, ToIntFunction<ProvisionalBallots>> fields
@@ -57,15 +73,10 @@ public class EavsService {
         return totals;
     }
 
-    /** Aggregation for E2a–E2i + Other (E2j+E2k+E2l). */
+    /** Aggregation for chart reasons (E2a–E2i + Other). */
     @Cacheable(value = "provisionalAggregates", key = "#fipsPrefix")
-    public Map<String, Integer> getCachedAggregateProvisionalReasons(String fipsPrefix) {
+    public ProvisionalChartDto getCachedAggregateProvisionalReasons(String fipsPrefix) {
         List<EavsData> rows = findByFipsPrefix(fipsPrefix, false);
-        return aggregateProvisionalReasons(rows);
-    }
-
-    /** Core aggregation logic. */
-    public Map<String, Integer> aggregateProvisionalReasons(List<EavsData> rows) {
         LinkedHashMap<String, ToIntFunction<ProvisionalBallots>> fields = new LinkedHashMap<>();
         fields.put("E2a", pb -> nz(pb.provReasonVoterNotOnList()));
         fields.put("E2b", pb -> nz(pb.provReasonVoterLackedID()));
@@ -77,37 +88,11 @@ public class EavsService {
         fields.put("E2h", pb -> nz(pb.provReasonJudgeExtendedVotingHours()));
         fields.put("E2i", pb -> nz(pb.provReasonVoterUsedSDR()));
         fields.put("Other", pb -> nz(pb.provReasonOtherSum()));
-        return sumProvisionalFields(rows, fields);
+
+        Map<String, Integer> totals = sumProvisionalFields(rows, fields);
+        return new ProvisionalChartDto(fipsPrefix, totals);
     }
 
-    /** Generate per-record DTOs for table view. */
-    public List<ProvisionalStateTableResponse> getProvisionalStateTable(String fipsPrefix) {
-        List<EavsData> data = findByFipsPrefix(fipsPrefix, true);
-        return data.stream().map(record -> {
-            var p = record.provisionalBallots();
-            if (p == null) {
-                return new ProvisionalStateTableResponse(
-                        record.jurisdictionName(),
-                        record.stateAbbr(),
-                        new ProvisionalStateTableMetrics(0, 0, 0, 0, 0, null)
-                );
-            }
-            return new ProvisionalStateTableResponse(
-                    record.jurisdictionName(),
-                    record.stateAbbr(),
-                    new ProvisionalStateTableMetrics(
-                            nz(p.totalProv()),
-                            nz(p.provCountFullyCounted()),
-                            nz(p.provCountPartialCounted()),
-                            nz(p.provRejected()),
-                            nz(p.provisionalOtherStatus()),
-                            null
-                    )
-            );
-        }).toList();
-    }
-
-    /** Manual cache clear (optional). */
     @CacheEvict(value = { "provisionalByFips", "provisionalAggregates" }, allEntries = true)
     public void clearCaches() {}
 }

@@ -11,5 +11,5 @@ public interface EavsDataRepository extends MongoRepository<EavsData, String> {
 
     /** Fetch EAVS records by FIPS code prefix (regex-based). */
     @Query("{ 'fipsCode': { $regex: ?0 } }")
-    List<EavsData> findByFipsCode(String fipsRegex);
+    List<EavsData> findByFipsCode(String fipsPrefix);
 }
