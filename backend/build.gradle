@@ -111,7 +111,23 @@ task runStatesPreprocessing(type: Exec) {
     }
 }
 
+// Task to run Python preprocessing script for felony voting data
+task runFelonyPreprocessing(type: Exec) {
+    description = 'Run Python preprocessing script to load felony data into MongoDB'
+    group = 'application'
+
+    workingDir file('preprocessing')
+    commandLine 'python', 'load_felony_data.py'
+
+    doLast {
+        println '================================================'
+        println 'Felony data preprocessing completed successfully!'
+        println '================================================'
+    }
+}
+
 // Make bootRun depend on the Python preprocessing tasks
 runCountiesPreprocessing.dependsOn installPythonDependencies
 runStatesPreprocessing.dependsOn runCountiesPreprocessing
-bootRun.dependsOn runStatesPreprocessing
+runFelonyPreprocessing.dependsOn runStatesPreprocessing
+bootRun.dependsOn runFelonyPreprocessing
