@@ -126,8 +126,24 @@ task runFelonyPreprocessing(type: Exec) {
     }
 }
 
+// Task to run Python preprocessing script for CVAP data
+task runCvapPreprocessing(type: Exec) {
+    description = 'Run Python preprocessing script to load Cvap data into MongoDB'
+    group = 'application'
+
+    workingDir file('preprocessing')
+    commandLine 'python', 'load_cvap_data.py'
+
+    doLast {
+        println '================================================'
+        println 'Cvap data preprocessing completed successfully!'
+        println '================================================'
+    }
+}
+
 // Make bootRun depend on the Python preprocessing tasks
 runCountiesPreprocessing.dependsOn installPythonDependencies
 runStatesPreprocessing.dependsOn runCountiesPreprocessing
 runFelonyPreprocessing.dependsOn runStatesPreprocessing
-bootRun.dependsOn runFelonyPreprocessing
+runCvapPreprocessing.dependsOn runFelonyPreprocessing
+bootRun.dependsOn runCvapPreprocessing
