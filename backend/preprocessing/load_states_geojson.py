@@ -1,5 +1,6 @@
 # python
 import logging
+from pathlib import Path
 from typing import Dict, Optional, Any, Set
 
 import geopandas as gpd
@@ -7,7 +8,11 @@ from shapely.geometry import mapping
 from shapely.geometry.base import BaseGeometry
 from pymongo import MongoClient, GEOSPHERE
 
-GEOJSON_URL = "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json"
+# Path to local GeoJSON file in resources folder
+SCRIPT_DIR = Path(__file__).parent
+RESOURCES_DIR = SCRIPT_DIR.parent / "src" / "main" / "resources"
+GEOJSON_FILE = RESOURCES_DIR / "us-states.json"
+
 MONGO_URI = "mongodb://localhost:27017/"
 DATABASE_NAME = "cse416"
 COLLECTION_NAME = "states_geojson"
@@ -79,8 +84,13 @@ def _validate_and_transform_row(row) -> Optional[Dict]:
 
 
 def load_with_geopandas():
-    logger.info("Reading state GeoJSON from URL...")
-    gdf = gpd.read_file(GEOJSON_URL)
+    logger.info(f"Reading state GeoJSON from local file: {GEOJSON_FILE}")
+
+    if not GEOJSON_FILE.exists():
+        logger.error(f"GeoJSON file not found at: {GEOJSON_FILE}")
+        return
+
+    gdf = gpd.read_file(GEOJSON_FILE)
 
     # Ensure geometry column exists
     if "geometry" not in gdf.columns:

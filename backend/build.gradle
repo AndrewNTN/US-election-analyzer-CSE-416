@@ -141,9 +141,25 @@ task runCvapPreprocessing(type: Exec) {
     }
 }
 
+// Task to run Python preprocessing scripts for EAVS 2024 data
+task runEavsPreprocessing(type: Exec) {
+    description = 'Run Python preprocessing script to load EAVS 2024 data into MongoDB'
+    group = 'application'
+
+    workingDir file('preprocessing')
+    commandLine 'python', 'load_eavs_data.py'
+
+    doLast {
+        println '================================================'
+        println 'EAVS 2024 data preprocessing completed successfully!'
+        println '================================================'
+    }
+}
+
 // Make bootRun depend on the Python preprocessing tasks
 runCountiesPreprocessing.dependsOn installPythonDependencies
 runStatesPreprocessing.dependsOn runCountiesPreprocessing
 runFelonyPreprocessing.dependsOn runStatesPreprocessing
 runCvapPreprocessing.dependsOn runFelonyPreprocessing
-bootRun.dependsOn runCvapPreprocessing
+runEavsPreprocessing.dependsOn runCvapPreprocessing
+bootRun.dependsOn runEavsPreprocessing
