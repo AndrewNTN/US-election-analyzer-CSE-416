@@ -48,7 +48,7 @@ task installPythonDependencies(type: Exec) {
     description = 'Install required Python packages for preprocessing'
     group = 'application'
 
-    commandLine 'python', '-m', 'pip', 'install', 'geopandas', 'pymongo', 'shapely'
+    commandLine 'python', '-m', 'pip', 'install', 'geopandas', 'pymongo', 'shapely', 'openpyxl'
 
     doFirst {
         println '================================================'
@@ -156,10 +156,25 @@ task runEavsPreprocessing(type: Exec) {
     }
 }
 
+task runVoterRegPreprocessing(type: Exec) {
+    description = 'Run Python preprocessing script to load Voter Registration data into MongoDB'
+    group = 'application'
+
+    workingDir file('preprocessing')
+    commandLine 'python', 'load_florida_voter_reg.py'
+
+    doLast {
+        println '================================================'
+        println 'Voter Registration data preprocessing completed successfully!'
+        println '================================================'
+    }
+}
+
 // Make bootRun depend on the Python preprocessing tasks
 runCountiesPreprocessing.dependsOn installPythonDependencies
 runStatesPreprocessing.dependsOn runCountiesPreprocessing
 runFelonyPreprocessing.dependsOn runStatesPreprocessing
 runCvapPreprocessing.dependsOn runFelonyPreprocessing
 runEavsPreprocessing.dependsOn runCvapPreprocessing
-bootRun.dependsOn runEavsPreprocessing
+runVoterRegPreprocessing.dependsOn runEavsPreprocessing
+bootRun.dependsOn runVoterRegPreprocessing
