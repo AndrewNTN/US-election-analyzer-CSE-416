@@ -156,20 +156,6 @@ task runEavsPreprocessing(type: Exec) {
     }
 }
 
-task runVoterRegPreprocessing(type: Exec) {
-    description = 'Run Python preprocessing script to load Voter Registration data into MongoDB'
-    group = 'application'
-
-    workingDir file('preprocessing')
-    commandLine 'python', 'load_florida_voter_reg.py'
-
-    doLast {
-        println '================================================'
-        println 'Voter Registration data preprocessing completed successfully!'
-        println '================================================'
-    }
-}
-
 task runFLCountyVoteSplitsPreprocessing(type: Exec) {
     description = 'Run Python preprocessing script to load Florida County Vote Splits into MongoDB'
     group = 'application'
@@ -204,7 +190,6 @@ runStatesPreprocessing.dependsOn runCountiesPreprocessing
 runFelonyPreprocessing.dependsOn runStatesPreprocessing
 runCvapPreprocessing.dependsOn runFelonyPreprocessing
 runEavsPreprocessing.dependsOn runCvapPreprocessing
-runVoterRegPreprocessing.dependsOn runEavsPreprocessing
-runFLCountyVoteSplitsPreprocessing.dependsOn runVoterRegPreprocessing
+runFLCountyVoteSplitsPreprocessing.dependsOn runEavsPreprocessing
 runCACountyVoteSplitsPreprocessing.dependsOn runFLCountyVoteSplitsPreprocessing
 bootRun.dependsOn runCACountyVoteSplitsPreprocessing

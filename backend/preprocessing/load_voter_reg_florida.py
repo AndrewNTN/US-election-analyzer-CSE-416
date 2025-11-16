@@ -7,6 +7,7 @@ import requests
 import asyncio
 import aiohttp
 import time
+import sys
 
 # Import validators
 from email_validator import EmailValidatorService
@@ -49,14 +50,31 @@ COUNTY_CODES = {
     "WAK": "Wakulla", "WAL": "Walton", "WAS": "Washington"
 }
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+
+def safe_async_run(coro, timeout=60):
+    """Run async coroutine with timeout to prevent hangs"""
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            return loop.run_until_complete(asyncio.wait_for(coro, timeout=timeout))
+        finally:
+            loop.close()
+    except asyncio.TimeoutError:
+        logger.error(f"Async operation timed out after {timeout}s")
+        return []
+    except Exception as e:
+        logger.error(f"Error in async operation: {e}", exc_info=True)
+        return []
 
 
 class FloridaVoterLoader:
     """Loads Florida voter registration data into MongoDB with validation"""
 
-    def __init__(self, batch_size: int = 250, max_concurrent: int = 50):
+    def __init__(self, batch_size: int = 1000, max_concurrent: int = 50):
         self.email_validator = EmailValidatorService()
         self.address_validator = USPSAPIService()
         self.address_validator.get_access_token()  # Get token once at initialization
@@ -169,71 +187,36 @@ class FloridaVoterLoader:
         return False
 
     async def _validate_batch_async(self, voters_data: List[Dict]) -> List[Dict]:
-        """Validate a batch of voters concurrently"""
+        """Validate a batch of voters concurrently - VALIDATION TEMPORARILY DISABLED"""
         if not voters_data:
             return []
 
         valid_voters = []
 
-        async with aiohttp.ClientSession() as session:
-            # Create tasks for all validations
-            tasks = []
-            for voter_data in voters_data:
-                # Validate address
-                address_task = self._validate_address_async(
-                    session,
-                    voter_data['address_line1'],
-                    voter_data['address_city'],
-                    voter_data['address_state'],
-                    voter_data['address_zip']
-                )
-                tasks.append(address_task)
+        # TEMPORARILY SKIP ALL VALIDATION - Accept all records
+        for voter_data in voters_data:
+            # Create final voter record with null email if not present
+            voter_record = {
+                'name': voter_data['name'],
+                'countyName': voter_data['countyName'],
+                'party': voter_data['party'],
+                'address': voter_data['address'],
+                'email': voter_data['email'] if voter_data['email'] else None  # Use None for missing emails
+            }
 
-                # Validate email if present
-                if voter_data['email']:
-                    email_task = self._validate_email_async(session, voter_data['email'])
-                    tasks.append(email_task)
-                else:
-                    tasks.append(asyncio.sleep(0))  # Dummy task
+            valid_voters.append(voter_record)
 
-            # Wait for all validations
-            results = await asyncio.gather(*tasks)
+            # Update county registration statistics
+            county_name = voter_data['countyName']
+            party = voter_data['party'].upper()
+            self.county_registration_stats[county_name]['totalRegisteredVoters'] += 1
 
-            # Process results
-            for i, voter_data in enumerate(voters_data):
-                address_valid = results[i * 2]
-                email_valid = results[i * 2 + 1] if voter_data['email'] else True
-
-                if not address_valid:
-                    self.stats['skipped_invalid_address'] += 1
-                    continue
-
-                if voter_data['email'] and not email_valid:
-                    self.stats['skipped_invalid_email'] += 1
-                    continue
-
-                # Create final voter record
-                voter_record = {
-                    'name': voter_data['name'],
-                    'countyName': voter_data['countyName'],
-                    'party': voter_data['party'],
-                    'address': voter_data['address'],
-                    'email': voter_data['email']
-                }
-
-                valid_voters.append(voter_record)
-
-                # Update county registration statistics
-                county_name = voter_data['countyName']
-                party = voter_data['party'].upper()
-                self.county_registration_stats[county_name]['totalRegisteredVoters'] += 1
-
-                if party == 'DEM':
-                    self.county_registration_stats[county_name]['democraticVoters'] += 1
-                elif party == 'REP':
-                    self.county_registration_stats[county_name]['republicanVoters'] += 1
-                else:
-                    self.county_registration_stats[county_name]['unaffiliatedVoters'] += 1
+            if party == 'DEM':
+                self.county_registration_stats[county_name]['democraticVoters'] += 1
+            elif party == 'REP':
+                self.county_registration_stats[county_name]['republicanVoters'] += 1
+            else:
+                self.county_registration_stats[county_name]['unaffiliatedVoters'] += 1
 
         return valid_voters
 
@@ -354,15 +337,20 @@ class FloridaVoterLoader:
             'address_zip': address_zip
         }
 
-    def _process_file(self, file_path: Path) -> List[Dict]:
-        """Process a single voter file with batch async validation"""
+    def _process_file(self, file_path: Path, db_collection) -> int:
+        """Process a single voter file with batch async validation and insert to DB incrementally"""
         county_code = file_path.name[:3].upper()
         county_name = COUNTY_CODES.get(county_code, county_code)
 
         logger.info(f"Processing {county_name} ({county_code})...")
+
+        # Force flush logs
+        for handler in logger.handlers:
+            handler.flush()
+
         start_time = time.time()
 
-        voters = []
+        total_inserted = 0
         batch = []
 
         # Initialize county stats if not exists
@@ -386,8 +374,8 @@ class FloridaVoterLoader:
 
                     batch.append(voter_data)
 
-                    # Progress report every 10 rows
-                    if line_num % 10 == 0:
+                    # Progress report every 10000 rows
+                    if line_num % 10000 == 0:
                         elapsed = time.time() - start_time
                         rate = line_num / elapsed if elapsed > 0 else 0
 
@@ -395,27 +383,64 @@ class FloridaVoterLoader:
                         avg_addr_ms = sum(self._address_validation_times) / len(self._address_validation_times) if self._address_validation_times else 0
                         avg_email_ms = sum(self._email_validation_times) / len(self._email_validation_times) if self._email_validation_times else 0
 
-                        logger.info(f"  {county_name}: {line_num:,} rows ({len(voters):,} valid) - {rate:.0f} rows/sec | Addr: {avg_addr_ms:.0f}ms | Email: {avg_email_ms:.0f}ms")
+                        logger.info(f"  {county_name}: {line_num:,} rows ({total_inserted:,} inserted) - {rate:.0f} rows/sec | Addr: {avg_addr_ms:.0f}ms | Email: {avg_email_ms:.0f}ms")
 
-                    # Process batch when it reaches batch_size
+                        # Flush logs to ensure they're written
+                        for handler in logger.handlers:
+                            handler.flush()
+
+                    # Process and insert batch when it reaches batch_size
                     if len(batch) >= self.batch_size:
-                        valid_batch = asyncio.run(self._validate_batch_async(batch))
-                        voters.extend(valid_batch)
+                        try:
+                            valid_batch = safe_async_run(self._validate_batch_async(batch), timeout=30)
+
+                            # Insert immediately in smaller chunks
+                            if valid_batch:
+                                chunk_size = 500
+                                for i in range(0, len(valid_batch), chunk_size):
+                                    chunk = valid_batch[i:i + chunk_size]
+                                    try:
+                                        db_collection.insert_many(chunk, ordered=False)
+                                        self.stats['inserted'] += len(chunk)
+                                        total_inserted += len(chunk)
+                                    except Exception as e:
+                                        logger.error(f"Error inserting chunk at line {line_num}: {e}", exc_info=True)
+                                        self.stats['errors'] += 1
+                        except Exception as e:
+                            logger.error(f"Error processing batch at line {line_num}: {e}", exc_info=True)
+                            self.stats['errors'] += 1
+
                         batch = []
 
 
                 # Process remaining batch
                 if batch:
-                    valid_batch = asyncio.run(self._validate_batch_async(batch))
-                    voters.extend(valid_batch)
+                    try:
+                        valid_batch = safe_async_run(self._validate_batch_async(batch), timeout=30)
+
+                        # Insert remaining voters
+                        if valid_batch:
+                            chunk_size = 500
+                            for i in range(0, len(valid_batch), chunk_size):
+                                chunk = valid_batch[i:i + chunk_size]
+                                try:
+                                    db_collection.insert_many(chunk, ordered=False)
+                                    self.stats['inserted'] += len(chunk)
+                                    total_inserted += len(chunk)
+                                except Exception as e:
+                                    logger.error(f"Error inserting final chunk: {e}", exc_info=True)
+                                    self.stats['errors'] += 1
+                    except Exception as e:
+                        logger.error(f"Error processing final batch: {e}", exc_info=True)
+                        self.stats['errors'] += 1
 
         except Exception as e:
             logger.error(f"Error processing file {file_path}: {e}")
             self.stats['errors'] += 1
 
         elapsed = time.time() - start_time
-        logger.info(f"  Completed {county_name}: {len(voters):,} valid voters in {elapsed:.1f}s")
-        return voters
+        logger.info(f"  Completed {county_name}: {total_inserted:,} valid voters inserted in {elapsed:.1f}s")
+        return total_inserted
 
     def _save_registration_statistics(self, db):
         """Save state voter registration statistics with embedded county data to MongoDB"""
@@ -499,10 +524,10 @@ class FloridaVoterLoader:
     def load_all_voters(self, force_reload: bool = False):
         """Load all Florida voter data into MongoDB with optimized async processing"""
         logger.info("=" * 70)
-        logger.info("Starting Florida voter data load with OPTIMIZATIONS:")
-        logger.info(f"  - Async validation (batch size: {self.batch_size})")
-        logger.info(f"  - Caching enabled")
-        logger.info(f"  - Fast batch processing")
+        logger.info("Starting Florida voter data load - VALIDATION DISABLED:")
+        logger.info(f"  - Skipping all address/email validation")
+        logger.info(f"  - Accepting all records (batch size: {self.batch_size})")
+        logger.info(f"  - Null emails will be stored as None")
         logger.info("=" * 70)
         logger.info(f"Voter directory: {VOTER_DIR}")
 
@@ -539,20 +564,32 @@ class FloridaVoterLoader:
 
         for file_path in txt_files:
             county_start = time.time()
-            voters = self._process_file(file_path)
-            county_elapsed = time.time() - county_start
 
-            # Insert voters immediately after processing county
-            if voters:
-                chunk_size = 500
-                for i in range(0, len(voters), chunk_size):
-                    chunk = voters[i:i + chunk_size]
-                    try:
-                        col.insert_many(chunk, ordered=False)
-                        self.stats['inserted'] += len(chunk)
-                    except Exception as e:
-                        logger.error(f"Error inserting chunk: {e}")
-                        self.stats['errors'] += 1
+            # Check MongoDB connection health
+            try:
+                db.command('ping')
+            except Exception as e:
+                logger.error(f"MongoDB connection lost! Error: {e}")
+                logger.info("Attempting to reconnect...")
+                try:
+                    client.close()
+                    client = MongoClient(MONGO_URI)
+                    db = client[DATABASE_NAME]
+                    col = db[COLLECTION_NAME]
+                    db.command('ping')
+                    logger.info("Reconnected successfully")
+                except Exception as e2:
+                    logger.error(f"Failed to reconnect: {e2}")
+                    raise
+
+            # Pass db collection for incremental insertion
+            try:
+                inserted_count = self._process_file(file_path, col)
+                county_elapsed = time.time() - county_start
+                logger.info(f"County completed successfully in {county_elapsed:.1f}s")
+            except Exception as e:
+                logger.error(f"FATAL ERROR processing county {file_path.name}: {e}", exc_info=True)
+                raise
 
             completed_counties += 1
 
