@@ -48,7 +48,7 @@ task installPythonDependencies(type: Exec) {
     description = 'Install required Python packages for preprocessing'
     group = 'application'
 
-    commandLine 'python', '-m', 'pip', 'install', 'geopandas', 'pymongo', 'shapely', 'openpyxl'
+    commandLine 'python', '-m', 'pip', 'install', 'geopandas', 'pymongo', 'shapely', 'openpyxl', 'requests', 'python-dotenv'
 
     doFirst {
         println '================================================'
@@ -170,6 +170,34 @@ task runVoterRegPreprocessing(type: Exec) {
     }
 }
 
+task runFLCountyVoteSplitsPreprocessing(type: Exec) {
+    description = 'Run Python preprocessing script to load Florida County Vote Splits into MongoDB'
+    group = 'application'
+
+    workingDir file('preprocessing')
+    commandLine 'python', 'load_florida_party_split.py'
+
+    doLast {
+        println '================================================'
+        println 'Florida County Vote Splits preprocessing completed successfully!'
+        println '================================================'
+    }
+}
+
+task runCACountyVoteSplitsPreprocessing(type: Exec) {
+    description = 'Run Python preprocessing script to load California County Vote Splits into MongoDB'
+    group = 'application'
+
+    workingDir file('preprocessing')
+    commandLine 'python', 'load_california_party_split.py'
+
+    doLast {
+        println '================================================'
+        println 'California County Vote Splits preprocessing completed successfully!'
+        println '================================================'
+    }
+}
+
 // Make bootRun depend on the Python preprocessing tasks
 runCountiesPreprocessing.dependsOn installPythonDependencies
 runStatesPreprocessing.dependsOn runCountiesPreprocessing
@@ -177,4 +205,6 @@ runFelonyPreprocessing.dependsOn runStatesPreprocessing
 runCvapPreprocessing.dependsOn runFelonyPreprocessing
 runEavsPreprocessing.dependsOn runCvapPreprocessing
 runVoterRegPreprocessing.dependsOn runEavsPreprocessing
-bootRun.dependsOn runVoterRegPreprocessing
+runFLCountyVoteSplitsPreprocessing.dependsOn runVoterRegPreprocessing
+runCACountyVoteSplitsPreprocessing.dependsOn runFLCountyVoteSplitsPreprocessing
+bootRun.dependsOn runCACountyVoteSplitsPreprocessing

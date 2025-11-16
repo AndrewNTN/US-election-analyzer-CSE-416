@@ -8,6 +8,4 @@ public record CvapData(
         Integer asian,
         Integer black,
         Integer white,
-        Integer hispanic
-) {
-}
+        Integer hispanic) {}

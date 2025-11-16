@@ -8,6 +8,4 @@ public record StateVoterRegistration(
         Integer democraticVoters,
         Integer republicanVoters,
         Integer unaffiliatedVoters,
-        List<CountyVoterRegistration> countyVoterRegistrations
-) {
-}
+        List<CountyVoterRegistration> countyVoterRegistrations) {}
