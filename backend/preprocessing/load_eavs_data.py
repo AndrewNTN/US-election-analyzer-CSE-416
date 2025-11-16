@@ -1,6 +1,7 @@
 """
 Load EAVS (Election Administration and Voting Survey) data into MongoDB.
 Uses pandas for efficient data processing and transformation.
+Supports data from 2016-2024 with year-specific column mappings.
 """
 
 import pandas as pd
@@ -13,8 +14,17 @@ MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 DATABASE_NAME = "cse416"
 COLLECTION_NAME = "eavs_data"
 
-# Path to CSV file
-CSV_PATH = Path(__file__).parent.parent / "src" / "main" / "resources" / "2024_EAVS_for_Public_Release_nolabel_V1.csv"
+# Path to resources directory
+RESOURCES_DIR = Path(__file__).parent.parent / "src" / "main" / "resources"
+
+# CSV files for each year
+CSV_FILES = {
+    2024: "2024_EAVS_for_Public_Release_nolabel_V1.csv",
+    2022: "2022_EAVS_for_Public_Release_nolabel_V1.1_CSV.csv",
+    2020: "2020_EAVS_for_Public_Release_nolabel_V1.2_CSV.csv",
+    2018: "EAVS_2018_for_Public_Release_Updates3.csv",
+    2016: "EAVS_2016_Final_Data_for_Public_Release_nolabel_V1.1_CSV.csv"
+}
 
 
 def clean_numeric_value(val):
@@ -31,23 +41,13 @@ def clean_numeric_value(val):
         return 0
 
 
-def load_eavs_data():
-    """Load and transform EAVS data from CSV into MongoDB."""
+def load_eavs_2024(collection, csv_path):
+    """Load and transform 2024 EAVS data with full details."""
 
-    # Connect to MongoDB
-    client = MongoClient(MONGO_URI)
-    db = client[DATABASE_NAME]
-    collection = db[COLLECTION_NAME]
-
-    # Check if data already exists
-    if collection.count_documents({}) > 0:
-        print("EAVS data already exists in MongoDB. Skipping.")
-        return
-
-    print(f"Reading CSV from: {CSV_PATH}")
+    print(f"Reading 2024 CSV from: {csv_path}")
 
     # Read CSV with pandas
-    df = pd.read_csv(CSV_PATH, dtype=str)
+    df = pd.read_csv(csv_path, dtype=str)
 
     # Strip quotes and whitespace from all string columns
     df = df.apply(lambda x: x.str.strip().str.strip('"') if x.dtype == "object" else x)
@@ -206,10 +206,217 @@ def load_eavs_data():
     # Bulk insert into MongoDB
     if documents:
         result = collection.insert_many(documents)
-        print(f"Successfully inserted {len(result.inserted_ids)} EAVS records into MongoDB")
+        print(f"Successfully inserted {len(result.inserted_ids)} documents for year 2024")
     else:
-        print("No documents to insert")
+        print("No documents to insert for year 2024")
 
+
+def load_eavs_2022_2020_2018(collection, csv_path, year):
+    """Load and transform 2022, 2020, or 2018 EAVS data with limited fields."""
+
+    print(f"Reading {year} CSV from: {csv_path}")
+
+    # Read CSV with pandas
+    df = pd.read_csv(csv_path, dtype=str)
+
+    # Strip quotes and whitespace from all string columns
+    df = df.apply(lambda x: x.str.strip().str.strip('"') if x.dtype == "object" else x)
+
+    # Filter out rows with missing or blank FIPS codes
+    df = df[df["FIPSCode"].notna() & (df["FIPSCode"].str.strip() != "")]
+
+    print(f"Processing {len(df)} records...")
+
+    # Define equipment columns for these years
+    equipment_cols = [
+        "F5c_1", "F5c_2", "F5c_3",  # DRE no VVPAT
+        "F6c_1", "F6c_2", "F6c_3",  # DRE with VVPAT
+        "F7c_1", "F7c_2", "F7c_3",  # Ballot marking device
+        "F8c_1", "F8c_2", "F8c_3",  # Scanner
+        "A1a"  # Total registered
+    ]
+
+    # Apply numeric cleaning to all relevant columns
+    for col in equipment_cols:
+        if col in df.columns:
+            df[col] = df[col].apply(clean_numeric_value)
+
+    # Build list of documents for MongoDB
+    documents = []
+
+    for _, row in df.iterrows():
+        # Equipment type counts
+        dre_no_vvpat = sum(row[col] for col in ["F5c_1", "F5c_2", "F5c_3"] if col in row)
+        dre_with_vvpat = sum(row[col] for col in ["F6c_1", "F6c_2", "F6c_3"] if col in row)
+        ballot_marking_device = sum(row[col] for col in ["F7c_1", "F7c_2", "F7c_3"] if col in row)
+        scanner = sum(row[col] for col in ["F8c_1", "F8c_2", "F8c_3"] if col in row)
+
+        # Build the document structure
+        document = {
+            "fipsCode": row["FIPSCode"],
+            "jurisdictionName": row["Jurisdiction_Name"],
+            "stateFull": row["State_Full"],
+            "stateAbbr": row["State_Abbr"],
+            "electionYear": year,
+
+            # Voter Registration - only total registered
+            "voterRegistration": {
+                "totalRegistered": row.get("A1a", 0),
+                "totalActive": None,
+                "totalInactive": None
+            },
+
+            # Equipment Summary
+            "equipmentTypeCount": {
+                "dreNoVVPAT": dre_no_vvpat,
+                "dreWithVVPAT": dre_with_vvpat,
+                "ballotMarkingDevice": ballot_marking_device,
+                "scanner": scanner
+            },
+
+            # Null fields not needed for these years
+            "mailBallotsRejectedReason": None,
+            "provisionalBallots": None,
+            "voterDeletion": None,
+            "mailTransmittedTotal": None,
+            "dropBoxesTotal": None,
+            "totalDropBoxesEarlyVoting": None,
+            "inPersonEarlyVoting": None,
+            "totalBallots": None,
+            "totalRejectedBallots": None,
+            "percentageRejectedBallots": None
+        }
+
+        documents.append(document)
+
+    # Bulk insert into MongoDB
+    if documents:
+        result = collection.insert_many(documents)
+        print(f"Successfully inserted {len(result.inserted_ids)} documents for year {year}")
+    else:
+        print(f"No documents to insert for year {year}")
+
+
+def load_eavs_2016(collection, csv_path):
+    """Load and transform 2016 EAVS data with limited fields and different column names."""
+
+    print(f"Reading 2016 CSV from: {csv_path}")
+
+    # Read CSV with pandas (2016 uses different encoding)
+    df = pd.read_csv(csv_path, dtype=str, encoding='latin-1')
+
+    # Strip quotes and whitespace from all string columns
+    df = df.apply(lambda x: x.str.strip().str.strip('"') if x.dtype == "object" else x)
+
+    # Filter out rows with missing or blank FIPS codes
+    df = df[df["FIPSCode"].notna() & (df["FIPSCode"].str.strip() != "")]
+
+    print(f"Processing {len(df)} records...")
+
+    # Define equipment columns for 2016 (different naming)
+    equipment_cols = [
+        "F7a_Number",   # DRE no VVPAT
+        "F7b_Number",   # DRE with VVPAT
+        "F7c_Number",   # Ballot marking device
+        "F7d_NumCounters",  # Scanner
+        "A1a"  # Total registered
+    ]
+
+    # Apply numeric cleaning to all relevant columns
+    for col in equipment_cols:
+        if col in df.columns:
+            df[col] = df[col].apply(clean_numeric_value)
+
+    # Build list of documents for MongoDB
+    documents = []
+
+    for _, row in df.iterrows():
+        # Equipment type counts (2016 uses single columns, not summed)
+        dre_no_vvpat = row.get("F7a_Number", 0)
+        dre_with_vvpat = row.get("F7b_Number", 0)
+        ballot_marking_device = row.get("F7c_Number", 0)
+        scanner = row.get("F7d_NumCounters", 0)
+
+        # Build the document structure
+        document = {
+            "fipsCode": row["FIPSCode"],
+            "jurisdictionName": row["JurisdictionName"],
+            "stateFull": None,  # Not available in 2016 data
+            "stateAbbr": row["State"],
+            "electionYear": 2016,
+
+            # Voter Registration - only total registered
+            "voterRegistration": {
+                "totalRegistered": row.get("A1a", 0),
+                "totalActive": None,
+                "totalInactive": None
+            },
+
+            # Equipment Summary
+            "equipmentTypeCount": {
+                "dreNoVVPAT": dre_no_vvpat,
+                "dreWithVVPAT": dre_with_vvpat,
+                "ballotMarkingDevice": ballot_marking_device,
+                "scanner": scanner
+            },
+
+            # Null fields not needed for 2016
+            "mailBallotsRejectedReason": None,
+            "provisionalBallots": None,
+            "voterDeletion": None,
+            "mailTransmittedTotal": None,
+            "dropBoxesTotal": None,
+            "totalDropBoxesEarlyVoting": None,
+            "inPersonEarlyVoting": None,
+            "totalBallots": None,
+            "totalRejectedBallots": None,
+            "percentageRejectedBallots": None
+        }
+
+        documents.append(document)
+
+    # Bulk insert into MongoDB
+    if documents:
+        result = collection.insert_many(documents)
+        print(f"Successfully inserted {len(result.inserted_ids)} documents for year 2016")
+    else:
+        print("No documents to insert for year 2016")
+
+
+def load_eavs_data():
+    """Main function to load all EAVS data from 2016-2024."""
+
+    # Connect to MongoDB
+    client = MongoClient(MONGO_URI)
+    db = client[DATABASE_NAME]
+    collection = db[COLLECTION_NAME]
+
+    # Check if data already exists
+    if collection.count_documents({}) > 0:
+        print("EAVS data already exists in MongoDB. Clearing collection...")
+        collection.delete_many({})
+
+    # Load data for each year (descending order: 2024 -> 2016)
+    for year, filename in sorted(CSV_FILES.items(), reverse=True):
+        csv_path = RESOURCES_DIR / filename
+
+        if not csv_path.exists():
+            print(f"Warning: CSV file for {year} not found at {csv_path}")
+            continue
+
+        try:
+            if year == 2024:
+                load_eavs_2024(collection, csv_path)
+            elif year in [2022, 2020, 2018]:
+                load_eavs_2022_2020_2018(collection, csv_path, year)
+            elif year == 2016:
+                load_eavs_2016(collection, csv_path)
+        except Exception as e:
+            print(f"Error loading data for year {year}: {e}")
+            import traceback
+            traceback.print_exc()
+
+    print(f"\nTotal documents in collection: {collection.count_documents({})}")
     client.close()
 
 
