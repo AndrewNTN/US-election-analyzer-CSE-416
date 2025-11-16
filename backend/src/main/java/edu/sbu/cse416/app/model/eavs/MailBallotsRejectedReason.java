@@ -1,7 +1,7 @@
 package edu.sbu.cse416.app.model.eavs;
 
 public record MailBallotsRejectedReason(
-        // A12b-A12h
+        // C9b-C9q
         Integer late,
         Integer missingVoterSignature,
         Integer missingWitnessSignature,

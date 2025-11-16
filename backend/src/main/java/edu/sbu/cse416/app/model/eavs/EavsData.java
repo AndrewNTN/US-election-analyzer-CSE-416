@@ -19,4 +19,7 @@ public record EavsData(
         Integer mailTransmittedTotal,
         Integer dropBoxesTotal,
         Integer totalDropBoxesEarlyVoting,
-        Integer inPersonEarlyVoting) {}
+        Integer inPersonEarlyVoting,
+        Integer totalRejectedBallots,
+        Integer totalBallots,
+        Double percentageRejectedBallots) {}

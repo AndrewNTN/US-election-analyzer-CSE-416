@@ -75,7 +75,7 @@ def load_eavs_data():
     # Apply numeric cleaning to all relevant columns
     numeric_cols = (voter_registration_cols + voter_deletion_cols + mail_rejected_cols +
                     provisional_e1_cols + provisional_e2_cols + provisional_e2_other_cols +
-                    equipment_cols + ["C1a", "C3a", "C5a", "F1f"]
+                    equipment_cols + ["C1a", "C3a", "C5a", "F1f", "F1b", "C8a", "C9a", "B24a"]
                     )
 
     for col in numeric_cols:
@@ -97,6 +97,23 @@ def load_eavs_data():
         dre_with_vvpat = sum(row[col] for col in ["F4c_1", "F4c_2", "F4c_3"] if col in row)
         ballot_marking_device = sum(row[col] for col in ["F5c_1", "F5c_2", "F5c_3"] if col in row)
         scanner = sum(row[col] for col in ["F6c_1", "F6c_2", "F6c_3"] if col in row)
+
+        # Calculate ballot statistics
+        # Total ballots = F1b (election day ballots) + C8a (counted mail ballots) + F1f (Early In-Person Ballots Counted) + E1b (provisional ballots counted)
+        election_day_ballots = row.get("F1b", 0)
+        counted_mail_ballots = row.get("C8a", 0)
+        early_in_person_counted = row.get("F1f", 0)
+        provisional_counted = row.get("E1b", 0)
+        total_ballots = election_day_ballots + counted_mail_ballots + early_in_person_counted + provisional_counted
+
+        # Total Rejected ballots = C9a (mail-in ballots rejected) + E1d (provisional ballots rejected) + B24a (UOCAVA ballots rejected)
+        mail_rejected = row.get("C9a", 0)
+        provisional_rejected = row.get("E1d", 0)
+        uocava_rejected = row.get("B24a", 0)
+        total_rejected_ballots = mail_rejected + provisional_rejected + uocava_rejected
+
+        # Rejected ballots % = total rejected ballots / total ballots (avoid division by zero)
+        percentage_rejected_ballots = (total_rejected_ballots / total_ballots * 100.0) if total_ballots > 0 else 0.0
 
         # Build the document structure matching the Java model
         document = {
@@ -176,7 +193,12 @@ def load_eavs_data():
             "mailTransmittedTotal": row.get("C1a", 0),
             "dropBoxesTotal": row.get("C3a", 0),
             "totalDropBoxesEarlyVoting": row.get("C5a", 0),
-            "inPersonEarlyVoting": row.get("F1f", 0)
+            "inPersonEarlyVoting": row.get("F1f", 0),
+
+            # Ballot statistics
+            "totalBallots": total_ballots,
+            "totalRejectedBallots": total_rejected_ballots,
+            "percentageRejectedBallots": round(percentage_rejected_ballots, 2)
         }
 
         documents.append(document)
