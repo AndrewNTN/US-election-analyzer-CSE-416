@@ -128,26 +128,48 @@ class FloridaVoteSplitLoader:
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 for line in f:
+                    # Skip empty lines
+                    if not line or not line.strip():
+                        continue
+
                     parts = line.strip().split('\t')
                     
                     # Ensure we have enough columns
                     if len(parts) < 19:
                         continue
                     
-                    # Extract relevant fields
-                    race = parts[11].strip()  # Race (e.g., "President and Vice President")
-                    candidate_name = parts[14].strip()  # Candidate name
-                    party = parts[15].strip()  # Party code (REP, DEM, etc.)
-                    votes_str = parts[18].strip()  # Number of votes
+                    # Extract relevant fields with null checks
+                    race = parts[11].strip() if parts[11] else ""
+                    candidate_name = parts[14].strip() if parts[14] else ""
+                    party = parts[15].strip() if parts[15] else ""
+                    votes_str = parts[18].strip() if parts[18] else "0"
+
+                    # Skip if essential fields are empty
+                    if not race:
+                        continue
 
                     # Only process Presidential race
                     if "President" not in race:
                         continue
                     
-                    # Parse votes
+                    # Parse votes with comprehensive validation
                     try:
-                        votes = int(votes_str)
-                    except ValueError:
+                        # Remove any non-numeric characters except digits
+                        votes_str_clean = ''.join(c for c in votes_str if c.isdigit() or c == '-')
+
+                        # Check for empty string after cleaning
+                        if not votes_str_clean:
+                            continue
+
+                        votes = int(votes_str_clean)
+
+                        # Validate vote count is non-negative
+                        if votes < 0:
+                            logger.warning(f"Negative vote count in {file_path.name}: {votes}, skipping")
+                            continue
+
+                    except (ValueError, TypeError) as e:
+                        logger.warning(f"Invalid vote count in {file_path.name}: '{votes_str}', skipping")
                         continue
                     
                     # Aggregate all presidential votes for accurate total
@@ -181,9 +203,20 @@ class FloridaVoteSplitLoader:
         documents = []
         
         for county_name, data in self.county_vote_data.items():
-            rep_votes = data["republicanVotes"]
-            dem_votes = data["democraticVotes"]
-            total_votes = data["totalVotes"]  # Use actual total including all parties
+            # Validate and sanitize vote counts
+            try:
+                rep_votes = int(data.get("republicanVotes", 0))
+                dem_votes = int(data.get("democraticVotes", 0))
+                total_votes = int(data.get("totalVotes", 0))
+
+                # Ensure non-negative values
+                if rep_votes < 0 or dem_votes < 0 or total_votes < 0:
+                    logger.warning(f"Negative vote count detected for {county_name}, skipping")
+                    continue
+
+            except (ValueError, TypeError) as e:
+                logger.warning(f"Invalid vote data for {county_name}: {e}, skipping")
+                continue
 
             # Calculate percentages based on ALL votes cast
             if total_votes > 0:
