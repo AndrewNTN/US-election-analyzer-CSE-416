@@ -15,7 +15,7 @@ public record EavsData(
         MailBallotsRejectedReason mailBallotsRejected,
         ProvisionalBallots provisionalBallots,
         VoterDeletion voterDeletion,
-        EquipmentTypeCount equipmentTypeCount,
+        Equipment equipment,
         Integer mailTransmittedTotal,
         Integer dropBoxesTotal,
         Integer totalDropBoxesEarlyVoting,

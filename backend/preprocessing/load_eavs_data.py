@@ -182,7 +182,7 @@ def load_eavs_2024(collection, csv_path):
             },
 
             # Equipment Summary
-            "equipmentTypeCount": {
+            "equipment": {
                 "dreNoVVPAT": dre_no_vvpat,
                 "dreWithVVPAT": dre_with_vvpat,
                 "ballotMarkingDevice": ballot_marking_device,
@@ -267,7 +267,7 @@ def load_eavs_2022_2020_2018(collection, csv_path, year):
             },
 
             # Equipment Summary
-            "equipmentTypeCount": {
+            "equipment": {
                 "dreNoVVPAT": dre_no_vvpat,
                 "dreWithVVPAT": dre_with_vvpat,
                 "ballotMarkingDevice": ballot_marking_device,
@@ -353,7 +353,7 @@ def load_eavs_2016(collection, csv_path):
             },
 
             # Equipment Summary
-            "equipmentTypeCount": {
+            "equipment": {
                 "dreNoVVPAT": dre_no_vvpat,
                 "dreWithVVPAT": dre_with_vvpat,
                 "ballotMarkingDevice": ballot_marking_device,
