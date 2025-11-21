@@ -20,15 +20,15 @@ public record ProvisionalChartResponse(
 
     public static Map<String, String> getDefaultMetricLabels() {
         return Map.of(
-                "provReasonVoterNotOnList", "E2a – Not on List",
-                "provReasonVoterLackedID", "E2b – Lacked ID",
-                "provReasonElectionOfficialChallengedEligibility", "E2c – Official Challenged Eligibility",
-                "provReasonAnotherPersonChallengedEligibility", "E2d – Person Challenged Eligibility",
-                "provReasonVoterNotResident", "E2e – Not Resident",
-                "provReasonVoterRegistrationNotUpdated", "E2f – Registration Not Updated",
-                "provReasonVoterDidNotSurrenderMailBallot", "E2g – Did Not Surrender Mail Ballot",
-                "provReasonJudgeExtendedVotingHours", "E2h – Judge Extended Hours",
-                "provReasonVoterUsedSDR", "E2i – Used SDR",
+                "provReasonVoterNotOnList", "Not on List",
+                "provReasonVoterLackedID", "Lacked ID",
+                "provReasonElectionOfficialChallengedEligibility", "Official Challenged Eligibility",
+                "provReasonAnotherPersonChallengedEligibility", "Person Challenged Eligibility",
+                "provReasonVoterNotResident", "Not Resident",
+                "provReasonVoterRegistrationNotUpdated", "Registration Not Updated",
+                "provReasonVoterDidNotSurrenderMailBallot", "Did Not Surrender Mail Ballot",
+                "provReasonJudgeExtendedVotingHours", "Judge Extended Hours",
+                "provReasonVoterUsedSDR", "Used SDR",
                 "provReasonOtherSum", "Other");
     }
 }

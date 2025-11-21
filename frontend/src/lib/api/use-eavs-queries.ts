@@ -9,6 +9,8 @@ import {
   getActiveVotersTable,
   type ActiveVotersChartResponse,
   type ActiveVotersTableResponse,
+  getPollbookDeletionsChart,
+  type PollbookDeletionsChartResponse,
 } from "@/lib/api/eavs-requests";
 
 export const useProvisionalChartQuery = (
@@ -63,6 +65,22 @@ export const useActiveVotersTableQuery = (
         throw new Error("Missing FIPS prefix for active voters table query");
       }
       return getActiveVotersTable(fipsPrefix);
+    },
+    enabled: Boolean(fipsPrefix),
+  });
+
+export const usePollbookDeletionsChartQuery = (
+  fipsPrefix: string | null | undefined,
+): UseQueryResult<PollbookDeletionsChartResponse, Error> =>
+  useQuery({
+    queryKey: ["pollbook-deletions-chart", fipsPrefix ?? "no-fips"],
+    queryFn: async () => {
+      if (!fipsPrefix) {
+        throw new Error(
+          "Missing FIPS prefix for pollbook deletions chart query",
+        );
+      }
+      return getPollbookDeletionsChart(fipsPrefix);
     },
     enabled: Boolean(fipsPrefix),
   });

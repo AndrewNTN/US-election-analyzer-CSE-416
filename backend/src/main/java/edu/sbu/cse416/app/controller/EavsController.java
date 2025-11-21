@@ -4,6 +4,7 @@ import edu.sbu.cse416.app.dto.activevoters.ActiveVotersChartResponse;
 import edu.sbu.cse416.app.dto.activevoters.ActiveVotersTableResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalTableResponse;
+import edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse;
 import edu.sbu.cse416.app.service.EavsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,12 @@ public class EavsController {
     @GetMapping("/active-voters/chart/{fipsPrefix}")
     public ResponseEntity<ActiveVotersChartResponse> getActiveVotersChart(@PathVariable String fipsPrefix) {
         var dto = eavsService.getActiveVotersChart(fipsPrefix);
+        return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("pollbook-deletions/chart/{fipsPrefix}")
+    public ResponseEntity<PollbookDeletionsChartResponse> getPollbookDeletionsChart(@PathVariable String fipsPrefix) {
+        var dto = eavsService.getPollbookDeletionsChart(fipsPrefix);
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 }

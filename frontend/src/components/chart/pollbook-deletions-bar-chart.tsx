@@ -1,54 +1,56 @@
 import { BaseBarChart } from "./base-bar-chart";
 import { formatNumber } from "@/lib/utils";
-
-export interface PollbookDeletionsData {
-  eavsRegion: string;
-  A12b: number;
-  A12c: number;
-  A12d: number;
-  A12e: number;
-  A12f: number;
-  A12g: number;
-  A12h: number;
-  notes: string;
-}
+import { type PollbookDeletionsChartResponse } from "@/lib/api/eavs-requests";
 
 export interface PollbookDeletionsBarChartProps {
   stateName: string;
-  barData: PollbookDeletionsData[];
+  barData: PollbookDeletionsChartResponse;
+  metricLabels?: Record<string, string>;
 }
 
 const METRIC_KEYS = [
-  "A12b",
-  "A12c",
-  "A12d",
-  "A12e",
-  "A12f",
-  "A12g",
-  "A12h",
+  "removedTotal",
+  "removedMoved",
+  "removedDeath",
+  "removedFelony",
+  "removedFailResponse",
+  "removedIncompetentToVote",
+  "removedVoterRequest",
+  "removedDuplicateRecords",
 ] as const;
 type MetricKey = (typeof METRIC_KEYS)[number];
 
-const METRIC_LABELS: Record<MetricKey, string> = {
-  A12b: "A12b – Moved",
-  A12c: "A12c – Death",
-  A12d: "A12d – Felony",
-  A12e: "A12e – Fail Response",
-  A12f: "A12f – Incompetent to Vote",
-  A12g: "A12g – Voter Request",
-  A12h: "A12h – Duplicate Record",
+const DEFAULT_METRIC_LABELS: Record<MetricKey, string> = {
+  removedTotal: "Total Removed",
+  removedMoved: "Moved",
+  removedDeath: "Deceased",
+  removedFelony: "Felony Conviction",
+  removedFailResponse: "Failure to Respond",
+  removedIncompetentToVote: "Mental Incompetence",
+  removedVoterRequest: "Voter Request",
+  removedDuplicateRecords: "Duplicate",
 };
 
 export function PollbookDeletionsBarChart({
   stateName,
   barData,
+  metricLabels,
 }: PollbookDeletionsBarChartProps) {
+  const chartData = [
+    {
+      name: stateName,
+      ...barData,
+    },
+  ];
+
+  const labels = { ...DEFAULT_METRIC_LABELS, ...metricLabels };
+
   return (
     <BaseBarChart
       stateName={stateName}
-      barData={barData}
+      barData={chartData}
       metricKeys={METRIC_KEYS}
-      metricLabels={METRIC_LABELS}
+      metricLabels={labels}
       metricAccessor={(data, key) => data[key]}
       yAxisLabel="Number of Deletions"
       yAxisTickFormatter={formatNumber}

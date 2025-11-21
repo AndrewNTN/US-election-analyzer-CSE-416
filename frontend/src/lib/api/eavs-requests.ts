@@ -62,3 +62,20 @@ export const getActiveVotersTable = async (
   fipsPrefix: string,
 ): Promise<ActiveVotersTableResponse> =>
   fetchJson(`/eavs/active-voters/table/${fipsPrefix}`);
+
+export interface PollbookDeletionsChartResponse {
+  removedTotal: number;
+  removedMoved: number;
+  removedDeath: number;
+  removedFelony: number;
+  removedFailResponse: number;
+  removedIncompetentToVote: number;
+  removedVoterRequest: number;
+  removedDuplicateRecords: number;
+  metricLabels?: Record<string, string>;
+}
+
+export const getPollbookDeletionsChart = async (
+  fipsPrefix: string,
+): Promise<PollbookDeletionsChartResponse> =>
+  fetchJson(`/eavs/pollbook-deletions/chart/${fipsPrefix}`);

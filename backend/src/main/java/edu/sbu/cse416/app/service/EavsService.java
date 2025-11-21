@@ -29,17 +29,33 @@ public class EavsService {
     }
 
     /**
+     * Clean jurisdiction name by removing leading and trailing numbers.
+     * E.g., "01 - Belknap County" becomes "Belknap County"
+     * E.g., "LACONIA 01" becomes "LACONIA"
+     */
+    private static String cleanJurisdictionName(String name) {
+        if (name == null) {
+            return null;
+        }
+        // Remove leading digits, spaces, hyphens, and subsequent spaces
+        String cleaned = name.replaceAll("^\\d+\\s*-?\\s*", "");
+        // Remove trailing spaces and digits
+        cleaned = cleaned.replaceAll("\\s+\\d+$", "");
+        return cleaned;
+    }
+
+    /**
      * Get provisional ballot table data for a FIPS prefix.
      */
     @Cacheable(value = "provisionalTable", key = "#fipsPrefix")
     public ProvisionalTableResponse getProvisionalTable(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByFipsCode("^0*" + prefix);
+        List<EavsData> data = repo.findByFipsCode("^" + prefix);
         List<ProvisionalTableResponse.Data> tableData = data.stream()
                 .map(record -> {
                     ProvisionalBallots p = record.provisionalBallots();
                     return new ProvisionalTableResponse.Data(
-                            record.jurisdictionName(),
+                            cleanJurisdictionName(record.jurisdictionName()),
                             nz(p == null ? null : p.totalProv()),
                             nz(p == null ? null : p.provCountFullyCounted()),
                             nz(p == null ? null : p.provCountPartialCounted()),
@@ -56,7 +72,7 @@ public class EavsService {
     @Cacheable(value = "provisionalChart", key = "#fipsPrefix")
     public ProvisionalChartResponse getProvisionalChart(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByFipsCode("0*" + prefix);
+        List<EavsData> data = repo.findByFipsCode("^" + prefix);
 
         ProvisionalChartResponse response =
                 RecordAggregator.aggregate(data, EavsData::provisionalBallots, ProvisionalChartResponse.class);
@@ -81,12 +97,12 @@ public class EavsService {
     @Cacheable(value = "activeVotersTable", key = "#fipsPrefix")
     public ActiveVotersTableResponse getActiveVotersTable(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByFipsCode("^0*" + prefix);
+        List<EavsData> data = repo.findByFipsCode("^" + prefix);
         List<ActiveVotersTableResponse.Data> tableData = data.stream()
                 .map(record -> {
                     edu.sbu.cse416.app.model.eavs.VoterRegistration vr = record.voterRegistration();
                     return new ActiveVotersTableResponse.Data(
-                            record.jurisdictionName(),
+                            cleanJurisdictionName(record.jurisdictionName()),
                             nz(vr == null ? null : vr.totalRegistered()),
                             nz(vr == null ? null : vr.totalActive()),
                             nz(vr == null ? null : vr.totalInactive()));
@@ -101,22 +117,38 @@ public class EavsService {
     @Cacheable(value = "activeVotersChart", key = "#fipsPrefix")
     public ActiveVotersChartResponse getActiveVotersChart(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByFipsCode("0*" + prefix);
+        List<EavsData> data = repo.findByFipsCode("^" + prefix);
 
-        int totalRegistered = 0;
-        int totalActive = 0;
-        int totalInactive = 0;
-
-        for (EavsData record : data) {
-            edu.sbu.cse416.app.model.eavs.VoterRegistration vr = record.voterRegistration();
-            if (vr != null) {
-                totalRegistered += nz(vr.totalRegistered());
-                totalActive += nz(vr.totalActive());
-                totalInactive += nz(vr.totalInactive());
-            }
-        }
+        ActiveVotersChartResponse response =
+                RecordAggregator.aggregate(data, EavsData::voterRegistration, ActiveVotersChartResponse.class);
 
         return new ActiveVotersChartResponse(
-                totalRegistered, totalActive, totalInactive, ActiveVotersChartResponse.getDefaultMetricLabels());
+                response.totalRegistered(),
+                response.totalActive(),
+                response.totalInactive(),
+                ActiveVotersChartResponse.getDefaultMetricLabels());
+    }
+
+    /**
+     * Get pollbook deletions chart data aggregated for a FIPS prefix.
+     */
+    @Cacheable(value = "pollbookDeletionsChart", key = "#fipsPrefix")
+    public edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse getPollbookDeletionsChart(String fipsPrefix) {
+        String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
+        List<EavsData> data = repo.findByFipsCode("^" + prefix);
+
+        edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse response =
+                RecordAggregator.aggregate(data, EavsData::voterDeletion, edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse.class);
+
+        return new edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse(
+                response.removedTotal(),
+                response.removedMoved(),
+                response.removedDeath(),
+                response.removedFelony(),
+                response.removedFailResponse(),
+                response.removedIncompetentToVote(),
+                response.removedVoterRequest(),
+                response.removedDuplicateRecords(),
+                edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse.getDefaultMetricLabels());
     }
 }

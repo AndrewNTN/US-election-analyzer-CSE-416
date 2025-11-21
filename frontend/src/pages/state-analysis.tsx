@@ -328,7 +328,6 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                 <EquipmentQualityView stateName={formatStateName(stateName)} />
               ) : selectedDataset === AnalysisType.POLLBOOK_DELETIONS_2024 ? (
                 <PollbookDeletionsView
-                  normalizedStateKey={normalizedStateKey}
                   stateName={formatStateName(stateName)}
                 />
               ) : selectedDataset === AnalysisType.MAIL_BALLOTS_REJECTED ? (

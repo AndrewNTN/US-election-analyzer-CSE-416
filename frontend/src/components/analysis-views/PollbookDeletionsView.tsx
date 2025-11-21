@@ -1,55 +1,71 @@
-import { useMemo } from "react";
-import { ActiveVotersTable } from "../table/state-tables/active-voters-table.tsx";
 import { PollbookDeletionsBarChart } from "../chart/pollbook-deletions-bar-chart";
-import pollbookDeletionsDataJson from "../../../data/pollbookDeletionsData.json" with { type: "json" };
-import activeVotersDataJson from "../../../data/activeVotersData.json" with { type: "json" };
-import activeVotersDataCaliforniaJson from "../../../data/activeVotersData-california.json" with { type: "json" };
-import activeVotersDataFloridaJson from "../../../data/activeVotersData-florida.json" with { type: "json" };
+import { usePollbookDeletionsChartQuery, useActiveVotersTableQuery } from "@/lib/api/use-eavs-queries.ts";
+import { getStateFipsCode } from "@/constants/stateFips.ts";
+import { ActiveVotersTable } from "../table/state-tables/active-voters-table.tsx";
 
 interface PollbookDeletionsViewProps {
-  normalizedStateKey: string;
   stateName: string;
 }
 
 export function PollbookDeletionsView({
-  normalizedStateKey,
   stateName,
 }: PollbookDeletionsViewProps) {
-  const activeVotersData = useMemo(() => {
-    if (normalizedStateKey === "california") {
-      return activeVotersDataCaliforniaJson.map((item: any) => ({
-        jurisdiction: item.eavsRegion,
-        totalActive: item.activeVoters,
-        totalRegistered: item.totalVoters,
-        totalInactive: item.inactiveVoters,
-      }));
-    } else if (normalizedStateKey === "florida") {
-      return activeVotersDataFloridaJson.map((item: any) => ({
-        jurisdiction: item.eavsRegion,
-        totalActive: item.activeVoters,
-        totalRegistered: item.totalVoters,
-        totalInactive: item.inactiveVoters,
-      }));
-    }
-    return activeVotersDataJson.map((item: any) => ({
-      jurisdiction: item.eavsRegion,
-      totalActive: item.activeVoters,
-      totalRegistered: item.totalVoters,
-      totalInactive: item.inactiveVoters,
-    }));
-  }, [normalizedStateKey]);
+  const stateFipsPrefix = getStateFipsCode(stateName);
+  
+  const {
+    data: chartData,
+    isPending: chartLoading,
+    isError: chartHasError,
+    error: chartError,
+  } = usePollbookDeletionsChartQuery(stateFipsPrefix);
+
+  const {
+    data: tableData,
+    isPending: tableLoading,
+    isError: tableHasError,
+    error: tableError,
+  } = useActiveVotersTableQuery(stateFipsPrefix);
+
+  const chartErrorMessage = chartHasError
+    ? (chartError?.message ?? "Unknown error")
+    : null;
+
+  const tableErrorMessage = tableHasError
+    ? (tableError?.message ?? "Unknown error")
+    : null;
 
   return (
     <div className="text-xs text-muted-foreground text-center">
-      <ActiveVotersTable data={activeVotersData} />
+      {tableLoading ? (
+        <p>Loading active voters data...</p>
+      ) : tableErrorMessage ? (
+        <p className="py-8">
+          Error loading {stateName} table data: {tableErrorMessage}
+        </p>
+      ) : tableData ? (
+        <ActiveVotersTable 
+          data={tableData.data} 
+          metricLabels={tableData.metricLabels}
+        />
+      ) : null}
+      
       <div className="mt-4">
         <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
           Pollbook Deletions by Reason
         </h3>
-        <PollbookDeletionsBarChart
-          stateName={stateName}
-          barData={pollbookDeletionsDataJson}
-        />
+        {chartLoading ? (
+          <p>Loading pollbook deletions data...</p>
+        ) : chartErrorMessage ? (
+          <p className="py-8">
+            Error loading {stateName} data: {chartErrorMessage}
+          </p>
+        ) : chartData ? (
+          <PollbookDeletionsBarChart
+            stateName={stateName}
+            barData={chartData}
+            metricLabels={chartData.metricLabels}
+          />
+        ) : null}
       </div>
     </div>
   );
