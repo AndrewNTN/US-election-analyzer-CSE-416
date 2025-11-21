@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import statesJSON from "../../data/us-states.json";
 import countiesJSON from "../../data/counties.geojson.json";
-// import censusBlockDataJSON from "../../data/censusBlockData.json";
 import type { CountyProps, StateProps } from "@/lib/map.ts";
 import {
   DETAILED_STATES,
@@ -18,97 +17,22 @@ import {
 } from "@/lib/choropleth.ts";
 import StateMap from "@/components/map/state-map.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
-// import type { CensusBlockData } from "@/components/map/bubble-chart-layer.tsx";
-//table imports
-import { VoterRegistrationTable } from "../components/table/state-tables/voter-registration-table.tsx";
-import eavsRegionVoterDataJson from "../../data/eavsRegionVoterData.json" with { type: "json" };
-import { ProvisionBallotsTable } from "../components/table/state-tables/provisional-ballot-table.tsx";
-import { ActiveVotersTable } from "../components/table/state-tables/active-voters-table.tsx";
 import activeVotersDataJson from "../../data/activeVotersData.json" with { type: "json" };
 import activeVotersDataCaliforniaJson from "../../data/activeVotersData-california.json" with { type: "json" };
 import activeVotersDataFloridaJson from "../../data/activeVotersData-florida.json" with { type: "json" };
-import pollbookDeletionsDataJson from "../../data/pollbookDeletionsData.json" with { type: "json" };
-import { MailBallotsRejectedTable } from "../components/table/state-tables/mail-ballots-rejected-table.tsx";
-import mailBallotsRejectedDataJson from "../../data/mailBallotsRejectedData.json" with { type: "json" };
-import stateEquipmentSummaryJson from "../../data/stateEquipmentSummary.json" with { type: "json" };
 
-//chart imports
-import { VoterRegistrationLineChart } from "../components/chart/voter-registration-line-chart";
-import voterRegistrationDataJson from "../../data/voterRegistrationChanges.json" with { type: "json" };
-import { ProvisionalBallotsBarChart } from "../components/chart/provisional-ballots-bar-chart";
-import { ActiveVotersBarChart } from "../components/chart/active-voters-bar-chart";
-import { PollbookDeletionsBarChart } from "../components/chart/pollbook-deletions-bar-chart";
-import { MailBallotsRejectedBarChart } from "../components/chart/mail-ballots-rejected-bar-chart";
-import { DropBoxVotingBubbleChart } from "../components/chart/drop-box-voting-bubble-chart";
-import dropBoxVotingDataJson from "../../data/dropBoxVotingData.json" with { type: "json" };
-import { EquipmentQualityBubbleChart } from "../components/chart/equipment-quality-bubble-chart";
-import equipmentQualityDataJson from "../../data/equipmentQualityVsRejectedBallots.json" with { type: "json" };
-import {
-  useProvisionalChartQuery,
-  useProvisionalTableQuery,
-} from "@/lib/api/use-eavs-queries.ts";
-import { StateEquipmentSummaryTable } from "@/components/table/state-tables/state-equipment-summary-table.tsx";
-import type { StateEquipmentSummary } from "@/components/table/state-tables/state-equipment-summary-columns.tsx";
+// View Components
+import { VoterRegistrationView } from "@/components/analysis-views/VoterRegistrationView";
+import { StateEquipmentSummaryView } from "@/components/analysis-views/StateEquipmentSummaryView";
+import { ProvisionalBallotView } from "@/components/analysis-views/ProvisionalBallotView";
+import { ActiveVotersView } from "@/components/analysis-views/ActiveVotersView";
+import { DropBoxVotingView } from "@/components/analysis-views/DropBoxVotingView";
+import { EquipmentQualityView } from "@/components/analysis-views/EquipmentQualityView";
+import { PollbookDeletionsView } from "@/components/analysis-views/PollbookDeletionsView";
+import { MailBallotsRejectedView } from "@/components/analysis-views/MailBallotsRejectedView";
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
-// const censusBlockData = censusBlockDataJSON as CensusBlockData[];
-
-// Voter registration data - already sorted by 2024 registered voters in ascending order
-const voterRegistrationData = voterRegistrationDataJson as {
-  jurisdiction: string;
-  registeredVoters2016: number;
-  registeredVoters2020: number;
-  registeredVoters2024: number;
-}[];
-
-// EAVS region voter data for Florida counties
-const eavsRegionVoterData = eavsRegionVoterDataJson as {
-  eavsRegion: string;
-  totalRegisteredVoters: number;
-  democraticVoters: number;
-  republicanVoters: number;
-  unaffiliatedVoters: number;
-  otherPartyVoters: number;
-  registrationRate: number;
-  activeVoters: number;
-  inactiveVoters: number;
-}[];
-
-// Mail Ballots Rejected Data
-const mailBallotsRejectedData = mailBallotsRejectedDataJson as {
-  eavsRegion: string;
-  C9b: number;
-  C9c: number;
-  C9d: number;
-  C9e: number;
-  C9f: number;
-  C9g: number;
-  C9h: number;
-  C9i: number;
-  C9j: number;
-  C9k: number;
-  C9l: number;
-  C9m: number;
-  C9n: number;
-  C9o: number;
-  C9p: number;
-  C9q: number;
-  notes: string;
-}[];
-
-// Drop box voting data type
-type DropBoxVotingData = {
-  eavsRegion: string;
-  totalDropBoxVotes: number;
-  republicanVotes: number;
-  democraticVotes: number;
-  otherVotes: number;
-  totalVotes: number;
-  republicanPercentage: number;
-  dropBoxPercentage: number;
-  dominantParty: "republican" | "democratic";
-};
 
 const AnalysisType = {
   PROVISIONAL_BALLOT: "prov-ballot-bchart",
@@ -295,37 +219,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     selectedDataset === AnalysisType.VOTER_REGISTRATION &&
     hasDetailedVoterData(normalizedStateKey);
 
-  // Get drop box voting data for current state
-  const getDropBoxVotingData = (): DropBoxVotingData[] => {
-    const stateKey = normalizedStateKey as keyof typeof dropBoxVotingDataJson;
-    return (dropBoxVotingDataJson[stateKey] || []) as DropBoxVotingData[];
-  };
-
-  // Get equipment quality data for current state
-  const getEquipmentQualityData = () => {
-    // The JSON has the structure: { equipmentQualityData: [...], regressionCoefficients: {...} }
-    // Provided JSON is for Arizona (based on counties)
-    // TODO: Adjust to state specific data
-    return {
-      data: (equipmentQualityDataJson.equipmentQualityData || []) as {
-        county: string;
-        equipmentQuality: number;
-        rejectedBallotPercentage: number;
-        totalBallots: number;
-        rejectedBallots: number;
-        dominantParty: "republican" | "democratic";
-        mailInRejected: number;
-        provisionalRejected: number;
-        uocavaRejected: number;
-      }[],
-      regressionCoefficients:
-        equipmentQualityDataJson.regressionCoefficients as {
-          republican: { a: number; b: number; c: number };
-          democratic: { a: number; b: number; c: number };
-        },
-    };
-  };
-
+  // Needed for Map Legend
   const activeVotersData = useMemo(() => {
     if (normalizedStateKey === "california") {
       return activeVotersDataCaliforniaJson;
@@ -334,24 +228,6 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     }
     return activeVotersDataJson;
   }, [normalizedStateKey]);
-
-  const {
-    data: provChartData,
-    isPending: provLoading,
-    isError: provChartHasError,
-    error: provChartError,
-  } = useProvisionalChartQuery(stateFipsPrefix);
-
-  const {
-    data: provTableData,
-    isPending: provTableLoading,
-    isError: provTableHasError,
-    error: provTableError,
-  } = useProvisionalTableQuery(stateFipsPrefix);
-
-  const provErrorMessage = provChartHasError
-    ? (provChartError?.message ?? "Unknown error")
-    : null;
 
   return (
     <div className="h-screen flex flex-col">
@@ -397,7 +273,6 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
             currentCountiesData={currentCountiesData}
             isDetailedState={detailedState}
             choroplethOption={choroplethOption}
-            // censusBlockData={censusBlockData}
             showBubbleChart={showBubbleChart}
             showCvapLegend={isPoliticalPartyState}
             cvapLegendData={activeVotersData}
@@ -413,116 +288,38 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
             </h2>
             <div className="mt-4">
               {selectedDataset === AnalysisType.VOTER_REGISTRATION ? (
-                <div>
-                  {hasDetailedVoterData(normalizedStateKey) && (
-                    <VoterRegistrationTable data={eavsRegionVoterData} />
-                  )}
-                  <div className="mt-4">
-                    <h3 className="text-lg font-semibold mb-2 text-center text-gray-900">
-                      Changes in Voter Registration by County
-                    </h3>
-                    <div className="h-[350px]">
-                      <VoterRegistrationLineChart
-                        data={voterRegistrationData}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <VoterRegistrationView
+                  normalizedStateKey={normalizedStateKey}
+                />
               ) : selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY ? (
-                <div className="h-full">
-                  <StateEquipmentSummaryTable
-                    data={stateEquipmentSummaryJson as StateEquipmentSummary[]}
-                  />
-                </div>
+                <StateEquipmentSummaryView />
               ) : selectedDataset === AnalysisType.PROVISIONAL_BALLOT ? (
-                <div className="text-xs text-muted-foreground text-center">
-                  {provLoading ? (
-                    <p>Loading provisional ballot data...</p>
-                  ) : provErrorMessage ? (
-                    <p className="py-8">
-                      Error loading {stateName} data: {provErrorMessage}
-                    </p>
-                  ) : (
-                    <>
-                      {provTableData && (
-                        <ProvisionBallotsTable
-                          data={provTableData}
-                          isPending={provTableLoading}
-                          isError={provTableHasError}
-                          error={provTableError}
-                        />
-                      )}
-                      {provChartData && (
-                        <div className="mt-4">
-                          <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
-                            Provisional Ballots by Reason
-                          </h3>
-                          <ProvisionalBallotsBarChart
-                            stateName={formatStateName(stateName)}
-                            barData={provChartData}
-                          />
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
+                <ProvisionalBallotView
+                  stateFipsPrefix={stateFipsPrefix}
+                  stateName={formatStateName(stateName)}
+                />
               ) : selectedDataset === AnalysisType.ACTIVE_VOTERS_2024 ? (
-                <div className="text-xs text-muted-foreground text-center">
-                  <ActiveVotersTable data={activeVotersData} />
-                  <div className="mt-4">
-                    <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
-                      Active Voters Status
-                    </h3>
-                    <ActiveVotersBarChart
-                      stateName={formatStateName(stateName)}
-                      barData={activeVotersData}
-                    />
-                  </div>
-                </div>
+                <ActiveVotersView
+                  normalizedStateKey={normalizedStateKey}
+                  stateName={formatStateName(stateName)}
+                />
               ) : selectedDataset === AnalysisType.DROP_BOX_VOTING ? (
-                <div className="h-[600px]">
-                  <DropBoxVotingBubbleChart
-                    stateName={formatStateName(stateName)}
-                    data={getDropBoxVotingData()}
-                  />
-                </div>
+                <DropBoxVotingView
+                  normalizedStateKey={normalizedStateKey}
+                  stateName={formatStateName(stateName)}
+                />
               ) : selectedDataset ===
                 AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS ? (
-                <div className="h-[600px]">
-                  <EquipmentQualityBubbleChart
-                    stateName={formatStateName(stateName)}
-                    data={getEquipmentQualityData().data}
-                    regressionCoefficients={
-                      getEquipmentQualityData().regressionCoefficients
-                    }
-                  />
-                </div>
+                <EquipmentQualityView stateName={formatStateName(stateName)} />
               ) : selectedDataset === AnalysisType.POLLBOOK_DELETIONS_2024 ? (
-                <div className="text-xs text-muted-foreground text-center">
-                  <ActiveVotersTable data={activeVotersData} />
-                  <div className="mt-4">
-                    <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
-                      Pollbook Deletions by Reason
-                    </h3>
-                    <PollbookDeletionsBarChart
-                      stateName={formatStateName(stateName)}
-                      barData={pollbookDeletionsDataJson}
-                    />
-                  </div>
-                </div>
+                <PollbookDeletionsView
+                  normalizedStateKey={normalizedStateKey}
+                  stateName={formatStateName(stateName)}
+                />
               ) : selectedDataset === AnalysisType.MAIL_BALLOTS_REJECTED ? (
-                <div className="text-xs text-muted-foreground text-center">
-                  <MailBallotsRejectedTable data={mailBallotsRejectedData} />
-                  <div className="mt-4">
-                    <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
-                      Mail Ballots Rejected by Reason
-                    </h3>
-                    <MailBallotsRejectedBarChart
-                      stateName={formatStateName(stateName)}
-                      barData={mailBallotsRejectedData}
-                    />
-                  </div>
-                </div>
+                <MailBallotsRejectedView
+                  stateName={formatStateName(stateName)}
+                />
               ) : (
                 <p className="text-xs text-muted-foreground text-center">
                   {analysisTypeLabels[selectedDataset]} visualization will be
