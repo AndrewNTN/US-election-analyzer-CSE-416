@@ -6,7 +6,15 @@ import java.util.Map;
 /**
  * DTO representing list of provisional ballot table data and associated metric labels.
  */
-public record ProvisionalTableResponse(List<ProvisionalTableData> data, Map<String, String> metricLabels) {
+public record ProvisionalTableResponse(List<Data> data, Map<String, String> metricLabels) {
+
+    public record Data(
+            String jurisdictionName,
+            Integer totalProv,
+            Integer provCountFullyCounted,
+            Integer provCountPartialCounted,
+            Integer provRejected,
+            Integer provisionalOtherStatus) {}
 
     public static Map<String, String> getDefaultMetricLabels() {
         return Map.of(

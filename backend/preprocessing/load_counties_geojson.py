@@ -1,4 +1,3 @@
-# python
 import logging
 from pathlib import Path
 from typing import Dict, Optional, Any, Set
@@ -92,6 +91,16 @@ def _validate_and_transform_row(row) -> Optional[Dict]:
 
 
 def load_with_geopandas():
+    # Check if data already exists
+    client = MongoClient(MONGO_URI)
+    db = client[DATABASE_NAME]
+    collection = db[COLLECTION_NAME]
+    if collection.count_documents({}) > 0:
+        logger.info(f"Data already exists in {COLLECTION_NAME}. Skipping load.")
+        client.close()
+        return
+    client.close()
+
     logger.info(f"Reading GeoJSON from local file: {GEOJSON_FILE}")
 
     if not GEOJSON_FILE.exists():

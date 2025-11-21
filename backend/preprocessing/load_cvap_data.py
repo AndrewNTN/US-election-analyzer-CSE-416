@@ -1,9 +1,7 @@
-# python
 import csv
 import logging
 from pathlib import Path
 from typing import Dict, Optional
-
 from pymongo import MongoClient
 
 MONGO_URI = "mongodb://localhost:27017/"
@@ -12,8 +10,6 @@ COLLECTION_NAME = "cvap_data"
 
 # State FIPS codes for filtering
 ALLOWED_STATES = {'06': 'California', '12': 'Florida'}
-
-# Line number mappings for race/ethnicity categories
 LINE_NUMBERS = {
     '1': 'total',       # Total CVAP
     '4': 'asian',       # Asian Alone
@@ -52,6 +48,16 @@ def _parse_county_name(geoname: str) -> str:
 
 def load_cvap_data():
     """Load county CVAP data from CSV file into MongoDB."""
+    
+    # Check if data already exists
+    client = MongoClient(MONGO_URI)
+    db = client[DATABASE_NAME]
+    collection = db[COLLECTION_NAME]
+    if collection.count_documents({}) > 0:
+        logger.info(f"Data already exists in {COLLECTION_NAME}. Skipping load.")
+        client.close()
+        return
+    client.close()
 
     # Get the path to the County.csv file
     script_dir = Path(__file__).parent

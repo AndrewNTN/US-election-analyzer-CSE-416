@@ -1,5 +1,7 @@
 package edu.sbu.cse416.app.controller;
 
+import edu.sbu.cse416.app.dto.activevoters.ActiveVotersChartResponse;
+import edu.sbu.cse416.app.dto.activevoters.ActiveVotersTableResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalTableResponse;
 import edu.sbu.cse416.app.service.EavsService;
@@ -26,6 +28,18 @@ public class EavsController {
     @GetMapping("/provisional/chart/{fipsPrefix}")
     public ResponseEntity<ProvisionalChartResponse> getProvisionalChart(@PathVariable String fipsPrefix) {
         var dto = eavsService.getProvisionalChart(fipsPrefix);
+        return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/active-voters/table/{fipsPrefix}")
+    public ResponseEntity<ActiveVotersTableResponse> getActiveVotersTable(@PathVariable String fipsPrefix) {
+        var response = eavsService.getActiveVotersTable(fipsPrefix);
+        return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/active-voters/chart/{fipsPrefix}")
+    public ResponseEntity<ActiveVotersChartResponse> getActiveVotersChart(@PathVariable String fipsPrefix) {
+        var dto = eavsService.getActiveVotersChart(fipsPrefix);
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 }

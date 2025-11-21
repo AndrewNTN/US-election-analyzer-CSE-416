@@ -393,8 +393,9 @@ def load_eavs_data():
 
     # Check if data already exists
     if collection.count_documents({}) > 0:
-        print("EAVS data already exists in MongoDB. Clearing collection...")
-        collection.delete_many({})
+        print("EAVS data already exists in MongoDB. Skipping load.")
+        client.close()
+        return
 
     # Load data for each year (descending order: 2024 -> 2016)
     for year, filename in sorted(CSV_FILES.items(), reverse=True):

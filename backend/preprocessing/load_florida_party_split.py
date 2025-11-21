@@ -274,6 +274,18 @@ def main():
     """Main execution function"""
     logger.info("Starting Florida vote split data load")
     
+    # Check if data already exists
+    client = MongoClient(MONGO_URI)
+    db = client[DATABASE_NAME]
+    collection = db[COLLECTION_NAME]
+    
+    # Check specifically for Florida data
+    if collection.count_documents({"stateFips": FLORIDA_FIPS}) > 0:
+        logger.info(f"Florida data already exists in {COLLECTION_NAME}. Skipping load.")
+        client.close()
+        return
+    client.close()
+    
     loader = FloridaVoteSplitLoader()
     
     # Process all county files

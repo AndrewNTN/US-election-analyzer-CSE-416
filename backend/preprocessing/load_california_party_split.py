@@ -242,6 +242,18 @@ def main():
     """Main execution function"""
     logger.info("Starting California vote split data load")
 
+    # Check if data already exists
+    client = MongoClient(MONGO_URI)
+    db = client[DATABASE_NAME]
+    collection = db[COLLECTION_NAME]
+    
+    # Check specifically for California data
+    if collection.count_documents({"stateFips": CALIFORNIA_FIPS}) > 0:
+        logger.info(f"California data already exists in {COLLECTION_NAME}. Skipping load.")
+        client.close()
+        return
+    client.close()
+
     loader = CaliforniaVoteSplitLoader()
 
     # Parse CSV file

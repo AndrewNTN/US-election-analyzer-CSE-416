@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 from typing import Dict, Optional, List
+import os
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import requests

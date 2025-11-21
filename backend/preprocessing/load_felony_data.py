@@ -1,4 +1,3 @@
-# python
 import json
 import logging
 from pathlib import Path
@@ -16,6 +15,16 @@ logger = logging.getLogger(__name__)
 
 def load_felony_data():
     """Load felony voting rights data from JSON file into MongoDB."""
+    
+    # Check if data already exists
+    client = MongoClient(MONGO_URI)
+    db = client[DATABASE_NAME]
+    collection = db[COLLECTION_NAME]
+    if collection.count_documents({}) > 0:
+        logger.info(f"Data already exists in {COLLECTION_NAME}. Skipping load.")
+        client.close()
+        return
+    client.close()
 
     # Get the path to the felony_data.json file
     script_dir = Path(__file__).parent
