@@ -35,3 +35,30 @@ export const getProvisionalTable = async (
   fipsPrefix: string,
 ): Promise<ProvisionalTableResponse> =>
   fetchJson(`/eavs/provisional/table/${fipsPrefix}`);
+
+export interface ActiveVotersChartResponse {
+  totalRegistered: number;
+  totalActive: number;
+  totalInactive: number;
+  metricLabels?: Record<string, string>;
+}
+
+export interface ActiveVotersTableResponse {
+  data: {
+    jurisdiction: string;
+    totalRegistered: number;
+    totalActive: number;
+    totalInactive: number;
+  }[];
+  metricLabels?: Record<string, string>;
+}
+
+export const getActiveVotersChart = async (
+  fipsPrefix: string,
+): Promise<ActiveVotersChartResponse> =>
+  fetchJson(`/eavs/active-voters/chart/${fipsPrefix}`);
+
+export const getActiveVotersTable = async (
+  fipsPrefix: string,
+): Promise<ActiveVotersTableResponse> =>
+  fetchJson(`/eavs/active-voters/table/${fipsPrefix}`);

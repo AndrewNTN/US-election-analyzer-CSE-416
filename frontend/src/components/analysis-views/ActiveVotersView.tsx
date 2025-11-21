@@ -1,40 +1,64 @@
-import { useMemo } from "react";
+import {
+  useActiveVotersChartQuery,
+  useActiveVotersTableQuery,
+} from "@/lib/api/use-eavs-queries.ts";
 import { ActiveVotersTable } from "../table/state-tables/active-voters-table.tsx";
-import activeVotersDataJson from "../../../data/activeVotersData.json" with { type: "json" };
-import activeVotersDataCaliforniaJson from "../../../data/activeVotersData-california.json" with { type: "json" };
-import activeVotersDataFloridaJson from "../../../data/activeVotersData-florida.json" with { type: "json" };
 import { ActiveVotersBarChart } from "../chart/active-voters-bar-chart";
 
 interface ActiveVotersViewProps {
-  normalizedStateKey: string;
   stateName: string;
+  stateFipsPrefix?: string;
 }
 
 export function ActiveVotersView({
-  normalizedStateKey,
   stateName,
+  stateFipsPrefix,
 }: ActiveVotersViewProps) {
-  const activeVotersData = useMemo(() => {
-    if (normalizedStateKey === "california") {
-      return activeVotersDataCaliforniaJson;
-    } else if (normalizedStateKey === "florida") {
-      return activeVotersDataFloridaJson;
-    }
-    return activeVotersDataJson;
-  }, [normalizedStateKey]);
+  const {
+    data: chartData,
+    isPending: chartLoading,
+    isError: chartHasError,
+    error: chartError,
+  } = useActiveVotersChartQuery(stateFipsPrefix);
+
+  const {
+    data: tableData,
+  } = useActiveVotersTableQuery(stateFipsPrefix);
+
+  const errorMessage = chartHasError
+    ? (chartError?.message ?? "Unknown error")
+    : null;
 
   return (
     <div className="text-xs text-muted-foreground text-center">
-      <ActiveVotersTable data={activeVotersData} />
-      <div className="mt-4">
-        <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
-          Active Voters Status
-        </h3>
-        <ActiveVotersBarChart
-          stateName={stateName}
-          barData={activeVotersData}
-        />
-      </div>
+      {chartLoading ? (
+        <p>Loading active voters data...</p>
+      ) : errorMessage ? (
+        <p className="py-8">
+          Error loading {stateName} data: {errorMessage}
+        </p>
+      ) : (
+        <>
+          {tableData && (
+            <ActiveVotersTable
+              data={tableData.data}
+              metricLabels={tableData.metricLabels}
+            />
+          )}
+          {chartData && (
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
+                Active Voters Status
+              </h3>
+              <ActiveVotersBarChart
+                stateName={stateName}
+                barData={chartData}
+                metricLabels={chartData.metricLabels}
+              />
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

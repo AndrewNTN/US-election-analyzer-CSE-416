@@ -17,11 +17,26 @@ export function PollbookDeletionsView({
 }: PollbookDeletionsViewProps) {
   const activeVotersData = useMemo(() => {
     if (normalizedStateKey === "california") {
-      return activeVotersDataCaliforniaJson;
+      return activeVotersDataCaliforniaJson.map((item: any) => ({
+        jurisdiction: item.eavsRegion,
+        totalActive: item.activeVoters,
+        totalRegistered: item.totalVoters,
+        totalInactive: item.inactiveVoters,
+      }));
     } else if (normalizedStateKey === "florida") {
-      return activeVotersDataFloridaJson;
+      return activeVotersDataFloridaJson.map((item: any) => ({
+        jurisdiction: item.eavsRegion,
+        totalActive: item.activeVoters,
+        totalRegistered: item.totalVoters,
+        totalInactive: item.inactiveVoters,
+      }));
     }
-    return activeVotersDataJson;
+    return activeVotersDataJson.map((item: any) => ({
+      jurisdiction: item.eavsRegion,
+      totalActive: item.activeVoters,
+      totalRegistered: item.totalVoters,
+      totalInactive: item.inactiveVoters,
+    }));
   }, [normalizedStateKey]);
 
   return (

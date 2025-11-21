@@ -1,38 +1,45 @@
 import { BaseBarChart } from "./base-bar-chart";
 import { formatNumber } from "@/lib/utils";
-
-export interface ActiveVotersData {
-  eavsRegion: string;
-  activeVoters: number;
-  totalVoters: number;
-  inactiveVoters: number;
-  notes: string;
-}
+import { type ActiveVotersChartResponse } from "@/lib/api/eavs-requests";
 
 export interface ActiveVotersBarChartProps {
   stateName: string;
-  barData: ActiveVotersData[];
+  barData: ActiveVotersChartResponse;
+  metricLabels?: Record<string, string>;
 }
 
-const METRIC_KEYS = ["activeVoters", "totalVoters", "inactiveVoters"] as const;
+const METRIC_KEYS = ["totalRegistered", "totalActive", "totalInactive"] as const;
 type MetricKey = (typeof METRIC_KEYS)[number];
 
-const METRIC_LABELS: Record<MetricKey, string> = {
-  activeVoters: "Active Voters",
-  totalVoters: "Total Voters",
-  inactiveVoters: "Inactive Voters",
+const DEFAULT_METRIC_LABELS: Record<MetricKey, string> = {
+  totalRegistered: "Total Voters",
+  totalActive: "Active Voters",
+  totalInactive: "Inactive Voters",
 };
 
 export function ActiveVotersBarChart({
   stateName,
   barData,
+  metricLabels,
 }: ActiveVotersBarChartProps) {
+  // Transform single object response into an array for the chart
+  const chartData = [
+    {
+      name: stateName,
+      totalActive: barData.totalActive,
+      totalRegistered: barData.totalRegistered,
+      totalInactive: barData.totalInactive,
+    },
+  ];
+
+  const labels = { ...DEFAULT_METRIC_LABELS, ...metricLabels };
+
   return (
     <BaseBarChart
       stateName={stateName}
-      barData={barData}
+      barData={chartData}
       metricKeys={METRIC_KEYS}
-      metricLabels={METRIC_LABELS}
+      metricLabels={labels}
       metricAccessor={(data, key) => data[key]}
       yAxisLabel="Number of Voters"
       yAxisTickFormatter={formatNumber}

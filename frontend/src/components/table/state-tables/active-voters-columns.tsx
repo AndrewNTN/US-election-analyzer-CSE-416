@@ -1,48 +1,61 @@
 import type { ColumnDef, Row } from "@tanstack/react-table";
 
 export interface ActiveVotersData {
-  eavsRegion: string;
-  activeVoters: number;
-  totalVoters: number;
-  inactiveVoters: number;
-  registrationRate?: number; // Percentage of CVAP registered (totalVoters / cvap2023 * 100)
-  notes?: string;
+  jurisdiction: string;
+  totalActive: number;
+  totalRegistered: number;
+  totalInactive: number;
+  registrationRate?: number;
 }
 
-export const activeVotersColumns: ColumnDef<ActiveVotersData>[] = [
+export const getActiveVotersColumns = (
+  metricLabels?: Record<string, string>,
+): ColumnDef<ActiveVotersData>[] => [
   {
-    accessorKey: "eavsRegion",
+    accessorKey: "jurisdiction",
     header: () => <div className="text-left">Region</div>,
     cell: ({ row }: { row: Row<ActiveVotersData> }) => (
       <div className="text-sm text-left text-black font-medium">
-        {row.getValue("eavsRegion")}
+        {row.getValue("jurisdiction")}
       </div>
     ),
   },
   {
-    accessorKey: "activeVoters",
-    header: () => <div className="text-right">Active Voters</div>,
+    accessorKey: "totalRegistered",
+    header: () => (
+      <div className="text-right">
+        {metricLabels?.totalRegistered ?? "Total Voters"}
+      </div>
+    ),
     cell: ({ row }: { row: Row<ActiveVotersData> }) => (
       <div className="text-sm text-right text-black">
-        {(row.getValue("activeVoters") as number).toLocaleString()}
+        {(row.getValue("totalRegistered") as number).toLocaleString()}
       </div>
     ),
   },
   {
-    accessorKey: "totalVoters",
-    header: () => <div className="text-right">Total Voters</div>,
+    accessorKey: "totalActive",
+    header: () => (
+      <div className="text-right">
+        {metricLabels?.totalActive ?? "Active Voters"}
+      </div>
+    ),
     cell: ({ row }: { row: Row<ActiveVotersData> }) => (
       <div className="text-sm text-right text-black">
-        {(row.getValue("totalVoters") as number).toLocaleString()}
+        {(row.getValue("totalActive") as number).toLocaleString()}
       </div>
     ),
   },
   {
-    accessorKey: "inactiveVoters",
-    header: () => <div className="text-right">Inactive Voters</div>,
+    accessorKey: "totalInactive",
+    header: () => (
+      <div className="text-right">
+        {metricLabels?.totalInactive ?? "Inactive Voters"}
+      </div>
+    ),
     cell: ({ row }: { row: Row<ActiveVotersData> }) => (
       <div className="text-sm text-right text-black">
-        {(row.getValue("inactiveVoters") as number).toLocaleString()}
+        {(row.getValue("totalInactive") as number).toLocaleString()}
       </div>
     ),
   },

@@ -222,11 +222,26 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
   // Needed for Map Legend
   const activeVotersData = useMemo(() => {
     if (normalizedStateKey === "california") {
-      return activeVotersDataCaliforniaJson;
+      return activeVotersDataCaliforniaJson.map((item: any) => ({
+        jurisdiction: item.eavsRegion,
+        totalActive: item.activeVoters,
+        totalRegistered: item.totalVoters,
+        totalInactive: item.inactiveVoters,
+      }));
     } else if (normalizedStateKey === "florida") {
-      return activeVotersDataFloridaJson;
+      return activeVotersDataFloridaJson.map((item: any) => ({
+        jurisdiction: item.eavsRegion,
+        totalActive: item.activeVoters,
+        totalRegistered: item.totalVoters,
+        totalInactive: item.inactiveVoters,
+      }));
     }
-    return activeVotersDataJson;
+    return activeVotersDataJson.map((item: any) => ({
+      jurisdiction: item.eavsRegion,
+      totalActive: item.activeVoters,
+      totalRegistered: item.totalVoters,
+      totalInactive: item.inactiveVoters,
+    }));
   }, [normalizedStateKey]);
 
   return (
@@ -300,8 +315,8 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                 />
               ) : selectedDataset === AnalysisType.ACTIVE_VOTERS_2024 ? (
                 <ActiveVotersView
-                  normalizedStateKey={normalizedStateKey}
                   stateName={formatStateName(stateName)}
+                  stateFipsPrefix={stateFipsPrefix}
                 />
               ) : selectedDataset === AnalysisType.DROP_BOX_VOTING ? (
                 <DropBoxVotingView
