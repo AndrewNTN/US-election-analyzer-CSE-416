@@ -9,7 +9,7 @@ DATABASE_NAME = "cse416"
 COLLECTION_NAME = "cvap_data"
 
 # State FIPS codes for filtering
-ALLOWED_STATES = {'06': 'California', '12': 'Florida'}
+ALLOWED_STATES = {'06': 'California', '12': 'Florida', '41': 'Oregon'}
 LINE_NUMBERS = {
     '1': 'total',       # Total CVAP
     '4': 'asian',       # Asian Alone

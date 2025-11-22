@@ -231,3 +231,46 @@ export const getStateComparison = async (
   fetchJson(
     `/state-comparison?republicanStateFips=${republicanStateFips}&democraticStateFips=${democraticStateFips}`,
   );
+
+export interface EarlyVotingComparisonRow {
+  metric: string;
+  republicanValue: string;
+  democraticValue: string;
+}
+
+export interface EarlyVotingComparisonResponse {
+  data: EarlyVotingComparisonRow[];
+  republicanState: string;
+  democraticState: string;
+}
+
+export const getEarlyVotingComparison = async (
+  republicanStateFips: string,
+  democraticStateFips: string,
+): Promise<EarlyVotingComparisonResponse> =>
+  fetchJson(
+    `/early-voting-comparison?republicanStateFips=${republicanStateFips}&democraticStateFips=${democraticStateFips}`,
+  );
+
+export interface OptInOptOutComparisonRow {
+  metric: string;
+  optInValue: string;
+  optOutWithSameDayValue: string;
+  optOutWithoutSameDayValue: string;
+}
+
+export interface OptInOptOutComparisonResponse {
+  data: OptInOptOutComparisonRow[];
+  optInState: string;
+  optOutWithSameDayState: string;
+  optOutWithoutSameDayState: string;
+}
+
+export const getOptInOptOutComparison = async (
+  optInFips: string,
+  optOutSameDayFips: string,
+  optOutNoSameDayFips: string,
+): Promise<OptInOptOutComparisonResponse> =>
+  fetchJson(
+    `/opt-in-opt-out-comparison?optInFips=${optInFips}&optOutSameDayFips=${optOutSameDayFips}&optOutNoSameDayFips=${optOutNoSameDayFips}`,
+  );

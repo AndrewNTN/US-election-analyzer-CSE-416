@@ -2,35 +2,38 @@ package edu.sbu.cse416.app.service;
 
 import edu.sbu.cse416.app.dto.activevoters.ActiveVotersChartResponse;
 import edu.sbu.cse416.app.dto.activevoters.ActiveVotersTableResponse;
+import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
+import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonResponse;
+import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonRow;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedChartResponse;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedTableResponse;
+import edu.sbu.cse416.app.dto.optinoptout.OptInOptOutComparisonResponse;
+import edu.sbu.cse416.app.dto.optinoptout.OptInOptOutComparisonRow;
 import edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalTableResponse;
+import edu.sbu.cse416.app.dto.statecomparison.StateComparisonResponse;
+import edu.sbu.cse416.app.dto.statecomparison.StateComparisonRow;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationChartResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationTableResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentChartResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentDTO;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentTableResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentYearlyDTO;
-import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
-import edu.sbu.cse416.app.dto.statecomparison.StateComparisonRow;
-import edu.sbu.cse416.app.dto.statecomparison.StateComparisonResponse;
 import edu.sbu.cse416.app.model.CvapData;
 import edu.sbu.cse416.app.model.FelonyVoting;
 import edu.sbu.cse416.app.model.eavs.*;
-import edu.sbu.cse416.app.repository.EavsDataRepository;
-import edu.sbu.cse416.app.repository.StateVoterRegistrationRepository;
 import edu.sbu.cse416.app.repository.CvapDataRepository;
+import edu.sbu.cse416.app.repository.EavsDataRepository;
 import edu.sbu.cse416.app.repository.FelonyVotingRepository;
+import edu.sbu.cse416.app.repository.StateVoterRegistrationRepository;
 import edu.sbu.cse416.app.util.RecordAggregator;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
-
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
 @Service
 public class VoterDataService {
@@ -40,8 +43,11 @@ public class VoterDataService {
     private final CvapDataRepository cvapRepo;
     private final FelonyVotingRepository felonyVotingRepo;
 
-    public VoterDataService(EavsDataRepository repo, StateVoterRegistrationRepository voterRegRepo, 
-                            CvapDataRepository cvapRepo, FelonyVotingRepository felonyVotingRepo) {
+    public VoterDataService(
+            EavsDataRepository repo,
+            StateVoterRegistrationRepository voterRegRepo,
+            CvapDataRepository cvapRepo,
+            FelonyVotingRepository felonyVotingRepo) {
         this.repo = repo;
         this.voterRegRepo = voterRegRepo;
         this.cvapRepo = cvapRepo;
@@ -249,19 +255,24 @@ public class VoterDataService {
      */
     @Cacheable(value = "votingEquipmentTable")
     public VotingEquipmentTableResponse getVotingEquipmentTable() {
-        // Get all data for year 2024 by filtering (continental US states only - exclude territories and non-continental states)
+        // Get all data for year 2024 by filtering (continental US states only - exclude territories and non-continental
+        // states)
         List<EavsData> allData = repo.findByFipsCodeAllYears("^");
-        
+
         List<String> excludedStates = List.of(
-            "ALASKA", "HAWAII", "GUAM", "AMERICAN SAMOA", "PUERTO RICO", 
-            "U.S. VIRGIN ISLANDS", "NORTHERN MARIANA ISLANDS", "DISTRICT OF COLUMBIA"
-        );
-        
+                "ALASKA",
+                "HAWAII",
+                "GUAM",
+                "AMERICAN SAMOA",
+                "PUERTO RICO",
+                "U.S. VIRGIN ISLANDS",
+                "NORTHERN MARIANA ISLANDS",
+                "DISTRICT OF COLUMBIA");
+
         List<EavsData> data = allData.stream()
-            .filter(record -> record.electionYear() != null && record.electionYear() == 2024)
-            .filter(record -> record.stateFull() != null && 
-                              !excludedStates.contains(record.stateFull()))
-            .toList();
+                .filter(record -> record.electionYear() != null && record.electionYear() == 2024)
+                .filter(record -> record.stateFull() != null && !excludedStates.contains(record.stateFull()))
+                .toList();
 
         Map<String, VotingEquipmentDTO> stateMap = new HashMap<>();
 
@@ -271,24 +282,25 @@ public class VoterDataService {
             String state = record.stateFull();
             Equipment eq = record.equipment();
 
-            stateMap.merge(state, new VotingEquipmentDTO(
-                state,
-                eq.dreNoVVPAT() != null ? eq.dreNoVVPAT() : 0,
-                eq.dreWithVVPAT() != null ? eq.dreWithVVPAT() : 0,
-                eq.ballotMarkingDevice() != null ? eq.ballotMarkingDevice() : 0,
-                eq.scanner() != null ? eq.scanner() : 0
-            ), (v1, v2) -> new VotingEquipmentDTO(
-                state,
-                v1.dreNoVVPAT() + v2.dreNoVVPAT(),
-                v1.dreWithVVPAT() + v2.dreWithVVPAT(),
-                v1.ballotMarkingDevice() + v2.ballotMarkingDevice(),
-                v1.scanner() + v2.scanner()
-            ));
+            stateMap.merge(
+                    state,
+                    new VotingEquipmentDTO(
+                            state,
+                            eq.dreNoVVPAT() != null ? eq.dreNoVVPAT() : 0,
+                            eq.dreWithVVPAT() != null ? eq.dreWithVVPAT() : 0,
+                            eq.ballotMarkingDevice() != null ? eq.ballotMarkingDevice() : 0,
+                            eq.scanner() != null ? eq.scanner() : 0),
+                    (v1, v2) -> new VotingEquipmentDTO(
+                            state,
+                            v1.dreNoVVPAT() + v2.dreNoVVPAT(),
+                            v1.dreWithVVPAT() + v2.dreWithVVPAT(),
+                            v1.ballotMarkingDevice() + v2.ballotMarkingDevice(),
+                            v1.scanner() + v2.scanner()));
         }
 
         List<VotingEquipmentDTO> sortedData = stateMap.values().stream()
-            .sorted(Comparator.comparing(VotingEquipmentDTO::state))
-            .collect(java.util.stream.Collectors.toList());
+                .sorted(Comparator.comparing(VotingEquipmentDTO::state))
+                .collect(java.util.stream.Collectors.toList());
 
         return new VotingEquipmentTableResponse(sortedData, VotingEquipmentTableResponse.getDefaultMetricLabels());
     }
@@ -301,16 +313,13 @@ public class VoterDataService {
         // Query all years and filter by state name
         List<EavsData> allData = repo.findByFipsCodeAllYears("^");
         List<EavsData> data = allData.stream()
-            .filter(record -> record.stateFull() != null && 
-                              record.stateFull().equalsIgnoreCase(stateName))
-            .toList();
+                .filter(record ->
+                        record.stateFull() != null && record.stateFull().equalsIgnoreCase(stateName))
+                .toList();
 
         if (data.isEmpty()) {
             return new VotingEquipmentChartResponse(
-                List.of(),
-                VotingEquipmentChartResponse.getDefaultMetricLabels(),
-                "Year",
-                "Quantity");
+                    List.of(), VotingEquipmentChartResponse.getDefaultMetricLabels(), "Year", "Quantity");
         }
 
         Map<Integer, VotingEquipmentYearlyDTO> yearMap = new HashMap<>();
@@ -321,30 +330,28 @@ public class VoterDataService {
             Integer year = record.electionYear();
             Equipment eq = record.equipment();
 
-            yearMap.merge(year, new VotingEquipmentYearlyDTO(
-                year,
-                eq.dreNoVVPAT() != null ? eq.dreNoVVPAT() : 0,
-                eq.dreWithVVPAT() != null ? eq.dreWithVVPAT() : 0,
-                eq.ballotMarkingDevice() != null ? eq.ballotMarkingDevice() : 0,
-                eq.scanner() != null ? eq.scanner() : 0
-            ), (v1, v2) -> new VotingEquipmentYearlyDTO(
-                year,
-                v1.dreNoVVPAT() + v2.dreNoVVPAT(),
-                v1.dreWithVVPAT() + v2.dreWithVVPAT(),
-                v1.ballotMarkingDevice() + v2.ballotMarkingDevice(),
-                v1.scanner() + v2.scanner()
-            ));
+            yearMap.merge(
+                    year,
+                    new VotingEquipmentYearlyDTO(
+                            year,
+                            eq.dreNoVVPAT() != null ? eq.dreNoVVPAT() : 0,
+                            eq.dreWithVVPAT() != null ? eq.dreWithVVPAT() : 0,
+                            eq.ballotMarkingDevice() != null ? eq.ballotMarkingDevice() : 0,
+                            eq.scanner() != null ? eq.scanner() : 0),
+                    (v1, v2) -> new VotingEquipmentYearlyDTO(
+                            year,
+                            v1.dreNoVVPAT() + v2.dreNoVVPAT(),
+                            v1.dreWithVVPAT() + v2.dreWithVVPAT(),
+                            v1.ballotMarkingDevice() + v2.ballotMarkingDevice(),
+                            v1.scanner() + v2.scanner()));
         }
 
         List<VotingEquipmentYearlyDTO> sortedData = yearMap.values().stream()
-            .sorted(Comparator.comparing(VotingEquipmentYearlyDTO::year))
-            .collect(java.util.stream.Collectors.toList());
+                .sorted(Comparator.comparing(VotingEquipmentYearlyDTO::year))
+                .collect(java.util.stream.Collectors.toList());
 
         return new VotingEquipmentChartResponse(
-            sortedData,
-            VotingEquipmentChartResponse.getDefaultMetricLabels(),
-            "Year",
-            "Quantity");
+                sortedData, VotingEquipmentChartResponse.getDefaultMetricLabels(), "Year", "Quantity");
     }
 
     /**
@@ -422,19 +429,19 @@ public class VoterDataService {
     @Cacheable(value = "cvapRegistrationRate", key = "#fipsPrefix")
     public CvapRegistrationRateResponse getCvapRegistrationRate(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        
+
         // Get EAVS 2024 data for the state
         List<EavsData> eavsData = repo.findByFipsCode("^" + prefix);
-        
-        // Get CVAP data for the state  
+
+        // Get CVAP data for the state
         List<CvapData> cvapDataList = cvapRepo.findByGeoidPrefix("^" + prefix);
-        
+
         // Create map of geoid -> cvap data for easy lookup
         Map<String, CvapData> cvapMap = new HashMap<>();
         for (CvapData cvap : cvapDataList) {
             cvapMap.put(cvap.geoid(), cvap);
         }
-        
+
         // Aggregate totals across all counties
         long totalRegisteredVoters = 0;
         long totalCvapEstimate = 0;
@@ -443,33 +450,32 @@ public class VoterDataService {
         for (EavsData eavs : eavsData) {
             eavsCounties++;
             if (eavs.fipsCode() == null || eavs.voterRegistration() == null) continue;
-            
+
             // Truncate EAVS FIPS code to 5 digits to match CVAP geoid format
             // EAVS uses 10-digit codes like "1200100000", CVAP uses 5-digit like "12001"
-            String eavsFips = eavs.fipsCode().length() >= 5 
-                ? eavs.fipsCode().substring(0, 5) 
-                : eavs.fipsCode();
-            
+            String eavsFips = eavs.fipsCode().length() >= 5 ? eavs.fipsCode().substring(0, 5) : eavs.fipsCode();
+
             // Match EAVS data with CVAP data by FIPS code
             CvapData cvap = cvapMap.get(eavsFips);
             if (cvap == null) {
                 if (eavsCounties <= 3) {
-                    System.out.println("No CVAP match for EAVS FIPS: " + eavs.fipsCode() + " (truncated: " + eavsFips + ")");
+                    System.out.println(
+                            "No CVAP match for EAVS FIPS: " + eavs.fipsCode() + " (truncated: " + eavsFips + ")");
                 }
                 continue;
             }
-            
+
             if (cvap.totalCvapEstimate() == null || cvap.totalCvapEstimate() == 0) {
                 continue;
             }
-            
+
             Integer registered = eavs.voterRegistration().totalRegistered();
             if (registered == null || registered == 0) continue;
 
             totalRegisteredVoters += registered;
             totalCvapEstimate += cvap.totalCvapEstimate();
         }
-        
+
         // Calculate state-level registration rate
         double rate = 0.0;
         if (totalCvapEstimate > 0) {
@@ -477,10 +483,7 @@ public class VoterDataService {
             rate = Math.round(rate * 100.0) / 100.0; // Round to 2 decimal places
         }
 
-        return new CvapRegistrationRateResponse(
-            rate,
-            CvapRegistrationRateResponse.getDefaultLabel()
-        );
+        return new CvapRegistrationRateResponse(rate, CvapRegistrationRateResponse.getDefaultLabel());
     }
 
     /**
@@ -492,7 +495,7 @@ public class VoterDataService {
         // Get data for both states
         var repData = getStateAggregateData(republicanStateFips);
         var demData = getStateAggregateData(democraticStateFips);
-        
+
         // Get raw values
         long repMailBallots = (Long) repData.get("mailBallots");
         long demMailBallots = (Long) demData.get("mailBallots");
@@ -500,11 +503,11 @@ public class VoterDataService {
         long demDropBox = (Long) demData.get("dropBox");
         long repTotalVotes = (Long) repData.get("totalVotesCast");
         long demTotalVotes = (Long) demData.get("totalVotesCast");
-        long repVoterReg = (Long) repData.get("voterRegistration");
-        long demVoterReg = (Long) demData.get("voterRegistration");
+        long repVoterReg = (Long) repData.get("activeRegistration");
+        long demVoterReg = (Long) demData.get("activeRegistration");
         long repCvap = (Long) repData.get("totalCvap");
         long demCvap = (Long) demData.get("totalCvap");
-        
+
         // Calculate percentages
         double repMailPct = repTotalVotes > 0 ? (repMailBallots / (double) repTotalVotes) * 100 : 0;
         double demMailPct = demTotalVotes > 0 ? (demMailBallots / (double) demTotalVotes) * 100 : 0;
@@ -512,121 +515,291 @@ public class VoterDataService {
         double demDropPct = demTotalVotes > 0 ? (demDropBox / (double) demTotalVotes) * 100 : 0;
         double repVoterRegRate = repCvap > 0 ? (repVoterReg / (double) repCvap) * 100 : 0;
         double demVoterRegRate = demCvap > 0 ? (demVoterReg / (double) demCvap) * 100 : 0;
-        
+
         // Turnout is already calculated as percentage
         double repTurnout = ((Number) repData.get("turnout")).doubleValue() / 100.0;
         double demTurnout = ((Number) demData.get("turnout")).doubleValue() / 100.0;
-        
+
         String repFelony = (String) repData.get("felonyVotingRights");
         String demFelony = (String) demData.get("felonyVotingRights");
-        
+
         // Create rows matching the original mock data structure
         List<StateComparisonRow> rows = List.of(
-            new StateComparisonRow("Felony Voting Rights", 
-                                  repFelony != null ? repFelony : "N/A", 
-                                  demFelony != null ? demFelony : "N/A"),
-            new StateComparisonRow("Mail Ballots (Count)",
-                                  String.format("%,d", repMailBallots), 
-                                  String.format("%,d", demMailBallots)),
-            new StateComparisonRow("Mail Ballots (%)", 
-                                  String.format("%.1f%%", repMailPct),
-                                  String.format("%.1f%%", demMailPct)),
-            new StateComparisonRow("Drop Box Ballots (Count)",
-                                  String.format("%,d", repDropBox), 
-                                  String.format("%,d", demDropBox)),
-            new StateComparisonRow("Drop Box Ballots (%)", 
-                                  String.format("%.1f%%", repDropPct),
-                                  String.format("%.1f%%", demDropPct)),
-            new StateComparisonRow("Turnout (Count)",
-                                  String.format("%,d", repTotalVotes), 
-                                  String.format("%,d", demTotalVotes)),
-            new StateComparisonRow("Turnout (%)", 
-                                  String.format("%.1f%%", repTurnout),
-                                  String.format("%.1f%%", demTurnout)),
-            new StateComparisonRow("Voter Registration (Count)",
-                                  String.format("%,d", repVoterReg), 
-                                  String.format("%,d", demVoterReg)),
-            new StateComparisonRow("Voter Registration (%)", 
-                                  String.format("%.1f%%", repVoterRegRate),
-                                  String.format("%.1f%%", demVoterRegRate))
-        );
-        
-        return new StateComparisonResponse(
-            rows,
-            (String) repData.get("stateName"),
-            (String) demData.get("stateName")
-        );
+                new StateComparisonRow(
+                        "Felony Voting Rights",
+                        repFelony != null ? repFelony : "N/A",
+                        demFelony != null ? demFelony : "N/A"),
+                new StateComparisonRow(
+                        "Mail Ballots (Count)",
+                        String.format("%,d", repMailBallots),
+                        String.format("%,d", demMailBallots)),
+                new StateComparisonRow(
+                        "Mail Ballots (%)", String.format("%.1f%%", repMailPct), String.format("%.1f%%", demMailPct)),
+                new StateComparisonRow(
+                        "Drop Box Ballots (Count)", String.format("%,d", repDropBox), String.format("%,d", demDropBox)),
+                new StateComparisonRow(
+                        "Drop Box Ballots (%)",
+                        String.format("%.1f%%", repDropPct), String.format("%.1f%%", demDropPct)),
+                new StateComparisonRow(
+                        "Turnout (Count)", String.format("%,d", repTotalVotes), String.format("%,d", demTotalVotes)),
+                new StateComparisonRow(
+                        "Turnout (%)", String.format("%.1f%%", repTurnout), String.format("%.1f%%", demTurnout)),
+                new StateComparisonRow(
+                        "Voter Registration (Count)",
+                        String.format("%,d", repVoterReg),
+                        String.format("%,d", demVoterReg)),
+                new StateComparisonRow(
+                        "Voter Registration (%)",
+                        String.format("%.1f%%", repVoterRegRate), String.format("%.1f%%", demVoterRegRate)));
+
+        return new StateComparisonResponse(rows, (String) repData.get("stateName"), (String) demData.get("stateName"));
     }
-    
+
+    /**
+     * Get early voting comparison data for Republican vs Democratic states.
+     * Returns comparison table with in-person early voting, mail/absentee voting, and total early voting.
+     */
+    @Cacheable(value = "earlyVotingComparison", key = "#republicanStateFips + '-' + #democraticStateFips")
+    public EarlyVotingComparisonResponse getEarlyVotingComparison(
+            String republicanStateFips, String democraticStateFips) {
+        // Get data for both states
+        var repData = getEarlyVotingAggregateData(republicanStateFips);
+        var demData = getEarlyVotingAggregateData(democraticStateFips);
+
+        // Get raw values
+        long repInPersonEarly = (Long) repData.get("inPersonEarlyVoting");
+        long demInPersonEarly = (Long) demData.get("inPersonEarlyVoting");
+        long repMailAbsentee = (Long) repData.get("mailAbsenteeVoting");
+        long demMailAbsentee = (Long) demData.get("mailAbsenteeVoting");
+        long repTotalBallots = (Long) repData.get("totalBallots");
+        long demTotalBallots = (Long) demData.get("totalBallots");
+
+        // Calculate totals
+        long repTotalEarlyVoting = repInPersonEarly + repMailAbsentee;
+        long demTotalEarlyVoting = demInPersonEarly + demMailAbsentee;
+
+        // Calculate percentages
+        double repInPersonPct = repTotalBallots > 0 ? (repInPersonEarly / (double) repTotalBallots) * 100 : 0;
+        double demInPersonPct = demTotalBallots > 0 ? (demInPersonEarly / (double) demTotalBallots) * 100 : 0;
+        double repMailPct = repTotalBallots > 0 ? (repMailAbsentee / (double) repTotalBallots) * 100 : 0;
+        double demMailPct = demTotalBallots > 0 ? (demMailAbsentee / (double) demTotalBallots) * 100 : 0;
+        double repTotalEarlyPct = repTotalBallots > 0 ? (repTotalEarlyVoting / (double) repTotalBallots) * 100 : 0;
+        double demTotalEarlyPct = demTotalBallots > 0 ? (demTotalEarlyVoting / (double) demTotalBallots) * 100 : 0;
+
+        // Create rows
+        List<EarlyVotingComparisonRow> rows = List.of(
+                new EarlyVotingComparisonRow(
+                        "In-Person Early Voting (Count)",
+                        String.format("%,d", repInPersonEarly),
+                        String.format("%,d", demInPersonEarly)),
+                new EarlyVotingComparisonRow(
+                        "In-Person Early Voting (%)",
+                        String.format("%.1f%%", repInPersonPct), String.format("%.1f%%", demInPersonPct)),
+                new EarlyVotingComparisonRow(
+                        "Mail/Absentee Voting (Count)",
+                        String.format("%,d", repMailAbsentee),
+                        String.format("%,d", demMailAbsentee)),
+                new EarlyVotingComparisonRow(
+                        "Mail/Absentee Voting (%)",
+                        String.format("%.1f%%", repMailPct), String.format("%.1f%%", demMailPct)),
+                new EarlyVotingComparisonRow(
+                        "Total Early Voting (Count)",
+                        String.format("%,d", repTotalEarlyVoting),
+                        String.format("%,d", demTotalEarlyVoting)),
+                new EarlyVotingComparisonRow(
+                        "Total Early Voting (%)",
+                        String.format("%.1f%%", repTotalEarlyPct), String.format("%.1f%%", demTotalEarlyPct)));
+
+        return new EarlyVotingComparisonResponse(
+                rows, (String) repData.get("stateName"), (String) demData.get("stateName"));
+    }
+
+    /**
+     * Get comparison data for Opt-in vs Opt-out states.
+     */
+    @Cacheable(
+            value = "optInOptOutComparison",
+            key = "#optInFips + '-' + #optOutSameDayFips + '-' + #optOutNoSameDayFips")
+    public OptInOptOutComparisonResponse getOptInOptOutComparison(
+            String optInFips, String optOutSameDayFips, String optOutNoSameDayFips) {
+        var optInData = getStateAggregateData(optInFips);
+        var optOutSameDayData = getStateAggregateData(optOutSameDayFips);
+        var optOutNoSameDayData = getStateAggregateData(optOutNoSameDayFips);
+
+        // Helper to extract values
+        long optInReg = (long) optInData.getOrDefault("voterRegistration", 0L);
+        long optInActive = (long) optInData.getOrDefault("activeRegistration", 0L);
+        long optInCvap = (long) optInData.getOrDefault("totalCvap", 0L);
+        long optInVotes = (long) optInData.getOrDefault("totalVotesCast", 0L);
+        long optInTurnout = (long) optInData.getOrDefault("turnout", 0L);
+
+        long optOutSameDayReg = (long) optOutSameDayData.getOrDefault("voterRegistration", 0L);
+        long optOutSameDayActive = (long) optOutSameDayData.getOrDefault("activeRegistration", 0L);
+        long optOutSameDayCvap = (long) optOutSameDayData.getOrDefault("totalCvap", 0L);
+        long optOutSameDayVotes = (long) optOutSameDayData.getOrDefault("totalVotesCast", 0L);
+        long optOutSameDayTurnout = (long) optOutSameDayData.getOrDefault("turnout", 0L);
+
+        long optOutNoSameDayReg = (long) optOutNoSameDayData.getOrDefault("voterRegistration", 0L);
+        long optOutNoSameDayActive = (long) optOutNoSameDayData.getOrDefault("activeRegistration", 0L);
+        long optOutNoSameDayCvap = (long) optOutNoSameDayData.getOrDefault("totalCvap", 0L);
+        long optOutNoSameDayVotes = (long) optOutNoSameDayData.getOrDefault("totalVotesCast", 0L);
+        long optOutNoSameDayTurnout = (long) optOutNoSameDayData.getOrDefault("turnout", 0L);
+
+        // Calculate percentages
+        double optInActivePct = optInCvap > 0 ? (optInActive / (double) optInCvap) * 100 : 0;
+        double optOutSameDayActivePct =
+                optOutSameDayCvap > 0 ? (optOutSameDayActive / (double) optOutSameDayCvap) * 100 : 0;
+        double optOutNoSameDayActivePct =
+                optOutNoSameDayCvap > 0 ? (optOutNoSameDayActive / (double) optOutNoSameDayCvap) * 100 : 0;
+
+        List<OptInOptOutComparisonRow> rows = List.of(
+                new OptInOptOutComparisonRow(
+                        "Voter Registration (Count)",
+                        String.format("%,d", optInReg),
+                        String.format("%,d", optOutSameDayReg),
+                        String.format("%,d", optOutNoSameDayReg)),
+                new OptInOptOutComparisonRow(
+                        "Voter Registration (%)",
+                        String.format("%.1f%%", optInActivePct),
+                        String.format("%.1f%%", optOutSameDayActivePct),
+                        String.format("%.1f%%", optOutNoSameDayActivePct)),
+                new OptInOptOutComparisonRow(
+                        "Turnout (Votes)",
+                        String.format("%,d", optInVotes),
+                        String.format("%,d", optOutSameDayVotes),
+                        String.format("%,d", optOutNoSameDayVotes)),
+                new OptInOptOutComparisonRow(
+                        "Turnout (%)",
+                        String.format("%.1f%%", optInTurnout / 100.0),
+                        String.format("%.1f%%", optOutSameDayTurnout / 100.0),
+                        String.format("%.1f%%", optOutNoSameDayTurnout / 100.0)));
+
+        return new OptInOptOutComparisonResponse(
+                rows, (String) optInData.get("stateName"), (String) optOutSameDayData.get("stateName"), (String)
+                        optOutNoSameDayData.get("stateName"));
+    }
+
+    /**
+     * Helper method to aggregate early voting data for a state.
+     */
+    private Map<String, Object> getEarlyVotingAggregateData(String stateFips) {
+        Map<String, Object> result = new HashMap<>();
+
+        // Get EAVS data for the state
+        List<EavsData> eavsData = repo.findByFipsCode("^" + stateFips);
+
+        long inPersonEarlyVoting = 0;
+        long mailAbsenteeVoting = 0;
+        long totalBallots = 0;
+        String stateName = "Unknown";
+
+        for (EavsData eavs : eavsData) {
+            if (eavs.stateFull() != null && stateName.equals("Unknown")) {
+                stateName = eavs.stateFull();
+            }
+
+            // In-Person Early Voting (F1f)
+            if (eavs.inPersonEarlyVoting() != null) {
+                inPersonEarlyVoting += nz(eavs.inPersonEarlyVoting());
+            }
+
+            // Mail/Absentee Voting (F1d or F1g - use mailCountedTotal which is F1d)
+            if (eavs.mailCountedTotal() != null) {
+                mailAbsenteeVoting += nz(eavs.mailCountedTotal());
+            }
+
+            // Total Ballots
+            if (eavs.totalBallots() != null) {
+                totalBallots += nz(eavs.totalBallots());
+            }
+        }
+
+        result.put("inPersonEarlyVoting", inPersonEarlyVoting);
+        result.put("mailAbsenteeVoting", mailAbsenteeVoting);
+        result.put("totalBallots", totalBallots);
+        result.put("stateName", stateName);
+
+        return result;
+    }
+
     /**
      * Helper method to aggregate state-level data from EAVS and CVAP for state comparison
      */
     private Map<String, Object> getStateAggregateData(String stateFips) {
         Map<String, Object> result = new HashMap<>();
-        
+
         // Get EAVS data for the state
         List<EavsData> eavsData = repo.findByFipsCode("^" + stateFips);
-        
+
         // Get CVAP data for the state
         List<CvapData> cvapDataList = cvapRepo.findByGeoidPrefix("^" + stateFips);
-        
+
         // Get felony voting rights
         var felonyData = felonyVotingRepo.findByStateFips(stateFips);
-        result.put("felonyVotingRights", felonyData.map(FelonyVoting::felonyVotingRights).orElse("N/A"));
-        
+        result.put(
+                "felonyVotingRights",
+                felonyData.map(FelonyVoting::felonyVotingRights).orElse("N/A"));
+
         // Aggregate metrics
         long totalMailBallots = 0;
         long totalDropBox = 0;
         long totalVotesCast = 0;
         long totalRegistered = 0;
+        long totalActive = 0;
         long totalCvap = 0;
         String stateName = "Unknown";
-        
+
         for (EavsData eavs : eavsData) {
             if (eavs.stateFull() != null && stateName.equals("Unknown")) {
                 stateName = eavs.stateFull();
             }
-            
-            // Mail ballots (C8a) - use mailBallotsCountedTotal field (counted ballots, not transmitted)
-            if (eavs.mailBallotsCountedTotal() != null) {
-                totalMailBallots += nz(eavs.mailBallotsCountedTotal());
+
+            // Mail ballots (C8a) - use mailBallotsReturned field (counted ballots, not transmitted)
+            if (eavs.mailBallotsReturned() != null) {
+                totalMailBallots += nz(eavs.mailBallotsReturned());
             }
-            
+
             // Drop box ballots (C6a) - Total mail ballots returned via drop box
             if (eavs.dropBoxesTotal() != null) {
                 totalDropBox += nz(eavs.dropBoxesTotal());
             }
-            
+
             // Total votes cast (F1a) - use totalBallots field
             if (eavs.totalBallots() != null) {
                 totalVotesCast += nz(eavs.totalBallots());
             }
-            
-            // Voter registration (A1a)
-            if (eavs.voterRegistration() != null && eavs.voterRegistration().totalRegistered() != null) {
-                totalRegistered += nz(eavs.voterRegistration().totalRegistered());
+
+            // Voter registration (A1a) and Active (A1b)
+            if (eavs.voterRegistration() != null) {
+                if (eavs.voterRegistration().totalRegistered() != null) {
+                    totalRegistered += nz(eavs.voterRegistration().totalRegistered());
+                }
+                if (eavs.voterRegistration().totalActive() != null) {
+                    totalActive += nz(eavs.voterRegistration().totalActive());
+                }
             }
         }
-        
+
         // Aggregate CVAP
         for (CvapData cvap : cvapDataList) {
             if (cvap.totalCvapEstimate() != null) {
                 totalCvap += cvap.totalCvapEstimate();
             }
         }
-        
+
         // Calculate turnout percentage (F1a / CVAP_est * 100)
         double turnout = totalCvap > 0 ? (totalVotesCast / (double) totalCvap) * 100 * 100 : 0;
         turnout = Math.round(turnout) / 100.0;
-        
+
         result.put("mailBallots", totalMailBallots);
         result.put("dropBox", totalDropBox);
         result.put("totalVotesCast", totalVotesCast);
         result.put("turnout", (long) (turnout * 100)); // Store as basis points for formatting
         result.put("voterRegistration", totalRegistered);
+        result.put("activeRegistration", totalActive);
         result.put("totalCvap", totalCvap);
         result.put("stateName", stateName);
-        
+
         return result;
     }
 }

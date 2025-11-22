@@ -15,19 +15,10 @@ import { EarlyVotingTable } from "@/components/table/early-voting-table.tsx";
 import {
   useVotingEquipmentTableQuery,
   useStateComparisonQuery,
+  useEarlyVotingComparisonQuery,
+  useOptInOptOutComparisonQuery,
 } from "@/lib/api/use-queries.ts";
 import equipmentSummaryDataJson from "../../data/equipmentSummary.json" with { type: "json" };
-import {
-  optInOptOutData,
-  optInStateName,
-  optOutWithSameDayStateName,
-  optOutWithoutSameDayStateName,
-} from "@/lib/opt-in-opt-out-data.ts";
-import {
-  earlyVotingData,
-  earlyVotingRepublicanStateName,
-  earlyVotingDemocraticStateName,
-} from "@/lib/early-voting-data.ts";
 
 import type { AnalysisItem } from "./analysis-drawer";
 
@@ -72,6 +63,22 @@ export default function AnalysisModal({
         selectedAnalysis?.title === AnalysisOption.REPUBLICAN_VS_DEMOCRATIC,
     });
 
+  // Only query early voting comparison data when Early Voting Comparison analysis is selected
+  const {
+    data: earlyVotingComparisonData,
+    isLoading: isEarlyVotingComparisonLoading,
+  } = useEarlyVotingComparisonQuery("12", "06", {
+    enabled: selectedAnalysis?.title === AnalysisOption.EARLY_VOTING_COMPARISON,
+  });
+
+  // Only query opt-in vs opt-out comparison data when Opt-in vs Opt-out analysis is selected
+  const {
+    data: optInOptOutComparisonData,
+    isLoading: isOptInOptOutComparisonLoading,
+  } = useOptInOptOutComparisonQuery("12", "06", "41", {
+    enabled: selectedAnalysis?.title === AnalysisOption.OPT_IN_VS_OPT_OUT,
+  });
+
   const votingEquipmentData: VotingEquipment[] =
     votingEquipmentTableData?.data || [];
 
@@ -108,21 +115,45 @@ export default function AnalysisModal({
           </div>
         );
       case AnalysisOption.OPT_IN_VS_OPT_OUT:
-        return (
+        return isOptInOptOutComparisonLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">
+              Loading opt-in vs opt-out comparison...
+            </p>
+          </div>
+        ) : optInOptOutComparisonData ? (
           <OptInOptOutTable
-            data={optInOptOutData}
-            optInState={optInStateName}
-            optOutWithSameDayState={optOutWithSameDayStateName}
-            optOutWithoutSameDayState={optOutWithoutSameDayStateName}
+            data={optInOptOutComparisonData.data}
+            optInState={optInOptOutComparisonData.optInState}
+            optOutWithSameDayState={
+              optInOptOutComparisonData.optOutWithSameDayState
+            }
+            optOutWithoutSameDayState={
+              optInOptOutComparisonData.optOutWithoutSameDayState
+            }
           />
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">No data available</p>
+          </div>
         );
       case AnalysisOption.EARLY_VOTING_COMPARISON:
-        return (
+        return isEarlyVotingComparisonLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">
+              Loading early voting comparison...
+            </p>
+          </div>
+        ) : earlyVotingComparisonData ? (
           <EarlyVotingTable
-            data={earlyVotingData}
-            republicanState={earlyVotingRepublicanStateName}
-            democraticState={earlyVotingDemocraticStateName}
+            data={earlyVotingComparisonData.data}
+            republicanState={earlyVotingComparisonData.republicanState}
+            democraticState={earlyVotingComparisonData.democraticState}
           />
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">No data available</p>
+          </div>
         );
       case AnalysisOption.DROP_BOX_VOTING_CHART:
         return (

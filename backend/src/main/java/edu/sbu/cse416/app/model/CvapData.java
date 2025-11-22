@@ -14,4 +14,3 @@ public record CvapData(
         Integer black,
         Integer white,
         Integer hispanic) {}
-

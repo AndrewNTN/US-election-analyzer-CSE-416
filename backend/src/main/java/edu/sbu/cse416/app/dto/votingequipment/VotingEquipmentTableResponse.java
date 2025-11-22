@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public record VotingEquipmentTableResponse(List<VotingEquipmentDTO> data, Map<String, String> metricLabels) {
-    
+
     public static Map<String, String> getDefaultMetricLabels() {
         return Map.of(
                 "state", "State",

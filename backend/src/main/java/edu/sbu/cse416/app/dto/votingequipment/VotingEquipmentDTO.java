@@ -1,9 +1,4 @@
 package edu.sbu.cse416.app.dto.votingequipment;
 
 public record VotingEquipmentDTO(
-    String state,
-    Integer dreNoVVPAT,
-    Integer dreWithVVPAT,
-    Integer ballotMarkingDevice,
-    Integer scanner
-) {}
+        String state, Integer dreNoVVPAT, Integer dreWithVVPAT, Integer ballotMarkingDevice, Integer scanner) {}

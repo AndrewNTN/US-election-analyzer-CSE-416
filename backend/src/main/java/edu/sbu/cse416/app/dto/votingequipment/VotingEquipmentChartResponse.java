@@ -4,11 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 public record VotingEquipmentChartResponse(
-        List<VotingEquipmentYearlyDTO> data,
-        Map<String, String> metricLabels,
-        String xAxisLabel,
-        String yAxisLabel) {
-    
+        List<VotingEquipmentYearlyDTO> data, Map<String, String> metricLabels, String xAxisLabel, String yAxisLabel) {
+
     public static Map<String, String> getDefaultMetricLabels() {
         return Map.of(
                 "year", "Year",

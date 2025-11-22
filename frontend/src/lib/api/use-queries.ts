@@ -27,6 +27,10 @@ import {
   type CvapRegistrationRateResponse,
   getStateComparison,
   type StateComparisonResponse,
+  getEarlyVotingComparison,
+  type EarlyVotingComparisonResponse,
+  getOptInOptOutComparison,
+  type OptInOptOutComparisonResponse,
 } from "@/lib/api/requests.ts";
 
 export const useProvisionalChartQuery = (
@@ -213,6 +217,46 @@ export const useStateComparisonQuery = (
     queryKey: ["state-comparison", republicanStateFips, democraticStateFips],
     queryFn: async () => {
       return getStateComparison(republicanStateFips, democraticStateFips);
+    },
+    ...options,
+  });
+
+export const useEarlyVotingComparisonQuery = (
+  republicanStateFips: string,
+  democraticStateFips: string,
+  options?: { enabled?: boolean },
+): UseQueryResult<EarlyVotingComparisonResponse, Error> =>
+  useQuery({
+    queryKey: [
+      "early-voting-comparison",
+      republicanStateFips,
+      democraticStateFips,
+    ],
+    queryFn: async () => {
+      return getEarlyVotingComparison(republicanStateFips, democraticStateFips);
+    },
+    ...options,
+  });
+
+export const useOptInOptOutComparisonQuery = (
+  optInFips: string,
+  optOutSameDayFips: string,
+  optOutNoSameDayFips: string,
+  options?: { enabled?: boolean },
+): UseQueryResult<OptInOptOutComparisonResponse, Error> =>
+  useQuery({
+    queryKey: [
+      "opt-in-opt-out-comparison",
+      optInFips,
+      optOutSameDayFips,
+      optOutNoSameDayFips,
+    ],
+    queryFn: async () => {
+      return getOptInOptOutComparison(
+        optInFips,
+        optOutSameDayFips,
+        optOutNoSameDayFips,
+      );
     },
     ...options,
   });

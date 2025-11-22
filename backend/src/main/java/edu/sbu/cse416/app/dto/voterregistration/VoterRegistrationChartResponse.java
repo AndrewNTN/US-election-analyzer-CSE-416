@@ -4,10 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public record VoterRegistrationChartResponse(
-        List<Data> data,
-        Map<String, String> metricLabels,
-        String xAxisLabel,
-        String yAxisLabel) {
+        List<Data> data, Map<String, String> metricLabels, String xAxisLabel, String yAxisLabel) {
 
     public record Data(
             String eavsRegion,

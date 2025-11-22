@@ -2,17 +2,19 @@ package edu.sbu.cse416.app.controller;
 
 import edu.sbu.cse416.app.dto.activevoters.ActiveVotersChartResponse;
 import edu.sbu.cse416.app.dto.activevoters.ActiveVotersTableResponse;
+import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
+import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonResponse;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedChartResponse;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedTableResponse;
+import edu.sbu.cse416.app.dto.optinoptout.OptInOptOutComparisonResponse;
 import edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalTableResponse;
+import edu.sbu.cse416.app.dto.statecomparison.StateComparisonResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationChartResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationTableResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentChartResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentTableResponse;
-import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
-import edu.sbu.cse416.app.dto.statecomparison.StateComparisonResponse;
 import edu.sbu.cse416.app.service.VoterDataService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -104,9 +106,24 @@ public class VoterDataController {
 
     @GetMapping("/state-comparison")
     public ResponseEntity<StateComparisonResponse> getStateComparison(
-            @RequestParam String republicanStateFips, 
-            @RequestParam String democraticStateFips) {
+            @RequestParam String republicanStateFips, @RequestParam String democraticStateFips) {
         var response = voterDataService.getStateComparison(republicanStateFips, democraticStateFips);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/early-voting-comparison")
+    public ResponseEntity<EarlyVotingComparisonResponse> getEarlyVotingComparison(
+            @RequestParam String republicanStateFips, @RequestParam String democraticStateFips) {
+        var response = voterDataService.getEarlyVotingComparison(republicanStateFips, democraticStateFips);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/opt-in-opt-out-comparison")
+    public ResponseEntity<OptInOptOutComparisonResponse> getOptInOptOutComparison(
+            @RequestParam String optInFips,
+            @RequestParam String optOutSameDayFips,
+            @RequestParam String optOutNoSameDayFips) {
+        var response = voterDataService.getOptInOptOutComparison(optInFips, optOutSameDayFips, optOutNoSameDayFips);
         return ResponseEntity.ok(response);
     }
 }
