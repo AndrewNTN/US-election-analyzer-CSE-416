@@ -11,6 +11,10 @@ import {
   type ActiveVotersTableResponse,
   getPollbookDeletionsChart,
   type PollbookDeletionsChartResponse,
+  getMailBallotsRejectedTable,
+  getMailBallotsRejectedChart,
+  type MailBallotsRejectedTableResponse,
+  type MailBallotsRejectedChartResponse,
 } from "@/lib/api/eavs-requests";
 
 export const useProvisionalChartQuery = (
@@ -81,6 +85,38 @@ export const usePollbookDeletionsChartQuery = (
         );
       }
       return getPollbookDeletionsChart(fipsPrefix);
+    },
+    enabled: Boolean(fipsPrefix),
+  });
+
+export const useMailBallotsRejectedTableQuery = (
+  fipsPrefix: string | null | undefined,
+): UseQueryResult<MailBallotsRejectedTableResponse, Error> =>
+  useQuery({
+    queryKey: ["mail-ballots-rejected-table", fipsPrefix ?? "no-fips"],
+    queryFn: async () => {
+      if (!fipsPrefix) {
+        throw new Error(
+          "Missing FIPS prefix for mail ballots rejected table query",
+        );
+      }
+      return getMailBallotsRejectedTable(fipsPrefix);
+    },
+    enabled: Boolean(fipsPrefix),
+  });
+
+export const useMailBallotsRejectedChartQuery = (
+  fipsPrefix: string | null | undefined,
+): UseQueryResult<MailBallotsRejectedChartResponse, Error> =>
+  useQuery({
+    queryKey: ["mail-ballots-rejected-chart", fipsPrefix ?? "no-fips"],
+    queryFn: async () => {
+      if (!fipsPrefix) {
+        throw new Error(
+          "Missing FIPS prefix for mail ballots rejected chart query",
+        );
+      }
+      return getMailBallotsRejectedChart(fipsPrefix);
     },
     enabled: Boolean(fipsPrefix),
   });

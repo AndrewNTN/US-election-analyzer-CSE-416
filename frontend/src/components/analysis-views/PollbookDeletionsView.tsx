@@ -1,5 +1,8 @@
 import { PollbookDeletionsBarChart } from "../chart/pollbook-deletions-bar-chart";
-import { usePollbookDeletionsChartQuery, useActiveVotersTableQuery } from "@/lib/api/use-eavs-queries.ts";
+import {
+  usePollbookDeletionsChartQuery,
+  useActiveVotersTableQuery,
+} from "@/lib/api/use-eavs-queries.ts";
 import { getStateFipsCode } from "@/constants/stateFips.ts";
 import { ActiveVotersTable } from "../table/state-tables/active-voters-table.tsx";
 
@@ -11,7 +14,7 @@ export function PollbookDeletionsView({
   stateName,
 }: PollbookDeletionsViewProps) {
   const stateFipsPrefix = getStateFipsCode(stateName);
-  
+
   const {
     data: chartData,
     isPending: chartLoading,
@@ -43,12 +46,12 @@ export function PollbookDeletionsView({
           Error loading {stateName} table data: {tableErrorMessage}
         </p>
       ) : tableData ? (
-        <ActiveVotersTable 
-          data={tableData.data} 
+        <ActiveVotersTable
+          data={tableData.data}
           metricLabels={tableData.metricLabels}
         />
       ) : null}
-      
+
       <div className="mt-4">
         <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
           Pollbook Deletions by Reason

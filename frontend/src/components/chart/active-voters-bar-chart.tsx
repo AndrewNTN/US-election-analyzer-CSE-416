@@ -8,7 +8,11 @@ export interface ActiveVotersBarChartProps {
   metricLabels?: Record<string, string>;
 }
 
-const METRIC_KEYS = ["totalRegistered", "totalActive", "totalInactive"] as const;
+const METRIC_KEYS = [
+  "totalRegistered",
+  "totalActive",
+  "totalInactive",
+] as const;
 type MetricKey = (typeof METRIC_KEYS)[number];
 
 const DEFAULT_METRIC_LABELS: Record<MetricKey, string> = {

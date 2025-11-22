@@ -2,10 +2,16 @@ package edu.sbu.cse416.app.service;
 
 import edu.sbu.cse416.app.dto.activevoters.ActiveVotersChartResponse;
 import edu.sbu.cse416.app.dto.activevoters.ActiveVotersTableResponse;
+import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedChartResponse;
+import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedTableResponse;
+import edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalTableResponse;
 import edu.sbu.cse416.app.model.eavs.EavsData;
+import edu.sbu.cse416.app.model.eavs.MailBallotsRejectedReason;
 import edu.sbu.cse416.app.model.eavs.ProvisionalBallots;
+import edu.sbu.cse416.app.model.eavs.VoterDeletion;
+import edu.sbu.cse416.app.model.eavs.VoterRegistration;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
 import edu.sbu.cse416.app.util.RecordAggregator;
 import java.util.List;
@@ -100,7 +106,7 @@ public class EavsService {
         List<EavsData> data = repo.findByFipsCode("^" + prefix);
         List<ActiveVotersTableResponse.Data> tableData = data.stream()
                 .map(record -> {
-                    edu.sbu.cse416.app.model.eavs.VoterRegistration vr = record.voterRegistration();
+                    VoterRegistration vr = record.voterRegistration();
                     return new ActiveVotersTableResponse.Data(
                             cleanJurisdictionName(record.jurisdictionName()),
                             nz(vr == null ? null : vr.totalRegistered()),
@@ -133,14 +139,14 @@ public class EavsService {
      * Get pollbook deletions chart data aggregated for a FIPS prefix.
      */
     @Cacheable(value = "pollbookDeletionsChart", key = "#fipsPrefix")
-    public edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse getPollbookDeletionsChart(String fipsPrefix) {
+    public PollbookDeletionsChartResponse getPollbookDeletionsChart(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
         List<EavsData> data = repo.findByFipsCode("^" + prefix);
 
-        edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse response =
-                RecordAggregator.aggregate(data, EavsData::voterDeletion, edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse.class);
+        PollbookDeletionsChartResponse response =
+                RecordAggregator.aggregate(data, EavsData::voterDeletion, PollbookDeletionsChartResponse.class);
 
-        return new edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse(
+        return new PollbookDeletionsChartResponse(
                 response.removedTotal(),
                 response.removedMoved(),
                 response.removedDeath(),
@@ -149,6 +155,71 @@ public class EavsService {
                 response.removedIncompetentToVote(),
                 response.removedVoterRequest(),
                 response.removedDuplicateRecords(),
-                edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse.getDefaultMetricLabels());
+                PollbookDeletionsChartResponse.getDefaultMetricLabels());
+    }
+
+    /**
+     * Get mail ballots rejected table data for a FIPS prefix.
+     */
+    @Cacheable(value = "mailBallotsRejectedTable", key = "#fipsPrefix")
+    public MailBallotsRejectedTableResponse getMailBallotsRejectedTable(String fipsPrefix) {
+        String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
+        List<EavsData> data = repo.findByFipsCode("^" + prefix);
+        List<MailBallotsRejectedTableResponse.Data> tableData = data.stream()
+                .map(record -> {
+                    MailBallotsRejectedReason mbr = record.mailBallotsRejectedReason();
+                    return new MailBallotsRejectedTableResponse.Data(
+                            cleanJurisdictionName(record.jurisdictionName()),
+                            nz(mbr == null ? null : mbr.late()),
+                            nz(mbr == null ? null : mbr.missingVoterSignature()),
+                            nz(mbr == null ? null : mbr.missingWitnessSignature()),
+                            nz(mbr == null ? null : mbr.nonMatchingVoterSignature()),
+                            nz(mbr == null ? null : mbr.unofficialEnvelope()),
+                            nz(mbr == null ? null : mbr.ballotMissingFromEnvelope()),
+                            nz(mbr == null ? null : mbr.noSecrecyEnvelope()),
+                            nz(mbr == null ? null : mbr.multipleBallotsInOneEnvelope()),
+                            nz(mbr == null ? null : mbr.envelopeNotSealed()),
+                            nz(mbr == null ? null : mbr.noPostmark()),
+                            nz(mbr == null ? null : mbr.noResidentAddressOnEnvelope()),
+                            nz(mbr == null ? null : mbr.voterDeceased()),
+                            nz(mbr == null ? null : mbr.voterAlreadyVoted()),
+                            nz(mbr == null ? null : mbr.missingDocumentation()),
+                            nz(mbr == null ? null : mbr.voterNotEligible()),
+                            nz(mbr == null ? null : mbr.noBallotApplication()));
+                })
+                .toList();
+        return new MailBallotsRejectedTableResponse(
+                tableData, MailBallotsRejectedTableResponse.getDefaultMetricLabels());
+    }
+
+    /**
+     * Get mail ballots rejected chart data aggregated for a FIPS prefix.
+     */
+    @Cacheable(value = "mailBallotsRejectedChart", key = "#fipsPrefix")
+    public MailBallotsRejectedChartResponse getMailBallotsRejectedChart(String fipsPrefix) {
+        String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
+        List<EavsData> data = repo.findByFipsCode("^" + prefix);
+
+        MailBallotsRejectedChartResponse response =
+                RecordAggregator.aggregate(data, EavsData::mailBallotsRejectedReason, MailBallotsRejectedChartResponse.class);
+
+        return new MailBallotsRejectedChartResponse(
+                response.late(),
+                response.missingVoterSignature(),
+                response.missingWitnessSignature(),
+                response.nonMatchingVoterSignature(),
+                response.unofficialEnvelope(),
+                response.ballotMissingFromEnvelope(),
+                response.noSecrecyEnvelope(),
+                response.multipleBallotsInOneEnvelope(),
+                response.envelopeNotSealed(),
+                response.noPostmark(),
+                response.noResidentAddressOnEnvelope(),
+                response.voterDeceased(),
+                response.voterAlreadyVoted(),
+                response.missingDocumentation(),
+                response.voterNotEligible(),
+                response.noBallotApplication(),
+                MailBallotsRejectedChartResponse.getDefaultMetricLabels());
     }
 }

@@ -1,82 +1,101 @@
 import type { ColumnDef, Row } from "@tanstack/react-table";
+import type { MailBallotsRejectedData } from "@/lib/api/eavs-requests";
+import { TableTooltip } from "@/components/table/table-tooltip";
 
-export interface MailBallotsRejectedData {
-  eavsRegion: string;
-  C9b: number;
-  C9c: number;
-  C9d: number;
-  C9e: number;
-  C9f: number;
-  C9g: number;
-  C9h: number;
-  C9i: number;
-  C9j: number;
-  C9k: number;
-  C9l: number;
-  C9m: number;
-  C9n: number;
-  C9o: number;
-  C9p: number;
-  C9q: number;
-}
+type MetricKey = keyof Omit<MailBallotsRejectedData, "jurisdictionName">;
 
-type MetricKey = keyof Omit<MailBallotsRejectedData, "eavsRegion">;
-
-const GROUPED_COLUMNS: Array<{
+interface GroupedColumn {
   id: string;
   label: string;
   columns: Array<{ key: MetricKey; label: string }>;
-}> = [
-  {
-    id: "signature",
-    label: "Signature",
-    columns: [
-      { key: "C9b", label: "Missing" },
-      { key: "C9d", label: "Miss wit" },
-      { key: "C9c", label: "Mismatch" },
-    ],
-  },
-  {
-    id: "envelope",
-    label: "Envelope",
-    columns: [
-      { key: "C9f", label: "Unoff." },
-      { key: "C9g", label: "Empty" },
-      { key: "C9h", label: "No Sec" },
-      { key: "C9i", label: "Mult." },
-      { key: "C9j", label: "Unseal" },
-      { key: "C9k", label: "No PM" },
-      { key: "C9l", label: "No Addr" },
-    ],
-  },
-  {
-    id: "timing",
-    label: "Time",
-    columns: [{ key: "C9h", label: "Late" }],
-  },
-  {
-    id: "voter-status",
-    label: "Voter",
-    columns: [
-      { key: "C9i", label: "Dead" },
-      { key: "C9n", label: "Voted" },
-      { key: "C9o", label: "No Doc" },
-      { key: "C9p", label: "Not Eligible" },
-      { key: "C9q", label: "No Application" },
-    ],
-  },
-];
+}
 
-export const mailBallotsRejectedColumns: ColumnDef<MailBallotsRejectedData>[] =
-  [
+const getGroupedColumns = (
+  metricLabels: Record<string, string>,
+): GroupedColumn[] => {
+  return [
     {
-      accessorKey: "eavsRegion",
+      id: "signature",
+      label: "Signature",
+      columns: [
+        {
+          key: "missingVoterSignature",
+          label: metricLabels.missingVoterSignature,
+        },
+        {
+          key: "missingWitnessSignature",
+          label: metricLabels.missingWitnessSignature,
+        },
+        {
+          key: "nonMatchingVoterSignature",
+          label: metricLabels.nonMatchingVoterSignature,
+        },
+      ],
+    },
+    {
+      id: "envelope",
+      label: "Envelope",
+      columns: [
+        { key: "unofficialEnvelope", label: metricLabels.unofficialEnvelope },
+        {
+          key: "ballotMissingFromEnvelope",
+          label: metricLabels.ballotMissingFromEnvelope,
+        },
+        { key: "noSecrecyEnvelope", label: metricLabels.noSecrecyEnvelope },
+        {
+          key: "multipleBallotsInOneEnvelope",
+          label: metricLabels.multipleBallotsInOneEnvelope,
+        },
+        { key: "envelopeNotSealed", label: metricLabels.envelopeNotSealed },
+        { key: "noPostmark", label: metricLabels.noPostmark },
+        {
+          key: "noResidentAddressOnEnvelope",
+          label: metricLabels.noResidentAddressOnEnvelope,
+        },
+      ],
+    },
+    {
+      id: "timing",
+      label: "Time",
+      columns: [{ key: "late", label: metricLabels.late }],
+    },
+    {
+      id: "voter-status",
+      label: "Voter",
+      columns: [
+        { key: "voterDeceased", label: metricLabels.voterDeceased },
+        { key: "voterAlreadyVoted", label: metricLabels.voterAlreadyVoted },
+        {
+          key: "missingDocumentation",
+          label: metricLabels.missingDocumentation,
+        },
+        { key: "voterNotEligible", label: metricLabels.voterNotEligible },
+        { key: "noBallotApplication", label: metricLabels.noBallotApplication },
+      ],
+    },
+  ];
+};
+
+export const getMailBallotsRejectedColumns = (
+  metricLabels: Record<string, string>,
+): ColumnDef<MailBallotsRejectedData>[] => {
+  const GROUPED_COLUMNS = getGroupedColumns(metricLabels);
+
+  return [
+    {
+      accessorKey: "jurisdictionName",
       header: () => <div className="text-left text-sm font-medium">Region</div>,
-      cell: ({ row }: { row: Row<MailBallotsRejectedData> }) => (
-        <div className="text-left text-xs text-black font-medium">
-          {row.getValue("eavsRegion")}
-        </div>
-      ),
+      cell: ({ row }: { row: Row<MailBallotsRejectedData> }) => {
+        const regionName = row.getValue("jurisdictionName") as string;
+
+        return (
+          <TableTooltip content={regionName}>
+            <div className="text-left text-xs text-black font-medium max-w-[125px] truncate cursor-help">
+              {regionName}
+            </div>
+          </TableTooltip>
+        );
+      },
     },
     ...GROUPED_COLUMNS.map((group) => ({
       id: group.id,
@@ -104,3 +123,4 @@ export const mailBallotsRejectedColumns: ColumnDef<MailBallotsRejectedData>[] =
       })),
     })),
   ];
+};

@@ -21,9 +21,7 @@ export function ActiveVotersView({
     error: chartError,
   } = useActiveVotersChartQuery(stateFipsPrefix);
 
-  const {
-    data: tableData,
-  } = useActiveVotersTableQuery(stateFipsPrefix);
+  const { data: tableData } = useActiveVotersTableQuery(stateFipsPrefix);
 
   const errorMessage = chartHasError
     ? (chartError?.message ?? "Unknown error")

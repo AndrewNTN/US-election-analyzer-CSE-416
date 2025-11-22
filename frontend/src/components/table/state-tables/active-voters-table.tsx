@@ -12,17 +12,14 @@ interface ActiveVotersTableProps {
   metricLabels?: Record<string, string>;
 }
 
-export function ActiveVotersTable({ data, metricLabels }: ActiveVotersTableProps) {
+export function ActiveVotersTable({
+  data,
+  metricLabels,
+}: ActiveVotersTableProps) {
   const columns = useMemo(
     () => getActiveVotersColumns(metricLabels),
     [metricLabels],
   );
 
-  return (
-    <DataTable
-      data={data}
-      columns={columns}
-      className="space-y-2"
-    />
-  );
+  return <DataTable data={data} columns={columns} className="space-y-2" />;
 }

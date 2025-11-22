@@ -34,6 +34,13 @@ import { MailBallotsRejectedView } from "@/components/analysis-views/MailBallots
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
 
+interface ActiveVotersDataItem {
+  eavsRegion: string;
+  activeVoters: number;
+  totalVoters: number;
+  inactiveVoters: number;
+}
+
 const AnalysisType = {
   PROVISIONAL_BALLOT: "prov-ballot-bchart",
   ACTIVE_VOTERS_2024: "active-voters-2024",
@@ -220,23 +227,26 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     hasDetailedVoterData(normalizedStateKey);
 
   // Needed for Map Legend
+  // TODO: change this wh
   const activeVotersData = useMemo(() => {
     if (normalizedStateKey === "california") {
-      return activeVotersDataCaliforniaJson.map((item: any) => ({
-        jurisdiction: item.eavsRegion,
-        totalActive: item.activeVoters,
-        totalRegistered: item.totalVoters,
-        totalInactive: item.inactiveVoters,
-      }));
+      return activeVotersDataCaliforniaJson.map(
+        (item: ActiveVotersDataItem) => ({
+          jurisdiction: item.eavsRegion,
+          totalActive: item.activeVoters,
+          totalRegistered: item.totalVoters,
+          totalInactive: item.inactiveVoters,
+        }),
+      );
     } else if (normalizedStateKey === "florida") {
-      return activeVotersDataFloridaJson.map((item: any) => ({
+      return activeVotersDataFloridaJson.map((item: ActiveVotersDataItem) => ({
         jurisdiction: item.eavsRegion,
         totalActive: item.activeVoters,
         totalRegistered: item.totalVoters,
         totalInactive: item.inactiveVoters,
       }));
     }
-    return activeVotersDataJson.map((item: any) => ({
+    return activeVotersDataJson.map((item: ActiveVotersDataItem) => ({
       jurisdiction: item.eavsRegion,
       totalActive: item.activeVoters,
       totalRegistered: item.totalVoters,
@@ -327,9 +337,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                 AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS ? (
                 <EquipmentQualityView stateName={formatStateName(stateName)} />
               ) : selectedDataset === AnalysisType.POLLBOOK_DELETIONS_2024 ? (
-                <PollbookDeletionsView
-                  stateName={formatStateName(stateName)}
-                />
+                <PollbookDeletionsView stateName={formatStateName(stateName)} />
               ) : selectedDataset === AnalysisType.MAIL_BALLOTS_REJECTED ? (
                 <MailBallotsRejectedView
                   stateName={formatStateName(stateName)}

@@ -29,7 +29,9 @@ interface VoterRegistrationViewProps {
   normalizedStateKey: string;
 }
 
-export function VoterRegistrationView({ normalizedStateKey }: VoterRegistrationViewProps) {
+export function VoterRegistrationView({
+  normalizedStateKey,
+}: VoterRegistrationViewProps) {
   return (
     <div>
       {hasDetailedVoterData(normalizedStateKey) && (

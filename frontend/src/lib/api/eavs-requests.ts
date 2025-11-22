@@ -72,10 +72,65 @@ export interface PollbookDeletionsChartResponse {
   removedIncompetentToVote: number;
   removedVoterRequest: number;
   removedDuplicateRecords: number;
-  metricLabels?: Record<string, string>;
+  metricLabels: Record<string, string>;
+}
+
+export interface MailBallotsRejectedTableResponse {
+  data: MailBallotsRejectedData[];
+  metricLabels: Record<string, string>;
+}
+
+export interface MailBallotsRejectedData {
+  jurisdictionName: string;
+  late: number;
+  missingVoterSignature: number;
+  missingWitnessSignature: number;
+  nonMatchingVoterSignature: number;
+  unofficialEnvelope: number;
+  ballotMissingFromEnvelope: number;
+  noSecrecyEnvelope: number;
+  multipleBallotsInOneEnvelope: number;
+  envelopeNotSealed: number;
+  noPostmark: number;
+  noResidentAddressOnEnvelope: number;
+  voterDeceased: number;
+  voterAlreadyVoted: number;
+  missingDocumentation: number;
+  voterNotEligible: number;
+  noBallotApplication: number;
+}
+
+export interface MailBallotsRejectedChartResponse {
+  late: number;
+  missingVoterSignature: number;
+  missingWitnessSignature: number;
+  nonMatchingVoterSignature: number;
+  unofficialEnvelope: number;
+  ballotMissingFromEnvelope: number;
+  noSecrecyEnvelope: number;
+  multipleBallotsInOneEnvelope: number;
+  envelopeNotSealed: number;
+  noPostmark: number;
+  noResidentAddressOnEnvelope: number;
+  voterDeceased: number;
+  voterAlreadyVoted: number;
+  missingDocumentation: number;
+  voterNotEligible: number;
+  noBallotApplication: number;
+  metricLabels: Record<string, string>;
 }
 
 export const getPollbookDeletionsChart = async (
   fipsPrefix: string,
 ): Promise<PollbookDeletionsChartResponse> =>
   fetchJson(`/eavs/pollbook-deletions/chart/${fipsPrefix}`);
+
+export const getMailBallotsRejectedTable = async (
+  fipsPrefix: string,
+): Promise<MailBallotsRejectedTableResponse> =>
+  fetchJson(`/eavs/mail-ballots-rejected/table/${fipsPrefix}`);
+
+export const getMailBallotsRejectedChart = async (
+  fipsPrefix: string,
+): Promise<MailBallotsRejectedChartResponse> =>
+  fetchJson(`/eavs/mail-ballots-rejected/chart/${fipsPrefix}`);

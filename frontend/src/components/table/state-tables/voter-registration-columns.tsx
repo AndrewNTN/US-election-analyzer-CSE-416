@@ -66,5 +66,5 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
         </div>
       );
     },
-  }
+  },
 ];
