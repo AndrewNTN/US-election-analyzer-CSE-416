@@ -1,7 +1,7 @@
 import { GeoJSON } from "react-leaflet";
 import type { FeatureCollection, Geometry, Feature } from "geojson";
 import type { PathOptions, Layer, LeafletMouseEvent } from "leaflet";
-import type { BaseMapProps, MapFeatureProps } from "@/lib/map.ts";
+import type { BaseMapProps, MapFeatureProps } from "@/lib/api/geojson-requests";
 import {
   defaultGrayTint,
   getEquipmentAgeColor,

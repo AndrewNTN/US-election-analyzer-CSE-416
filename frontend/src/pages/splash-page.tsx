@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { IconChartBar } from "@tabler/icons-react";
-import type { FeatureCollection, Geometry } from "geojson";
 
 import BaseMap from "@/components/map/base-map.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
@@ -15,15 +14,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.tsx";
-import statesJSON from "../../data/us-states.json";
-import type { StateProps } from "@/lib/map.ts";
+import { useStatesGeoJsonQuery } from "@/lib/api/use-queries.ts";
+
 import {
   SPLASH_CHOROPLETH_OPTIONS,
   SPLASH_CHOROPLETH_LABELS,
   type SplashChoroplethOption,
 } from "@/lib/choropleth.ts";
 
-const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
+import { MapLoading } from "@/components/ui/map-loading";
+import { MapError } from "@/components/ui/map-error";
 
 export default function SplashPage() {
   const [open, setOpen] = useState(false);
@@ -33,6 +33,34 @@ export default function SplashPage() {
   const handleChoroplethChange = (value: string) => {
     setChoroplethOption(value as SplashChoroplethOption);
   };
+
+  const {
+    data: statesData,
+    isLoading,
+    isError,
+    refetch,
+  } = useStatesGeoJsonQuery();
+
+  const safeStatesData = statesData || {
+    type: "FeatureCollection",
+    features: [],
+  };
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-gray-50">
+        <MapLoading />
+      </div>
+    );
+  }
+
+  if (isError || !statesData) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-gray-50">
+        <MapError onRetry={() => refetch()} />
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen">
@@ -77,10 +105,10 @@ export default function SplashPage() {
       <div className="absolute inset-0 z-0">
         <BaseMap style={{ width: "100%", height: "100vh", zIndex: 0 }}>
           <ChoroplethLayer
-            data={statesData}
+            data={safeStatesData}
             choroplethOption={choroplethOption}
           />
-          <OutlineLayer data={statesData} />
+          <OutlineLayer data={safeStatesData} />
         </BaseMap>
 
         {/* Choropleth Legend */}

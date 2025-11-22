@@ -1,6 +1,6 @@
 import { BaseBarChart } from "./base-bar-chart";
 import { formatNumber } from "@/lib/utils";
-import type { MailBallotsRejectedChartResponse } from "@/lib/api/requests.ts";
+import type { MailBallotsRejectedChartResponse } from "@/lib/api/voting-requests";
 
 export interface MailBallotsRejectedBarChartProps {
   stateName: string;

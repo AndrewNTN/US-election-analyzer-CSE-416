@@ -1,6 +1,6 @@
 import { BaseBarChart } from "./base-bar-chart";
 import { formatNumber } from "@/lib/utils";
-import { type PollbookDeletionsChartResponse } from "@/lib/api/requests.ts";
+import { type PollbookDeletionsChartResponse } from "@/lib/api/voting-requests";
 
 export interface PollbookDeletionsBarChartProps {
   stateName: string;
@@ -9,7 +9,6 @@ export interface PollbookDeletionsBarChartProps {
 }
 
 const METRIC_KEYS = [
-  "removedTotal",
   "removedMoved",
   "removedDeath",
   "removedFelony",
@@ -21,7 +20,6 @@ const METRIC_KEYS = [
 type MetricKey = (typeof METRIC_KEYS)[number];
 
 const DEFAULT_METRIC_LABELS: Record<MetricKey, string> = {
-  removedTotal: "Total Removed",
   removedMoved: "Moved",
   removedDeath: "Deceased",
   removedFelony: "Felony Conviction",

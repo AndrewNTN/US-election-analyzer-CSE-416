@@ -28,6 +28,7 @@ import edu.sbu.cse416.app.repository.EavsDataRepository;
 import edu.sbu.cse416.app.repository.FelonyVotingRepository;
 import edu.sbu.cse416.app.repository.StateVoterRegistrationRepository;
 import edu.sbu.cse416.app.util.RecordAggregator;
+import edu.sbu.cse416.app.util.FipsUtil;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -78,12 +79,30 @@ public class VoterDataService {
     }
 
     /**
+     * Filter EAVS data to ensure it matches the expected state and has valid FIPS codes.
+     * This prevents cross-state contamination (e.g., Wisconsin towns with FIPS starting with "12").
+     */
+    /**
+     * Helper to filter EAVS data by state name using FipsUtil.
+     */
+    private List<EavsData> filterByState(List<EavsData> data, String fipsPrefix) {
+        String expectedState = FipsUtil.getStateName(fipsPrefix);
+        if (expectedState == null) {
+            return data;
+        }
+        return data.stream()
+                .filter(d -> d.stateFull() != null && d.stateFull().equalsIgnoreCase(expectedState))
+                .toList();
+    }
+
+    /**
      * Get provisional ballot table data for a FIPS prefix.
      */
     @Cacheable(value = "provisionalTable", key = "#fipsPrefix")
     public ProvisionalTableResponse getProvisionalTable(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByFipsCode("^" + prefix);
+        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
+        List<EavsData> data = filterByState(rawData, prefix);
         List<ProvisionalTableResponse.Data> tableData = data.stream()
                 .map(record -> {
                     ProvisionalBallots p = record.provisionalBallots();
@@ -105,7 +124,8 @@ public class VoterDataService {
     @Cacheable(value = "provisionalChart", key = "#fipsPrefix")
     public ProvisionalChartResponse getProvisionalChart(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByFipsCode("^" + prefix);
+        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
+        List<EavsData> data = filterByState(rawData, prefix);
 
         ProvisionalChartResponse response =
                 RecordAggregator.aggregate(data, EavsData::provisionalBallots, ProvisionalChartResponse.class);
@@ -130,7 +150,8 @@ public class VoterDataService {
     @Cacheable(value = "activeVotersTable", key = "#fipsPrefix")
     public ActiveVotersTableResponse getActiveVotersTable(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByFipsCode("^" + prefix);
+        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
+        List<EavsData> data = filterByState(rawData, prefix);
         List<ActiveVotersTableResponse.Data> tableData = data.stream()
                 .map(record -> {
                     VoterRegistration vr = record.voterRegistration();
@@ -150,7 +171,8 @@ public class VoterDataService {
     @Cacheable(value = "activeVotersChart", key = "#fipsPrefix")
     public ActiveVotersChartResponse getActiveVotersChart(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByFipsCode("^" + prefix);
+        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
+        List<EavsData> data = filterByState(rawData, prefix);
 
         ActiveVotersChartResponse response =
                 RecordAggregator.aggregate(data, EavsData::voterRegistration, ActiveVotersChartResponse.class);
@@ -168,13 +190,13 @@ public class VoterDataService {
     @Cacheable(value = "pollbookDeletionsChart", key = "#fipsPrefix")
     public PollbookDeletionsChartResponse getPollbookDeletionsChart(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByFipsCode("^" + prefix);
+        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
+        List<EavsData> data = filterByState(rawData, prefix);
 
         PollbookDeletionsChartResponse response =
                 RecordAggregator.aggregate(data, EavsData::voterDeletion, PollbookDeletionsChartResponse.class);
 
         return new PollbookDeletionsChartResponse(
-                response.removedTotal(),
                 response.removedMoved(),
                 response.removedDeath(),
                 response.removedFelony(),
@@ -191,7 +213,8 @@ public class VoterDataService {
     @Cacheable(value = "mailBallotsRejectedTable", key = "#fipsPrefix")
     public MailBallotsRejectedTableResponse getMailBallotsRejectedTable(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByFipsCode("^" + prefix);
+        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
+        List<EavsData> data = filterByState(rawData, prefix);
         List<MailBallotsRejectedTableResponse.Data> tableData = data.stream()
                 .map(record -> {
                     MailBallotsRejectedReason mbr = record.mailBallotsRejectedReason();
@@ -225,7 +248,8 @@ public class VoterDataService {
     @Cacheable(value = "mailBallotsRejectedChart", key = "#fipsPrefix")
     public MailBallotsRejectedChartResponse getMailBallotsRejectedChart(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByFipsCode("^" + prefix);
+        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
+        List<EavsData> data = filterByState(rawData, prefix);
 
         MailBallotsRejectedChartResponse response = RecordAggregator.aggregate(
                 data, EavsData::mailBallotsRejectedReason, MailBallotsRejectedChartResponse.class);
@@ -431,10 +455,22 @@ public class VoterDataService {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
 
         // Get EAVS 2024 data for the state
-        List<EavsData> eavsData = repo.findByFipsCode("^" + prefix);
+        List<EavsData> rawEavsData = repo.findByFipsCode("^" + prefix);
+        List<EavsData> eavsData = filterByState(rawEavsData, prefix);
 
         // Get CVAP data for the state
-        List<CvapData> cvapDataList = cvapRepo.findByGeoidPrefix("^" + prefix);
+        List<CvapData> rawCvapData = cvapRepo.findByGeoidPrefix("^" + prefix);
+        
+        // Filter CVAP by state name
+        String expectedState = FipsUtil.getStateName(prefix);
+        List<CvapData> cvapDataList;
+        if (expectedState != null) {
+            cvapDataList = rawCvapData.stream()
+                    .filter(d -> d.stateName() != null && d.stateName().equalsIgnoreCase(expectedState))
+                    .toList();
+        } else {
+            cvapDataList = rawCvapData;
+        }
 
         // Create map of geoid -> cvap data for easy lookup
         Map<String, CvapData> cvapMap = new HashMap<>();
@@ -445,23 +481,16 @@ public class VoterDataService {
         // Aggregate totals across all counties
         long totalRegisteredVoters = 0;
         long totalCvapEstimate = 0;
-        int eavsCounties = 0;
 
         for (EavsData eavs : eavsData) {
-            eavsCounties++;
             if (eavs.fipsCode() == null || eavs.voterRegistration() == null) continue;
-
+            
             // Truncate EAVS FIPS code to 5 digits to match CVAP geoid format
-            // EAVS uses 10-digit codes like "1200100000", CVAP uses 5-digit like "12001"
             String eavsFips = eavs.fipsCode().length() >= 5 ? eavs.fipsCode().substring(0, 5) : eavs.fipsCode();
 
             // Match EAVS data with CVAP data by FIPS code
             CvapData cvap = cvapMap.get(eavsFips);
             if (cvap == null) {
-                if (eavsCounties <= 3) {
-                    System.out.println(
-                            "No CVAP match for EAVS FIPS: " + eavs.fipsCode() + " (truncated: " + eavsFips + ")");
-                }
                 continue;
             }
 
@@ -470,12 +499,14 @@ public class VoterDataService {
             }
 
             Integer registered = eavs.voterRegistration().totalRegistered();
-            if (registered == null || registered == 0) continue;
+            if (registered == null || registered == 0) {
+                continue;
+            }
 
             totalRegisteredVoters += registered;
             totalCvapEstimate += cvap.totalCvapEstimate();
         }
-
+        
         // Calculate state-level registration rate
         double rate = 0.0;
         if (totalCvapEstimate > 0) {
@@ -686,7 +717,8 @@ public class VoterDataService {
         Map<String, Object> result = new HashMap<>();
 
         // Get EAVS data for the state
-        List<EavsData> eavsData = repo.findByFipsCode("^" + stateFips);
+        List<EavsData> rawEavsData = repo.findByFipsCode("^" + stateFips);
+        List<EavsData> eavsData = filterByState(rawEavsData, stateFips);
 
         long inPersonEarlyVoting = 0;
         long mailAbsenteeVoting = 0;
@@ -729,10 +761,22 @@ public class VoterDataService {
         Map<String, Object> result = new HashMap<>();
 
         // Get EAVS data for the state
-        List<EavsData> eavsData = repo.findByFipsCode("^" + stateFips);
+        List<EavsData> rawEavsData = repo.findByFipsCode("^" + stateFips);
+        List<EavsData> eavsData = filterByState(rawEavsData, stateFips);
 
         // Get CVAP data for the state
-        List<CvapData> cvapDataList = cvapRepo.findByGeoidPrefix("^" + stateFips);
+        List<CvapData> rawCvapData = cvapRepo.findByGeoidPrefix("^" + stateFips);
+        
+        // Filter CVAP by state name
+        String expectedState = FipsUtil.getStateName(stateFips);
+        List<CvapData> cvapDataList;
+        if (expectedState != null) {
+            cvapDataList = rawCvapData.stream()
+                    .filter(d -> d.stateName() != null && d.stateName().equalsIgnoreCase(expectedState))
+                    .toList();
+        } else {
+            cvapDataList = rawCvapData;
+        }
 
         // Get felony voting rights
         var felonyData = felonyVotingRepo.findByStateFips(stateFips);

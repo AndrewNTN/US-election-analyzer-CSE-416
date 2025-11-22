@@ -1,5 +1,5 @@
 import type { ColumnDef, Row } from "@tanstack/react-table";
-import type { MailBallotsRejectedData } from "@/lib/api/requests.ts";
+import type { MailBallotsRejectedData } from "@/lib/api/voting-requests";
 import { TableTooltip } from "@/components/table/table-tooltip";
 
 type MetricKey = keyof Omit<MailBallotsRejectedData, "eavsRegion">;

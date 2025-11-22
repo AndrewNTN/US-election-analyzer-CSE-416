@@ -31,7 +31,14 @@ import {
   type EarlyVotingComparisonResponse,
   getOptInOptOutComparison,
   type OptInOptOutComparisonResponse,
-} from "@/lib/api/requests.ts";
+} from "@/lib/api/voting-requests";
+
+import {
+  getStatesGeoJson,
+  getCountiesGeoJson,
+} from "@/lib/api/geojson-requests";
+import type { FeatureCollection, Geometry } from "geojson";
+import type { StateProps, CountyProps } from "@/lib/api/geojson-requests";
 
 export const useProvisionalChartQuery = (
   fipsPrefix: string | null | undefined,
@@ -259,4 +266,74 @@ export const useOptInOptOutComparisonQuery = (
       );
     },
     ...options,
+  });
+
+export const useStatesGeoJsonQuery = (): UseQueryResult<
+  FeatureCollection<Geometry, StateProps>,
+  Error
+> =>
+  useQuery({
+    queryKey: ["states-geojson"],
+    queryFn: async ({ signal }) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const onAbort = () => {
+        clearTimeout(timeoutId);
+        controller.abort();
+      };
+
+      signal?.addEventListener("abort", onAbort);
+
+      try {
+        return await getStatesGeoJson(controller.signal);
+      } catch (error) {
+        if (controller.signal.aborted && !signal?.aborted) {
+          throw new Error("Request timed out");
+        }
+        throw error;
+      } finally {
+        clearTimeout(timeoutId);
+        signal?.removeEventListener("abort", onAbort);
+      }
+    },
+    staleTime: Infinity,
+    retry: false,
+  });
+
+export const useCountiesGeoJsonQuery = (
+  fipsPrefix: string | null | undefined,
+): UseQueryResult<FeatureCollection<Geometry, CountyProps>, Error> =>
+  useQuery({
+    queryKey: ["counties-geojson", fipsPrefix ?? "no-fips"],
+    queryFn: async ({ signal }) => {
+      if (!fipsPrefix) {
+        throw new Error("Missing FIPS prefix for counties GeoJSON query");
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const onAbort = () => {
+        clearTimeout(timeoutId);
+        controller.abort();
+      };
+
+      signal?.addEventListener("abort", onAbort);
+
+      try {
+        return await getCountiesGeoJson(fipsPrefix, controller.signal);
+      } catch (error) {
+        if (controller.signal.aborted && !signal?.aborted) {
+          throw new Error("Request timed out");
+        }
+        throw error;
+      } finally {
+        clearTimeout(timeoutId);
+        signal?.removeEventListener("abort", onAbort);
+      }
+    },
+    retry: false,
+    enabled: Boolean(fipsPrefix),
+    staleTime: Infinity,
   });

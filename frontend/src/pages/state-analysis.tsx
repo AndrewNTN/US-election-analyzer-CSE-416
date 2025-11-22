@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import statesJSON from "../../data/us-states.json";
-import countiesJSON from "../../data/counties.geojson.json";
-import type { CountyProps, StateProps } from "@/lib/map.ts";
+import {
+  useStatesGeoJsonQuery,
+  useCountiesGeoJsonQuery,
+} from "@/lib/api/use-queries.ts";
+import type { CountyProps, StateProps } from "@/lib/api/geojson-requests";
 import {
   DETAILED_STATES,
   getStateDetails,
@@ -17,6 +19,8 @@ import {
 } from "@/lib/choropleth.ts";
 import StateMap from "@/components/map/state-map.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
+import { MapLoading } from "@/components/ui/map-loading";
+import { MapError } from "@/components/ui/map-error";
 
 // View Components
 import { VoterRegistrationView } from "@/components/analysis-views/VoterRegistrationView";
@@ -27,9 +31,6 @@ import { DropBoxVotingView } from "@/components/analysis-views/DropBoxVotingView
 import { EquipmentQualityView } from "@/components/analysis-views/EquipmentQualityView";
 import { PollbookDeletionsView } from "@/components/analysis-views/PollbookDeletionsView";
 import { MailBallotsRejectedView } from "@/components/analysis-views/MailBallotsRejectedView";
-
-const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
-const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
 
 const AnalysisType = {
   PROVISIONAL_BALLOT: "prov-ballot-bchart",
@@ -171,45 +172,53 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
       .trim();
   }
 
+  const {
+    data: allStatesData,
+    isLoading: isLoadingStates,
+    isError: isErrorStates,
+    refetch: refetchStates,
+  } = useStatesGeoJsonQuery();
+  const {
+    data: stateCountiesData,
+    isLoading: isLoadingCounties,
+    isError: isErrorCounties,
+    refetch: refetchCounties,
+  } = useCountiesGeoJsonQuery(stateFipsPrefix);
+
+  const isLoading = isLoadingStates || (isDetailedState && isLoadingCounties);
+  const isError = isErrorStates || (isDetailedState && isErrorCounties);
+
   // Filter states data to only include the current state
-  const getCurrentStateData = (): FeatureCollection<Geometry, StateProps> => {
-    const filteredFeatures = statesData.features.filter(
-      (feature) => feature.properties?.NAME === formattedStateName,
+  const currentStateData = useMemo((): FeatureCollection<
+    Geometry,
+    StateProps
+  > => {
+    if (!allStatesData || !normalizedStateKey) {
+      return { type: "FeatureCollection", features: [] };
+    }
+
+    const features = allStatesData.features.filter(
+      (feature) =>
+        feature.properties.stateName?.toLowerCase().replace(/\s+/g, "-") ===
+        normalizedStateKey,
     );
 
     return {
-      ...statesData,
-      features: filteredFeatures,
+      type: "FeatureCollection",
+      features,
     };
-  };
+  }, [allStatesData, normalizedStateKey]);
 
-  // Filter counties data for the current state (only for detailed states)
-  const getCurrentCountiesData = (): FeatureCollection<
+  const currentCountiesData = useMemo((): FeatureCollection<
     Geometry,
     CountyProps
   > | null => {
-    if (!isDetailedState) {
+    if (!isDetailedState || !stateCountiesData) {
       return null;
     }
+    return stateCountiesData;
+  }, [isDetailedState, stateCountiesData]);
 
-    const stateFips = stateFipsPrefix;
-
-    if (!stateFips) {
-      return null;
-    }
-
-    const filteredFeatures = countiesData.features.filter(
-      (feature) => feature.properties?.STATEFP === stateFips,
-    );
-
-    return {
-      ...countiesData,
-      features: filteredFeatures,
-    };
-  };
-
-  const currentStateData = getCurrentStateData();
-  const currentCountiesData = getCurrentCountiesData();
   const detailedState = isDetailedState;
 
   const showBubbleChart =
@@ -255,16 +264,29 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
 
         {/* Middle - Map */}
         <div className="w-[30%] relative flex-shrink-0">
-          <StateMap
-            currentStateData={currentStateData}
-            currentCountiesData={currentCountiesData}
-            isDetailedState={detailedState}
-            choroplethOption={choroplethOption}
-            showBubbleChart={showBubbleChart}
-            showCvapLegend={isPoliticalPartyState}
-            fipsPrefix={stateFipsPrefix}
-            hasDetailedVoterData={hasDetailedVoterData(normalizedStateKey)}
-          />
+          {isLoading ? (
+            <MapLoading />
+          ) : isError ? (
+            <MapError
+              onRetry={() => {
+                refetchStates();
+                if (isDetailedState) {
+                  refetchCounties();
+                }
+              }}
+            />
+          ) : (
+            <StateMap
+              currentStateData={currentStateData}
+              currentCountiesData={currentCountiesData}
+              isDetailedState={detailedState}
+              choroplethOption={choroplethOption}
+              showBubbleChart={showBubbleChart}
+              showCvapLegend={isPoliticalPartyState}
+              fipsPrefix={stateFipsPrefix}
+              hasDetailedVoterData={hasDetailedVoterData(normalizedStateKey)}
+            />
+          )}
         </div>
 
         {/* Right - Analysis Content */}

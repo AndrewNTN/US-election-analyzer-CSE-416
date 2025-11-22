@@ -4,7 +4,7 @@ import type { PathOptions, Layer, LeafletMouseEvent } from "leaflet";
 import { useRouter } from "@tanstack/react-router";
 import { DETAILED_STATES } from "@/constants/states.ts";
 import { formatStateNameForUrl } from "@/lib/utils";
-import type { BaseMapProps, MapFeatureProps } from "@/lib/map.ts";
+import type { BaseMapProps, MapFeatureProps } from "@/lib/api/geojson-requests";
 
 interface OutlineLayerProps<T extends BaseMapProps = MapFeatureProps> {
   data: FeatureCollection<Geometry, T>;
@@ -33,11 +33,11 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
   const getFeatureStyle = (feature?: Feature<Geometry, T>): PathOptions => {
     // Check if this state is in our detailed states
     const isDetailedState =
-      feature?.properties?.NAME &&
+      feature?.properties?.stateName &&
       Object.keys(DETAILED_STATES).includes(
-        formatStateNameForUrl(feature.properties.NAME),
+        formatStateNameForUrl(feature.properties.stateName),
       );
-    const isCounty = feature?.properties && "STATEFP" in feature.properties;
+    const isCounty = feature?.properties && "geoid" in feature.properties;
     return {
       fillColor: "transparent",
       fillOpacity: 0,
@@ -52,7 +52,7 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
 
   const onEachFeature = (feature: Feature<Geometry, T>, layer: Layer) => {
     if (feature.properties) {
-      const isCounty = feature.properties && "STATEFP" in feature.properties;
+      const isCounty = feature.properties && "geoid" in feature.properties;
       const shouldEnableHover =
         !stateView || (isCounty && enableCountyInteractions);
 
@@ -74,8 +74,10 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
         },
         click: () => {
           // Only handle navigation for state features and when not in state view
-          if (feature.properties.NAME && !stateView) {
-            const stateName = formatStateNameForUrl(feature.properties.NAME);
+          if (feature.properties.stateName && !stateView) {
+            const stateName = formatStateNameForUrl(
+              feature.properties.stateName,
+            );
             router.navigate({ to: `/state/${stateName}` });
           }
 

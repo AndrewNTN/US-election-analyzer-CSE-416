@@ -6,7 +6,7 @@ import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
 //   type CensusBlockData,
 // } from "@/components/map/bubble-chart-layer.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
-import type { StateProps, CountyProps } from "@/lib/map.ts";
+import type { StateProps, CountyProps } from "@/lib/api/geojson-requests";
 import type { StateChoroplethOption } from "@/lib/choropleth.ts";
 import { ChoroplethLegend } from "@/components/map/choropleth-legend";
 import { CvapRegistrationLegend } from "@/components/map/cvap-registration-legend";
@@ -89,11 +89,12 @@ function toSafeCounty(props: unknown): SafeCounty {
   };
 
   return {
-    name: pick("NAME", "name") || "Unknown County",
-    statefp: pick("STATEFP", "state", "STATE", "state_code") || "N/A",
+    name: pick("countyName", "NAME", "name") || "Unknown County",
+    statefp:
+      pick("stateFips", "STATEFP", "state", "STATE", "state_code") || "N/A",
     countyfp: pick("COUNTYFP", "county_code") || "N/A",
     geoid:
-      pick("GEOID", "FIPS", "fips", "id") ||
+      pick("geoid", "GEOID", "FIPS", "fips", "id") ||
       `FAKE-${Math.floor(Math.random() * 10000)}`,
   };
 }

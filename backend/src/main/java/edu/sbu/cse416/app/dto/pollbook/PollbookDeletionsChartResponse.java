@@ -3,7 +3,6 @@ package edu.sbu.cse416.app.dto.pollbook;
 import java.util.Map;
 
 public record PollbookDeletionsChartResponse(
-        Integer removedTotal,
         Integer removedMoved,
         Integer removedDeath,
         Integer removedFelony,
@@ -15,7 +14,6 @@ public record PollbookDeletionsChartResponse(
 
     public static Map<String, String> getDefaultMetricLabels() {
         return Map.of(
-                "removedTotal", "Total Removed",
                 "removedMoved", "Moved",
                 "removedDeath", "Deceased",
                 "removedFelony", "Felony Conviction",
