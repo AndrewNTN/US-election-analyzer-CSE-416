@@ -19,6 +19,10 @@ import {
   getVoterRegistrationChart,
   type VoterRegistrationTableResponse,
   type VoterRegistrationChartResponse,
+  getVotingEquipmentTable,
+  getVotingEquipmentChart,
+  type VotingEquipmentTableResponse,
+  type VotingEquipmentChartResponse,
 } from "@/lib/api/eavs-requests";
 
 export const useProvisionalChartQuery = (
@@ -155,4 +159,29 @@ export const useVoterRegistrationChartQuery = (
       return getVoterRegistrationChart(fipsPrefix);
     },
     enabled: Boolean(fipsPrefix),
+  });
+
+export const useVotingEquipmentTableQuery = (): UseQueryResult<
+  VotingEquipmentTableResponse,
+  Error
+> =>
+  useQuery({
+    queryKey: ["voting-equipment-table"],
+    queryFn: async () => {
+      return getVotingEquipmentTable();
+    },
+  });
+
+export const useVotingEquipmentChartQuery = (
+  stateName: string | null | undefined,
+): UseQueryResult<VotingEquipmentChartResponse, Error> =>
+  useQuery({
+    queryKey: ["voting-equipment-chart", stateName ?? "no-state"],
+    queryFn: async () => {
+      if (!stateName) {
+        throw new Error("Missing state name for voting equipment chart query");
+      }
+      return getVotingEquipmentChart(stateName);
+    },
+    enabled: Boolean(stateName),
   });

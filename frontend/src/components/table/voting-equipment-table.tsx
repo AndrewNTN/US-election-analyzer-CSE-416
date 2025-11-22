@@ -10,23 +10,32 @@ import {
 } from "@tanstack/react-table";
 import { DataTablePagination, DataTableView } from "./data-table.tsx";
 import {
-  votingEquipmentColumns,
+  createVotingEquipmentColumns,
   type VotingEquipment,
 } from "./voting-equipment-columns.tsx";
 import { VotingEquipmentBarChart } from "@/components/chart/voting-equipment-bar-chart.tsx";
-import votingEquipmentByYearJson from "../../../data/votingEquipmentByYear.json" with { type: "json" };
+import { useVotingEquipmentChartQuery } from "@/lib/api/use-eavs-queries";
 
 interface VotingEquipmentTableProps {
   data: VotingEquipment[];
+  metricLabels?: Record<string, string>;
 }
 
-export function VotingEquipmentTable({ data }: VotingEquipmentTableProps) {
+export function VotingEquipmentTable({
+  data,
+  metricLabels,
+}: VotingEquipmentTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
+  const columns = useMemo(
+    () => createVotingEquipmentColumns(metricLabels),
+    [metricLabels],
+  );
+
   const table = useReactTable({
     data,
-    columns: votingEquipmentColumns,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -49,24 +58,21 @@ export function VotingEquipmentTable({ data }: VotingEquipmentTableProps) {
   const selectedState =
     selectedRows.length > 0 ? selectedRows[0].original : null;
 
-  const equipmentByYear = useMemo(() => {
-    if (!selectedState) return [];
+  const { data: chartData } = useVotingEquipmentChartQuery(
+    selectedState?.state,
+  );
 
-    return selectedState.state in votingEquipmentByYearJson
-      ? (
-          votingEquipmentByYearJson as Record<
-            string,
-            Array<{
-              year: number;
-              dreNoVVPAT: number;
-              dreWithVVPAT: number;
-              ballotMarkingDevice: number;
-              scanner: number;
-            }>
-          >
-        )[selectedState.state]
-      : [];
-  }, [selectedState]);
+  const equipmentByYear = useMemo(() => {
+    if (!chartData?.data) return [];
+
+    return chartData.data.map((item) => ({
+      year: item.year,
+      dreNoVVPAT: item.dreNoVVPAT,
+      dreWithVVPAT: item.dreWithVVPAT,
+      ballotMarkingDevice: item.ballotMarkingDevice,
+      scanner: item.scanner,
+    }));
+  }, [chartData]);
 
   return (
     <div className="flex flex-col space-y-1">
@@ -98,20 +104,25 @@ export function VotingEquipmentTable({ data }: VotingEquipmentTableProps) {
         cellClassName="py-1.5 px-2"
       />
 
-      {selectedState && equipmentByYear.length > 0 && (
+      {selectedState && (
         <div className="flex-shrink-0 border-t pt-1 overflow-visible">
-          <VotingEquipmentBarChart
-            stateName={selectedState.state}
-            data={equipmentByYear}
-          />
-        </div>
-      )}
-
-      {selectedState && equipmentByYear.length === 0 && (
-        <div className="flex items-center justify-center border-t pt-2 h-16">
-          <p className="text-sm text-muted-foreground font-medium">
-            No historical equipment data available for {selectedState.state}.
-          </p>
+          {chartData === undefined ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Loading historical data...
+            </div>
+          ) : equipmentByYear.length > 0 ? (
+            <VotingEquipmentBarChart
+              stateName={selectedState.state}
+              data={equipmentByYear}
+              metricLabels={chartData?.metricLabels}
+              xAxisLabel={chartData?.xAxisLabel}
+              yAxisLabel={chartData?.yAxisLabel}
+            />
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No historical data available for {selectedState.state}
+            </div>
+          )}
         </div>
       )}
 

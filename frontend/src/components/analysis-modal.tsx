@@ -12,7 +12,7 @@ import type { EquipmentSummary } from "@/components/table/equipment-summary-colu
 import { StateComparisonTable } from "@/components/table/state-comparison-table.tsx";
 import { OptInOptOutTable } from "@/components/table/opt-in-opt-out-table.tsx";
 import { EarlyVotingTable } from "@/components/table/early-voting-table.tsx";
-import votingEquipmentDataJson from "../../data/votingEquipment.json" with { type: "json" };
+import { useVotingEquipmentTableQuery } from "@/lib/api/use-eavs-queries";
 import equipmentSummaryDataJson from "../../data/equipmentSummary.json" with { type: "json" };
 import {
   stateComparisonData,
@@ -32,9 +32,6 @@ import {
 } from "@/lib/early-voting-data.ts";
 
 import type { AnalysisItem } from "./analysis-drawer";
-
-const votingEquipmentData: VotingEquipment[] =
-  votingEquipmentDataJson as VotingEquipment[];
 
 const equipmentSummaryData: EquipmentSummary[] =
   equipmentSummaryDataJson as EquipmentSummary[];
@@ -62,11 +59,21 @@ export default function AnalysisModal({
   onOpenChange,
   selectedAnalysis,
 }: AnalysisModalProps) {
+  const { data: votingEquipmentTableData } = useVotingEquipmentTableQuery();
+
+  const votingEquipmentData: VotingEquipment[] =
+    votingEquipmentTableData?.data || [];
+
   const renderContent = () => {
     if (!selectedAnalysis) return null;
     switch (selectedAnalysis.title) {
       case AnalysisOption.US_VOTING_EQUIPMENT:
-        return <VotingEquipmentTable data={votingEquipmentData} />;
+        return (
+          <VotingEquipmentTable
+            data={votingEquipmentData}
+            metricLabels={votingEquipmentTableData?.metricLabels}
+          />
+        );
       case AnalysisOption.EQUIPMENT_SUMMARY:
         return <EquipmentSummaryTable data={equipmentSummaryData} />;
       case AnalysisOption.REPUBLICAN_VS_DEMOCRATIC:

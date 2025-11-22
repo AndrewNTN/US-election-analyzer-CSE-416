@@ -167,3 +167,38 @@ export const getVoterRegistrationChart = async (
   fipsPrefix: string,
 ): Promise<VoterRegistrationChartResponse> =>
   fetchJson(`/eavs/voter-registration/chart/${fipsPrefix}`);
+
+export interface VotingEquipmentTableResponse {
+  data: {
+    state: string;
+    dreNoVVPAT: number;
+    dreWithVVPAT: number;
+    ballotMarkingDevice: number;
+    scanner: number;
+  }[];
+  metricLabels: Record<string, string>;
+}
+
+export interface VotingEquipmentChartResponse {
+  data: {
+    year: number;
+    dreNoVVPAT: number;
+    dreWithVVPAT: number;
+    ballotMarkingDevice: number;
+    scanner: number;
+  }[];
+  metricLabels: Record<string, string>;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
+}
+
+export const getVotingEquipmentTable =
+  async (): Promise<VotingEquipmentTableResponse> =>
+    fetchJson(`/eavs/voting-equipment/table`);
+
+export const getVotingEquipmentChart = async (
+  stateName: string,
+): Promise<VotingEquipmentChartResponse> =>
+  fetchJson(
+    `/eavs/voting-equipment/chart?stateName=${encodeURIComponent(stateName)}`,
+  );

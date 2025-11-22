@@ -19,30 +19,36 @@ interface VotingEquipmentBarChartProps {
     ballotMarkingDevice: number;
     scanner: number;
   }[];
+  metricLabels?: Record<string, string>;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
 }
 
 export function VotingEquipmentBarChart({
   data,
+  metricLabels,
+  xAxisLabel = "Year",
+  yAxisLabel = "Quantity",
 }: VotingEquipmentBarChartProps) {
   const categories = [
     {
       key: "dreNoVVPAT",
-      label: "DRE (No VVPAT)",
+      label: metricLabels?.dreNoVVPAT || "DRE (No VVPAT)",
       color: "#8e51ff",
     },
     {
       key: "dreWithVVPAT",
-      label: "DRE (With VVPAT)",
+      label: metricLabels?.dreWithVVPAT || "DRE (With VVPAT)",
       color: "#8e51ff",
     },
     {
       key: "ballotMarkingDevice",
-      label: "Ballot Marking Device",
+      label: metricLabels?.ballotMarkingDevice || "Ballot Marking Device",
       color: "#8e51ff",
     },
     {
       key: "scanner",
-      label: "Scanner",
+      label: metricLabels?.scanner || "Scanner",
       color: "#8e51ff",
     },
   ];
@@ -71,7 +77,7 @@ export function VotingEquipmentBarChart({
                   <XAxis
                     dataKey="year"
                     label={{
-                      value: "Year",
+                      value: xAxisLabel,
                       position: "insideBottom",
                       offset: -3,
                       style: { fontSize: 12 },
@@ -80,7 +86,7 @@ export function VotingEquipmentBarChart({
                   />
                   <YAxis
                     label={{
-                      value: "Quantity",
+                      value: yAxisLabel,
                       angle: -90,
                       position: "insideLeft",
                       style: { textAnchor: "middle", fontSize: 12 },

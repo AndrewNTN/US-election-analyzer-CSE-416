@@ -9,6 +9,8 @@ import edu.sbu.cse416.app.dto.provisional.ProvisionalChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalTableResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationChartResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationTableResponse;
+import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentChartResponse;
+import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentTableResponse;
 import edu.sbu.cse416.app.service.EavsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -77,6 +79,18 @@ public class EavsController {
     @GetMapping("voter-registration/chart/{fipsPrefix}")
     public ResponseEntity<VoterRegistrationChartResponse> getVoterRegistrationChart(@PathVariable String fipsPrefix) {
         var dto = eavsService.getVoterRegistrationChart(fipsPrefix);
+        return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/voting-equipment/table")
+    public ResponseEntity<VotingEquipmentTableResponse> getVotingEquipmentTable() {
+        var dto = eavsService.getVotingEquipmentTable();
+        return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/voting-equipment/chart")
+    public ResponseEntity<VotingEquipmentChartResponse> getVotingEquipmentChart(@RequestParam String stateName) {
+        var dto = eavsService.getVotingEquipmentChart(stateName);
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 }

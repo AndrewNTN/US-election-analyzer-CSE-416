@@ -8,17 +8,23 @@ export type VotingEquipment = {
   scanner: number;
 };
 
-export const votingEquipmentColumns: ColumnDef<VotingEquipment>[] = [
+export const createVotingEquipmentColumns = (
+  metricLabels?: Record<string, string>,
+): ColumnDef<VotingEquipment>[] => [
   {
     accessorKey: "state",
-    header: "State",
+    header: metricLabels?.state || "State",
     cell: ({ row }) => (
       <div className="font-medium">{row.getValue("state")}</div>
     ),
   },
   {
     accessorKey: "dreNoVVPAT",
-    header: () => <div className="text-right">DRE (No VVPAT)</div>,
+    header: () => (
+      <div className="text-right">
+        {metricLabels?.dreNoVVPAT || "DRE (No VVPAT)"}
+      </div>
+    ),
     cell: ({ row }) => {
       const value = row.getValue("dreNoVVPAT") as number;
       return <div className="text-right">{value.toLocaleString()}</div>;
@@ -26,7 +32,11 @@ export const votingEquipmentColumns: ColumnDef<VotingEquipment>[] = [
   },
   {
     accessorKey: "dreWithVVPAT",
-    header: () => <div className="text-right">DRE (With VVPAT)</div>,
+    header: () => (
+      <div className="text-right">
+        {metricLabels?.dreWithVVPAT || "DRE (With VVPAT)"}
+      </div>
+    ),
     cell: ({ row }) => {
       const value = row.getValue("dreWithVVPAT") as number;
       return <div className="text-right">{value.toLocaleString()}</div>;
@@ -34,7 +44,11 @@ export const votingEquipmentColumns: ColumnDef<VotingEquipment>[] = [
   },
   {
     accessorKey: "ballotMarkingDevice",
-    header: () => <div className="text-right">Ballot Marking Device</div>,
+    header: () => (
+      <div className="text-right">
+        {metricLabels?.ballotMarkingDevice || "Ballot Marking Device"}
+      </div>
+    ),
     cell: ({ row }) => {
       const value = row.getValue("ballotMarkingDevice") as number;
       return <div className="text-right">{value.toLocaleString()}</div>;
@@ -42,10 +56,15 @@ export const votingEquipmentColumns: ColumnDef<VotingEquipment>[] = [
   },
   {
     accessorKey: "scanner",
-    header: () => <div className="text-right">Scanner</div>,
+    header: () => (
+      <div className="text-right">{metricLabels?.scanner || "Scanner"}</div>
+    ),
     cell: ({ row }) => {
       const value = row.getValue("scanner") as number;
       return <div className="text-right">{value.toLocaleString()}</div>;
     },
   },
 ];
+
+// Keep backward compatibility
+export const votingEquipmentColumns = createVotingEquipmentColumns();

@@ -9,17 +9,21 @@ import edu.sbu.cse416.app.dto.provisional.ProvisionalChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalTableResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationChartResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationTableResponse;
-import edu.sbu.cse416.app.model.eavs.EavsData;
-import edu.sbu.cse416.app.model.eavs.MailBallotsRejectedReason;
-import edu.sbu.cse416.app.model.eavs.ProvisionalBallots;
-import edu.sbu.cse416.app.model.eavs.VoterRegistration;
+import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentChartResponse;
+import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentDTO;
+import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentTableResponse;
+import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentYearlyDTO;
+import edu.sbu.cse416.app.model.eavs.*;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
 import edu.sbu.cse416.app.repository.StateVoterRegistrationRepository;
 import edu.sbu.cse416.app.util.RecordAggregator;
-import java.util.List;
-import java.util.Map;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EavsService {
@@ -226,6 +230,109 @@ public class EavsService {
                 response.voterNotEligible(),
                 response.noBallotApplication(),
                 MailBallotsRejectedChartResponse.getDefaultMetricLabels());
+    }
+
+    /**
+     * Get voting equipment data for the table (2024 only, aggregated by state).
+     */
+    @Cacheable(value = "votingEquipmentTable")
+    public VotingEquipmentTableResponse getVotingEquipmentTable() {
+        // Get all data for year 2024 by filtering (continental US states only - exclude territories and non-continental states)
+        List<EavsData> allData = repo.findByFipsCodeAllYears("^");
+        
+        List<String> excludedStates = List.of(
+            "ALASKA", "HAWAII", "GUAM", "AMERICAN SAMOA", "PUERTO RICO", 
+            "U.S. VIRGIN ISLANDS", "NORTHERN MARIANA ISLANDS", "DISTRICT OF COLUMBIA"
+        );
+        
+        List<EavsData> data = allData.stream()
+            .filter(record -> record.electionYear() != null && record.electionYear() == 2024)
+            .filter(record -> record.stateFull() != null && 
+                              !excludedStates.contains(record.stateFull()))
+            .toList();
+
+        Map<String, VotingEquipmentDTO> stateMap = new HashMap<>();
+
+        for (EavsData record : data) {
+            if (record.stateFull() == null || record.equipment() == null) continue;
+
+            String state = record.stateFull();
+            Equipment eq = record.equipment();
+
+            stateMap.merge(state, new VotingEquipmentDTO(
+                state,
+                eq.dreNoVVPAT() != null ? eq.dreNoVVPAT() : 0,
+                eq.dreWithVVPAT() != null ? eq.dreWithVVPAT() : 0,
+                eq.ballotMarkingDevice() != null ? eq.ballotMarkingDevice() : 0,
+                eq.scanner() != null ? eq.scanner() : 0
+            ), (v1, v2) -> new VotingEquipmentDTO(
+                state,
+                v1.dreNoVVPAT() + v2.dreNoVVPAT(),
+                v1.dreWithVVPAT() + v2.dreWithVVPAT(),
+                v1.ballotMarkingDevice() + v2.ballotMarkingDevice(),
+                v1.scanner() + v2.scanner()
+            ));
+        }
+
+        List<VotingEquipmentDTO> sortedData = stateMap.values().stream()
+            .sorted(Comparator.comparing(VotingEquipmentDTO::state))
+            .collect(java.util.stream.Collectors.toList());
+
+        return new VotingEquipmentTableResponse(sortedData, VotingEquipmentTableResponse.getDefaultMetricLabels());
+    }
+
+    /**
+     * Get voting equipment data for the chart (aggregated by year for a specific state).
+     */
+    @Cacheable(value = "votingEquipmentChart", key = "#stateName")
+    public VotingEquipmentChartResponse getVotingEquipmentChart(String stateName) {
+        // Query all years and filter by state name
+        List<EavsData> allData = repo.findByFipsCodeAllYears("^");
+        List<EavsData> data = allData.stream()
+            .filter(record -> record.stateFull() != null && 
+                              record.stateFull().equalsIgnoreCase(stateName))
+            .toList();
+
+        if (data.isEmpty()) {
+            return new VotingEquipmentChartResponse(
+                List.of(),
+                VotingEquipmentChartResponse.getDefaultMetricLabels(),
+                "Year",
+                "Quantity");
+        }
+
+        Map<Integer, VotingEquipmentYearlyDTO> yearMap = new HashMap<>();
+
+        for (EavsData record : data) {
+            if (record.electionYear() == null || record.equipment() == null) continue;
+
+            Integer year = record.electionYear();
+            Equipment eq = record.equipment();
+
+            yearMap.merge(year, new VotingEquipmentYearlyDTO(
+                year,
+                eq.dreNoVVPAT() != null ? eq.dreNoVVPAT() : 0,
+                eq.dreWithVVPAT() != null ? eq.dreWithVVPAT() : 0,
+                eq.ballotMarkingDevice() != null ? eq.ballotMarkingDevice() : 0,
+                eq.scanner() != null ? eq.scanner() : 0
+            ), (v1, v2) -> new VotingEquipmentYearlyDTO(
+                year,
+                v1.dreNoVVPAT() + v2.dreNoVVPAT(),
+                v1.dreWithVVPAT() + v2.dreWithVVPAT(),
+                v1.ballotMarkingDevice() + v2.ballotMarkingDevice(),
+                v1.scanner() + v2.scanner()
+            ));
+        }
+
+        List<VotingEquipmentYearlyDTO> sortedData = yearMap.values().stream()
+            .sorted(Comparator.comparing(VotingEquipmentYearlyDTO::year))
+            .collect(java.util.stream.Collectors.toList());
+
+        return new VotingEquipmentChartResponse(
+            sortedData,
+            VotingEquipmentChartResponse.getDefaultMetricLabels(),
+            "Year",
+            "Quantity");
     }
 
     /**
