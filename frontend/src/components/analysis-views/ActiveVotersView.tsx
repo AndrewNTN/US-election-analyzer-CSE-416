@@ -37,23 +37,34 @@ export function ActiveVotersView({
         </p>
       ) : (
         <>
-          {tableData && (
-            <ActiveVotersTable
-              data={tableData.data}
-              metricLabels={tableData.metricLabels}
-            />
-          )}
-          {chartData && (
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
-                Active Voters Status
-              </h3>
-              <ActiveVotersBarChart
-                stateName={stateName}
-                barData={chartData}
-                metricLabels={chartData.metricLabels}
-              />
-            </div>
+          {chartData &&
+          chartData.totalRegistered === 0 &&
+          chartData.totalActive === 0 &&
+          chartData.totalInactive === 0 ? (
+            <p className="py-8 text-lg font-semibold">
+              Data not reported for this state.
+            </p>
+          ) : (
+            <>
+              {tableData && (
+                <ActiveVotersTable
+                  data={tableData.data}
+                  metricLabels={tableData.metricLabels}
+                />
+              )}
+              {chartData && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
+                    Active Voters Status
+                  </h3>
+                  <ActiveVotersBarChart
+                    stateName={stateName}
+                    barData={chartData}
+                    metricLabels={chartData.metricLabels}
+                  />
+                </div>
+              )}
+            </>
           )}
         </>
       )}

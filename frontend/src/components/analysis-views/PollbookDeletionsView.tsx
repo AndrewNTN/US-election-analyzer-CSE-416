@@ -37,6 +37,21 @@ export function PollbookDeletionsView({
     ? (tableError?.message ?? "Unknown error")
     : null;
 
+  if (
+    chartData &&
+    Object.values(chartData)
+      .filter((val): val is number => typeof val === "number")
+      .every((val) => val === 0)
+  ) {
+    return (
+      <div className="text-xs text-muted-foreground text-center">
+        <p className="py-8 text-lg font-semibold">
+          Data not reported for this state.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="text-xs text-muted-foreground text-center">
       {tableLoading ? (

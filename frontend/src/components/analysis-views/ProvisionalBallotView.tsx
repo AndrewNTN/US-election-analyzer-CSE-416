@@ -42,24 +42,35 @@ export function ProvisionalBallotView({
         </p>
       ) : (
         <>
-          {provTableData && (
-            <ProvisionBallotsTable
-              data={provTableData}
-              isPending={provTableLoading}
-              isError={provTableHasError}
-              error={provTableError}
-            />
-          )}
-          {provChartData && (
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
-                Provisional Ballots by Reason
-              </h3>
-              <ProvisionalBallotsBarChart
-                stateName={stateName}
-                barData={provChartData}
-              />
-            </div>
+          {provChartData &&
+          Object.values(provChartData)
+            .filter((val): val is number => typeof val === "number")
+            .every((val) => val === 0) ? (
+            <p className="py-8 text-lg font-semibold">
+              Data not reported for this state.
+            </p>
+          ) : (
+            <>
+              {provTableData && (
+                <ProvisionBallotsTable
+                  data={provTableData}
+                  isPending={provTableLoading}
+                  isError={provTableHasError}
+                  error={provTableError}
+                />
+              )}
+              {provChartData && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
+                    Provisional Ballots by Reason
+                  </h3>
+                  <ProvisionalBallotsBarChart
+                    stateName={stateName}
+                    barData={provChartData}
+                  />
+                </div>
+              )}
+            </>
           )}
         </>
       )}
