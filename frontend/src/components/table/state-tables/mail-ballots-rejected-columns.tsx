@@ -2,7 +2,7 @@ import type { ColumnDef, Row } from "@tanstack/react-table";
 import type { MailBallotsRejectedData } from "@/lib/api/eavs-requests";
 import { TableTooltip } from "@/components/table/table-tooltip";
 
-type MetricKey = keyof Omit<MailBallotsRejectedData, "jurisdictionName">;
+type MetricKey = keyof Omit<MailBallotsRejectedData, "eavsRegion">;
 
 interface GroupedColumn {
   id: string;
@@ -83,10 +83,10 @@ export const getMailBallotsRejectedColumns = (
 
   return [
     {
-      accessorKey: "jurisdictionName",
+      accessorKey: "eavsRegion",
       header: () => <div className="text-left text-sm font-medium">Region</div>,
       cell: ({ row }: { row: Row<MailBallotsRejectedData> }) => {
-        const regionName = row.getValue("jurisdictionName") as string;
+        const regionName = row.getValue("eavsRegion") as string;
 
         return (
           <TableTooltip content={regionName}>

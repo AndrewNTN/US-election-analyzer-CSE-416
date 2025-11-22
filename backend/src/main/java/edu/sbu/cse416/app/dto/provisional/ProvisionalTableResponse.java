@@ -9,7 +9,7 @@ import java.util.Map;
 public record ProvisionalTableResponse(List<Data> data, Map<String, String> metricLabels) {
 
     public record Data(
-            String jurisdictionName,
+            String eavsRegion,
             Integer totalProv,
             Integer provCountFullyCounted,
             Integer provCountPartialCounted,

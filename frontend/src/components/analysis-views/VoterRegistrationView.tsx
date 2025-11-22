@@ -1,29 +1,12 @@
 import { VoterRegistrationTable } from "../table/state-tables/voter-registration-table.tsx";
-import eavsRegionVoterDataJson from "../../../data/eavsRegionVoterData.json" with { type: "json" };
 import { VoterRegistrationLineChart } from "../chart/voter-registration-line-chart";
-import voterRegistrationDataJson from "../../../data/voterRegistrationChanges.json" with { type: "json" };
 import { hasDetailedVoterData } from "@/constants/states.ts";
-
-// Voter registration data - already sorted by 2024 registered voters in ascending order
-const voterRegistrationData = voterRegistrationDataJson as {
-  jurisdiction: string;
-  registeredVoters2016: number;
-  registeredVoters2020: number;
-  registeredVoters2024: number;
-}[];
-
-// EAVS region voter data for Florida counties
-const eavsRegionVoterData = eavsRegionVoterDataJson as {
-  eavsRegion: string;
-  totalRegisteredVoters: number;
-  democraticVoters: number;
-  republicanVoters: number;
-  unaffiliatedVoters: number;
-  otherPartyVoters: number;
-  registrationRate: number;
-  activeVoters: number;
-  inactiveVoters: number;
-}[];
+import {
+  useVoterRegistrationTableQuery,
+  useVoterRegistrationChartQuery,
+} from "@/lib/api/use-eavs-queries";
+import { getStateFipsCode } from "@/constants/stateFips.ts";
+import { useMemo } from "react";
 
 interface VoterRegistrationViewProps {
   normalizedStateKey: string;
@@ -32,17 +15,36 @@ interface VoterRegistrationViewProps {
 export function VoterRegistrationView({
   normalizedStateKey,
 }: VoterRegistrationViewProps) {
+  // Get state FIPS code
+  const stateFips = getStateFipsCode(normalizedStateKey);
+
+  // Fetch data using query hooks
+  const { data: tableData } = useVoterRegistrationTableQuery(stateFips);
+  const { data: chartData } = useVoterRegistrationChartQuery(stateFips);
+
+  // Transform chart data to match expected format
+  const transformedChartData = useMemo(() => {
+    if (!chartData?.data) return [];
+    // Sort by 2024 registered voters (already sorted from backend)
+    return chartData.data.map((item) => ({
+      eavsRegion: item.eavsRegion,
+      registeredVoters2016: item.registeredVoters2016,
+      registeredVoters2020: item.registeredVoters2020,
+      registeredVoters2024: item.registeredVoters2024,
+    }));
+  }, [chartData]);
+
   return (
     <div>
       {hasDetailedVoterData(normalizedStateKey) && (
-        <VoterRegistrationTable data={eavsRegionVoterData} />
+        <VoterRegistrationTable data={tableData?.data || []} />
       )}
       <div className="mt-4">
         <h3 className="text-lg font-semibold mb-2 text-center text-gray-900">
           Changes in Voter Registration by County
         </h3>
         <div className="h-[350px]">
-          <VoterRegistrationLineChart data={voterRegistrationData} />
+          <VoterRegistrationLineChart data={transformedChartData} />
         </div>
       </div>
     </div>

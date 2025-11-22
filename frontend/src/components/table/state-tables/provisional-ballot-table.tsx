@@ -22,7 +22,7 @@ export function ProvisionBallotsTable({
   const tableData = useMemo(() => {
     const mappedData = data.data.map((record) => {
       return {
-        jurisdictionName: record.jurisdictionName || "Unknown",
+        eavsRegion: record.eavsRegion || "Unknown",
         totalProv: record.totalProv ?? 0,
         provCountFullyCounted: record.provCountFullyCounted ?? 0,
         provCountPartialCounted: record.provCountPartialCounted ?? 0,
@@ -52,7 +52,7 @@ export function ProvisionBallotsTable({
 
     // Add total row at the end
     const totalRow = {
-      jurisdictionName: "TOTAL",
+      eavsRegion: "TOTAL",
       ...totals,
     };
 

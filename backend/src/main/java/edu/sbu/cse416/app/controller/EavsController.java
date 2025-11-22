@@ -7,6 +7,8 @@ import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedTableResponse;
 import edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalTableResponse;
+import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationChartResponse;
+import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationTableResponse;
 import edu.sbu.cse416.app.service.EavsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,14 +55,28 @@ public class EavsController {
     }
 
     @GetMapping("mail-ballots-rejected/table/{fipsPrefix}")
-    public ResponseEntity<MailBallotsRejectedTableResponse> getMailBallotsRejectedTable(@PathVariable String fipsPrefix) {
+    public ResponseEntity<MailBallotsRejectedTableResponse> getMailBallotsRejectedTable(
+            @PathVariable String fipsPrefix) {
         var dto = eavsService.getMailBallotsRejectedTable(fipsPrefix);
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 
     @GetMapping("mail-ballots-rejected/chart/{fipsPrefix}")
-    public ResponseEntity<MailBallotsRejectedChartResponse> getMailBallotsRejectedChart(@PathVariable String fipsPrefix) {
+    public ResponseEntity<MailBallotsRejectedChartResponse> getMailBallotsRejectedChart(
+            @PathVariable String fipsPrefix) {
         var dto = eavsService.getMailBallotsRejectedChart(fipsPrefix);
+        return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("voter-registration/table/{stateFips}")
+    public ResponseEntity<VoterRegistrationTableResponse> getVoterRegistrationTable(@PathVariable String stateFips) {
+        var dto = eavsService.getVoterRegistrationTable(stateFips);
+        return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("voter-registration/chart/{fipsPrefix}")
+    public ResponseEntity<VoterRegistrationChartResponse> getVoterRegistrationChart(@PathVariable String fipsPrefix) {
+        var dto = eavsService.getVoterRegistrationChart(fipsPrefix);
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 }

@@ -11,7 +11,7 @@ import {
 import { formatNumber } from "@/lib/utils";
 
 type VoterRegistrationData = {
-  jurisdiction: string;
+  eavsRegion: string;
   registeredVoters2016: number;
   registeredVoters2020: number;
   registeredVoters2024: number;
@@ -19,7 +19,7 @@ type VoterRegistrationData = {
 
 type ChartDataPoint = {
   jurisdiction: number;
-  jurisdictionName: string;
+  eavsRegion: string;
   "2016": number;
   "2020": number;
   "2024": number;
@@ -36,7 +36,7 @@ export function VoterRegistrationLineChart({
   // The data is already sorted by 2024 registered voters in ascending order
   const chartData: ChartDataPoint[] = data.map((item, index) => ({
     jurisdiction: index + 1, // Use index for x-axis (sorted order)
-    jurisdictionName: item.jurisdiction,
+    eavsRegion: item.eavsRegion,
     "2016": item.registeredVoters2016,
     "2020": item.registeredVoters2020,
     "2024": item.registeredVoters2024,
@@ -58,7 +58,7 @@ export function VoterRegistrationLineChart({
       return (
         <div className="bg-background border rounded-lg p-3 shadow-lg">
           <p className="font-medium text-sm mb-2">
-            {tooltipData.jurisdictionName}
+            {tooltipData.eavsRegion}
           </p>
           <p className="text-sm text-cyan-600">
             2016: {tooltipData["2016"].toLocaleString()} registered voters

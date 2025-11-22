@@ -7,14 +7,17 @@ import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedTableResponse;
 import edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalTableResponse;
+import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationChartResponse;
+import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationTableResponse;
 import edu.sbu.cse416.app.model.eavs.EavsData;
 import edu.sbu.cse416.app.model.eavs.MailBallotsRejectedReason;
 import edu.sbu.cse416.app.model.eavs.ProvisionalBallots;
-import edu.sbu.cse416.app.model.eavs.VoterDeletion;
 import edu.sbu.cse416.app.model.eavs.VoterRegistration;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
+import edu.sbu.cse416.app.repository.StateVoterRegistrationRepository;
 import edu.sbu.cse416.app.util.RecordAggregator;
 import java.util.List;
+import java.util.Map;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +25,11 @@ import org.springframework.stereotype.Service;
 public class EavsService {
 
     private final EavsDataRepository repo;
+    private final StateVoterRegistrationRepository voterRegRepo;
 
-    public EavsService(EavsDataRepository repo) {
+    public EavsService(EavsDataRepository repo, StateVoterRegistrationRepository voterRegRepo) {
         this.repo = repo;
+        this.voterRegRepo = voterRegRepo;
     }
 
     /**
@@ -200,8 +205,8 @@ public class EavsService {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
         List<EavsData> data = repo.findByFipsCode("^" + prefix);
 
-        MailBallotsRejectedChartResponse response =
-                RecordAggregator.aggregate(data, EavsData::mailBallotsRejectedReason, MailBallotsRejectedChartResponse.class);
+        MailBallotsRejectedChartResponse response = RecordAggregator.aggregate(
+                data, EavsData::mailBallotsRejectedReason, MailBallotsRejectedChartResponse.class);
 
         return new MailBallotsRejectedChartResponse(
                 response.late(),
@@ -221,5 +226,69 @@ public class EavsService {
                 response.voterNotEligible(),
                 response.noBallotApplication(),
                 MailBallotsRejectedChartResponse.getDefaultMetricLabels());
+    }
+
+    /**
+     * Get voter registration table data for a state FIPS code.
+     * Returns county-level party affiliation data.
+     */
+    @Cacheable(value = "voterRegistrationTable", key = "#stateFips")
+    public VoterRegistrationTableResponse getVoterRegistrationTable(String stateFips) {
+        var stateData = voterRegRepo.findByStateFips(stateFips);
+
+        if (stateData.isEmpty()) {
+            return new VoterRegistrationTableResponse(
+                    List.of(), VoterRegistrationTableResponse.getDefaultMetricLabels());
+        }
+
+        List<VoterRegistrationTableResponse.Data> tableData = stateData.get().countyVoterRegistrations().stream()
+                .map(county -> new VoterRegistrationTableResponse.Data(
+                        cleanJurisdictionName(county.countyName()),
+                        county.totalRegisteredVoters(),
+                        county.democraticVoters(),
+                        county.republicanVoters(),
+                        county.unaffiliatedVoters()))
+                .toList();
+
+        return new VoterRegistrationTableResponse(tableData, VoterRegistrationTableResponse.getDefaultMetricLabels());
+    }
+
+    /**
+     * Get voter registration chart data for a state FIPS prefix.
+     * Returns historical voter registration totals (2016, 2020, 2024) by county.
+     */
+    @Cacheable(value = "voterRegistrationChart", key = "#fipsPrefix")
+    public VoterRegistrationChartResponse getVoterRegistrationChart(String fipsPrefix) {
+        String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
+        List<EavsData> data = repo.findByFipsCode("^" + prefix);
+
+        // Filter and group by jurisdiction, then pivot years into separate fields
+        Map<String, Map<Integer, Integer>> jurisdictionData = data.stream()
+                .filter(record -> {
+                    Integer year = record.electionYear();
+                    return year != null && (year == 2016 || year == 2020 || year == 2024);
+                })
+                .collect(java.util.stream.Collectors.groupingBy(
+                        record -> cleanJurisdictionName(record.jurisdictionName()),
+                        java.util.stream.Collectors.toMap(
+                                EavsData::electionYear,
+                                record -> {
+                                    VoterRegistration vr = record.voterRegistration();
+                                    return nz(vr == null ? null : vr.totalRegistered());
+                                },
+                                (existing, replacement) -> existing // In case of duplicates, keep first
+                                )));
+
+        // Convert to chart response data and sort by 2024 registration count
+        List<VoterRegistrationChartResponse.Data> chartData = jurisdictionData.entrySet().stream()
+                .map(entry -> new VoterRegistrationChartResponse.Data(
+                        entry.getKey(),
+                        entry.getValue().getOrDefault(2016, 0),
+                        entry.getValue().getOrDefault(2020, 0),
+                        entry.getValue().getOrDefault(2024, 0)))
+                .sorted((a, b) -> Integer.compare(a.registeredVoters2024(), b.registeredVoters2024()))
+                .toList();
+
+        return new VoterRegistrationChartResponse(chartData, VoterRegistrationChartResponse.getDefaultMetricLabels());
     }
 }

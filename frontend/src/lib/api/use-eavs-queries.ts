@@ -15,6 +15,10 @@ import {
   getMailBallotsRejectedChart,
   type MailBallotsRejectedTableResponse,
   type MailBallotsRejectedChartResponse,
+  getVoterRegistrationTable,
+  getVoterRegistrationChart,
+  type VoterRegistrationTableResponse,
+  type VoterRegistrationChartResponse,
 } from "@/lib/api/eavs-requests";
 
 export const useProvisionalChartQuery = (
@@ -117,6 +121,38 @@ export const useMailBallotsRejectedChartQuery = (
         );
       }
       return getMailBallotsRejectedChart(fipsPrefix);
+    },
+    enabled: Boolean(fipsPrefix),
+  });
+
+export const useVoterRegistrationTableQuery = (
+  stateFips: string | null | undefined,
+): UseQueryResult<VoterRegistrationTableResponse, Error> =>
+  useQuery({
+    queryKey: ["voter-registration-table", stateFips ?? "no-fips"],
+    queryFn: async () => {
+      if (!stateFips) {
+        throw new Error(
+          "Missing state FIPS for voter registration table query",
+        );
+      }
+      return getVoterRegistrationTable(stateFips);
+    },
+    enabled: Boolean(stateFips),
+  });
+
+export const useVoterRegistrationChartQuery = (
+  fipsPrefix: string | null | undefined,
+): UseQueryResult<VoterRegistrationChartResponse, Error> =>
+  useQuery({
+    queryKey: ["voter-registration-chart", fipsPrefix ?? "no-fips"],
+    queryFn: async () => {
+      if (!fipsPrefix) {
+        throw new Error(
+          "Missing FIPS prefix for voter registration chart query",
+        );
+      }
+      return getVoterRegistrationChart(fipsPrefix);
     },
     enabled: Boolean(fipsPrefix),
   });

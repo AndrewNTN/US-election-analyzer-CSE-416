@@ -1,7 +1,7 @@
 import type { ColumnDef, Row } from "@tanstack/react-table";
 
 export interface ActiveVotersData {
-  jurisdiction: string;
+  eavsRegion: string;
   totalActive: number;
   totalRegistered: number;
   totalInactive: number;
@@ -12,11 +12,11 @@ export const getActiveVotersColumns = (
   metricLabels?: Record<string, string>,
 ): ColumnDef<ActiveVotersData>[] => [
   {
-    accessorKey: "jurisdiction",
+    accessorKey: "eavsRegion",
     header: () => <div className="text-left">Region</div>,
     cell: ({ row }: { row: Row<ActiveVotersData> }) => (
       <div className="text-sm text-left text-black font-medium">
-        {row.getValue("jurisdiction")}
+        {row.getValue("eavsRegion")}
       </div>
     ),
   },

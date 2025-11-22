@@ -1,7 +1,7 @@
 import type { ColumnDef, Row } from "@tanstack/react-table";
 
 export type ProvisionalTableRow = {
-  jurisdictionName: string;
+  eavsRegion: string;
   totalProv: number;
   provCountFullyCounted: number;
   provCountPartialCounted: number;
@@ -21,15 +21,15 @@ export const createProvisionalBallotsColumns = (
   metricLabels: Record<string, string>,
 ): ColumnDef<ProvisionalTableRow>[] => [
   {
-    accessorKey: "jurisdictionName",
+    accessorKey: "eavsRegion",
     header: () => <div className="text-left font-semibold">Region</div>,
     cell: ({ row }: { row: Row<ProvisionalTableRow> }) => {
-      const isTotal = row.original.jurisdictionName === "TOTAL";
+      const isTotal = row.original.eavsRegion === "TOTAL";
       return (
         <div
           className={`text-sm text-left py-0 px-0 ${isTotal ? "font-bold text-black" : "text-black font-medium"}`}
         >
-          {row.original.jurisdictionName}
+          {row.original.eavsRegion}
         </div>
       );
     },
@@ -38,7 +38,7 @@ export const createProvisionalBallotsColumns = (
     id: key,
     header: () => <div className="text-right">{metricLabels[key] || key}</div>,
     cell: ({ row }: { row: Row<ProvisionalTableRow> }) => {
-      const isTotal = row.original.jurisdictionName === "TOTAL";
+      const isTotal = row.original.eavsRegion === "TOTAL";
       const value = row.original[key] ?? 0;
       return (
         <div

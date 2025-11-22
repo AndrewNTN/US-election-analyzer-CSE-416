@@ -8,9 +8,6 @@ export type EAVSRegionVoterData = {
   democraticVoters: number;
   republicanVoters: number;
   unaffiliatedVoters: number;
-  otherPartyVoters: number;
-  activeVoters: number;
-  inactiveVoters: number;
 };
 
 export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [

@@ -16,7 +16,7 @@ export interface ProvisionalChartResponse {
 
 export interface ProvisionalTableResponse {
   data: {
-    jurisdictionName: string;
+    eavsRegion: string;
     totalProv?: number;
     provCountFullyCounted?: number;
     provCountPartialCounted?: number;
@@ -45,7 +45,7 @@ export interface ActiveVotersChartResponse {
 
 export interface ActiveVotersTableResponse {
   data: {
-    jurisdiction: string;
+    eavsRegion: string;
     totalRegistered: number;
     totalActive: number;
     totalInactive: number;
@@ -81,7 +81,7 @@ export interface MailBallotsRejectedTableResponse {
 }
 
 export interface MailBallotsRejectedData {
-  jurisdictionName: string;
+  eavsRegion: string;
   late: number;
   missingVoterSignature: number;
   missingWitnessSignature: number;
@@ -134,3 +134,34 @@ export const getMailBallotsRejectedChart = async (
   fipsPrefix: string,
 ): Promise<MailBallotsRejectedChartResponse> =>
   fetchJson(`/eavs/mail-ballots-rejected/chart/${fipsPrefix}`);
+
+export interface VoterRegistrationTableResponse {
+  data: {
+    eavsRegion: string;
+    totalRegisteredVoters: number;
+    democraticVoters: number;
+    republicanVoters: number;
+    unaffiliatedVoters: number;
+  }[];
+  metricLabels: Record<string, string>;
+}
+
+export interface VoterRegistrationChartResponse {
+  data: {
+    eavsRegion: string;
+    registeredVoters2016: number;
+    registeredVoters2020: number;
+    registeredVoters2024: number;
+  }[];
+  metricLabels: Record<string, string>;
+}
+
+export const getVoterRegistrationTable = async (
+  stateFips: string,
+): Promise<VoterRegistrationTableResponse> =>
+  fetchJson(`/eavs/voter-registration/table/${stateFips}`);
+
+export const getVoterRegistrationChart = async (
+  fipsPrefix: string,
+): Promise<VoterRegistrationChartResponse> =>
+  fetchJson(`/eavs/voter-registration/chart/${fipsPrefix}`);
