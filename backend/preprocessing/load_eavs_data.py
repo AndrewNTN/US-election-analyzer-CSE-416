@@ -75,7 +75,7 @@ def load_eavs_2024(collection, csv_path):
     # Apply numeric cleaning to all relevant columns
     numeric_cols = (voter_registration_cols + voter_deletion_cols + mail_rejected_cols +
                     provisional_e1_cols + provisional_e2_cols + provisional_e2_other_cols +
-                    equipment_cols + ["C1a", "C3a", "C5a", "F1f", "F1b", "C8a", "C9a", "B24a"]
+                    equipment_cols + ["C1b", "C6a", "C5a", "F1f", "F1b", "C8a", "C9a", "B24a"]
                     )
 
     for col in numeric_cols:
@@ -190,8 +190,8 @@ def load_eavs_2024(collection, csv_path):
             },
 
             # Top-level aggregates
-            "mailTransmittedTotal": row.get("C1a", 0),
-            "dropBoxesTotal": row.get("C3a", 0),
+            "mailBallotsCountedTotal": row.get("C1b", 0),
+            "dropBoxesTotal": row.get("C6a", 0),
             "totalDropBoxesEarlyVoting": row.get("C5a", 0),
             "inPersonEarlyVoting": row.get("F1f", 0),
 
@@ -278,7 +278,7 @@ def load_eavs_2022_2020_2018(collection, csv_path, year):
             "mailBallotsRejectedReason": None,
             "provisionalBallots": None,
             "voterDeletion": None,
-            "mailTransmittedTotal": None,
+            "mailBallotsCountedTotal": None,
             "dropBoxesTotal": None,
             "totalDropBoxesEarlyVoting": None,
             "inPersonEarlyVoting": None,
@@ -360,11 +360,19 @@ def load_eavs_2016(collection, csv_path):
                 "scanner": scanner
             },
 
+            # Equipment Summary
+            "equipment": {
+                "dreNoVVPAT": dre_no_vvpat,
+                "dreWithVVPAT": dre_with_vvpat,
+                "ballotMarkingDevice": ballot_marking_device,
+                "scanner": scanner
+            },
+
             # Null fields not needed for 2016
             "mailBallotsRejectedReason": None,
             "provisionalBallots": None,
             "voterDeletion": None,
-            "mailTransmittedTotal": None,
+            "mailBallotsCountedTotal": None,
             "dropBoxesTotal": None,
             "totalDropBoxesEarlyVoting": None,
             "inPersonEarlyVoting": None,

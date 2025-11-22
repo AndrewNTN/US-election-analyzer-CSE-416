@@ -12,13 +12,11 @@ import type { EquipmentSummary } from "@/components/table/equipment-summary-colu
 import { StateComparisonTable } from "@/components/table/state-comparison-table.tsx";
 import { OptInOptOutTable } from "@/components/table/opt-in-opt-out-table.tsx";
 import { EarlyVotingTable } from "@/components/table/early-voting-table.tsx";
-import { useVotingEquipmentTableQuery } from "@/lib/api/use-queries.ts";
-import equipmentSummaryDataJson from "../../data/equipmentSummary.json" with { type: "json" };
 import {
-  stateComparisonData,
-  republicanStateName,
-  democraticStateName,
-} from "@/lib/state-comparison-data.ts";
+  useVotingEquipmentTableQuery,
+  useStateComparisonQuery,
+} from "@/lib/api/use-queries.ts";
+import equipmentSummaryDataJson from "../../data/equipmentSummary.json" with { type: "json" };
 import {
   optInOptOutData,
   optInStateName,
@@ -59,7 +57,20 @@ export default function AnalysisModal({
   onOpenChange,
   selectedAnalysis,
 }: AnalysisModalProps) {
-  const { data: votingEquipmentTableData } = useVotingEquipmentTableQuery();
+  // Only query voting equipment data when US Voting Equipment analysis is selected
+  const {
+    data: votingEquipmentTableData,
+    isLoading: isVotingEquipmentLoading,
+  } = useVotingEquipmentTableQuery({
+    enabled: selectedAnalysis?.title === AnalysisOption.US_VOTING_EQUIPMENT,
+  });
+
+  // Only query state comparison data when Republican vs Democratic analysis is selected
+  const { data: stateComparisonData, isLoading: isStateComparisonLoading } =
+    useStateComparisonQuery("12", "06", {
+      enabled:
+        selectedAnalysis?.title === AnalysisOption.REPUBLICAN_VS_DEMOCRATIC,
+    });
 
   const votingEquipmentData: VotingEquipment[] =
     votingEquipmentTableData?.data || [];
@@ -68,7 +79,11 @@ export default function AnalysisModal({
     if (!selectedAnalysis) return null;
     switch (selectedAnalysis.title) {
       case AnalysisOption.US_VOTING_EQUIPMENT:
-        return (
+        return isVotingEquipmentLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">Loading voting equipment...</p>
+          </div>
+        ) : (
           <VotingEquipmentTable
             data={votingEquipmentData}
             metricLabels={votingEquipmentTableData?.metricLabels}
@@ -77,12 +92,20 @@ export default function AnalysisModal({
       case AnalysisOption.EQUIPMENT_SUMMARY:
         return <EquipmentSummaryTable data={equipmentSummaryData} />;
       case AnalysisOption.REPUBLICAN_VS_DEMOCRATIC:
-        return (
+        return isStateComparisonLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">Loading state comparison...</p>
+          </div>
+        ) : stateComparisonData ? (
           <StateComparisonTable
-            data={stateComparisonData}
-            republicanState={republicanStateName}
-            democraticState={democraticStateName}
+            data={stateComparisonData.data}
+            republicanState={stateComparisonData.republicanState}
+            democraticState={stateComparisonData.democraticState}
           />
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">No data available</p>
+          </div>
         );
       case AnalysisOption.OPT_IN_VS_OPT_OUT:
         return (
@@ -150,7 +173,7 @@ export default function AnalysisModal({
     selectedAnalysis?.title === AnalysisOption.EARLY_VOTING_COMPARISON ||
     selectedAnalysis?.title === AnalysisOption.OPT_IN_VS_OPT_OUT;
   const dialogWidthClass = isComparisonTable
-    ? "min-w-[45rem] max-w-[90%]"
+    ? "min-w-[65rem] max-w-[90%]"
     : "min-w-[77rem] max-w-[95%]";
 
   return (

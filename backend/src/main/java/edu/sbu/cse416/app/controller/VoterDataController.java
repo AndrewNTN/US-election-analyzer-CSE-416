@@ -12,6 +12,7 @@ import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationTableResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentChartResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentTableResponse;
 import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
+import edu.sbu.cse416.app.dto.statecomparison.StateComparisonResponse;
 import edu.sbu.cse416.app.service.VoterDataService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -99,5 +100,13 @@ public class VoterDataController {
     public ResponseEntity<CvapRegistrationRateResponse> getCvapRegistrationRate(@PathVariable String fipsPrefix) {
         var response = voterDataService.getCvapRegistrationRate(fipsPrefix);
         return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/state-comparison")
+    public ResponseEntity<StateComparisonResponse> getStateComparison(
+            @RequestParam String republicanStateFips, 
+            @RequestParam String democraticStateFips) {
+        var response = voterDataService.getStateComparison(republicanStateFips, democraticStateFips);
+        return ResponseEntity.ok(response);
     }
 }

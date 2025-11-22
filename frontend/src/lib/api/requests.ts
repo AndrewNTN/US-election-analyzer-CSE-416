@@ -212,3 +212,22 @@ export const getCvapRegistrationRate = async (
   fipsPrefix: string,
 ): Promise<CvapRegistrationRateResponse> =>
   fetchJson(`/cvap-registration-rate/${fipsPrefix}`);
+
+export interface StateComparisonResponse {
+  data: {
+    metric: string;
+    republicanValue: string;
+    democraticValue: string;
+  }[];
+  metricLabels: Record<string, string>;
+  republicanState: string;
+  democraticState: string;
+}
+
+export const getStateComparison = async (
+  republicanStateFips: string,
+  democraticStateFips: string,
+): Promise<StateComparisonResponse> =>
+  fetchJson(
+    `/state-comparison?republicanStateFips=${republicanStateFips}&democraticStateFips=${democraticStateFips}`,
+  );

@@ -25,6 +25,8 @@ import {
   type VotingEquipmentChartResponse,
   getCvapRegistrationRate,
   type CvapRegistrationRateResponse,
+  getStateComparison,
+  type StateComparisonResponse,
 } from "@/lib/api/requests.ts";
 
 export const useProvisionalChartQuery = (
@@ -163,15 +165,15 @@ export const useVoterRegistrationChartQuery = (
     enabled: Boolean(fipsPrefix),
   });
 
-export const useVotingEquipmentTableQuery = (): UseQueryResult<
-  VotingEquipmentTableResponse,
-  Error
-> =>
+export const useVotingEquipmentTableQuery = (options?: {
+  enabled?: boolean;
+}): UseQueryResult<VotingEquipmentTableResponse, Error> =>
   useQuery({
     queryKey: ["voting-equipment-table"],
     queryFn: async () => {
       return getVotingEquipmentTable();
     },
+    ...options,
   });
 
 export const useVotingEquipmentChartQuery = (
@@ -200,4 +202,17 @@ export const useCvapRegistrationRateQuery = (
       return getCvapRegistrationRate(fipsPrefix);
     },
     enabled: Boolean(fipsPrefix),
+  });
+
+export const useStateComparisonQuery = (
+  republicanStateFips: string,
+  democraticStateFips: string,
+  options?: { enabled?: boolean },
+): UseQueryResult<StateComparisonResponse, Error> =>
+  useQuery({
+    queryKey: ["state-comparison", republicanStateFips, democraticStateFips],
+    queryFn: async () => {
+      return getStateComparison(republicanStateFips, democraticStateFips);
+    },
+    ...options,
   });

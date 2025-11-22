@@ -17,6 +17,7 @@ public record EavsData(
         VoterDeletion voterDeletion,
         Equipment equipment,
         Integer mailTransmittedTotal,
+        Integer mailBallotsCountedTotal,
         Integer dropBoxesTotal,
         Integer totalDropBoxesEarlyVoting,
         Integer inPersonEarlyVoting,
