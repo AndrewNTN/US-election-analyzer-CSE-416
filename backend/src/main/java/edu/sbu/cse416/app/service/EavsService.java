@@ -260,7 +260,7 @@ public class EavsService {
     @Cacheable(value = "voterRegistrationChart", key = "#fipsPrefix")
     public VoterRegistrationChartResponse getVoterRegistrationChart(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByFipsCode("^" + prefix);
+        List<EavsData> data = repo.findByFipsCodeAllYears("^" + prefix);
 
         // Filter and group by jurisdiction, then pivot years into separate fields
         Map<String, Map<Integer, Integer>> jurisdictionData = data.stream()
@@ -274,7 +274,9 @@ public class EavsService {
                                 EavsData::electionYear,
                                 record -> {
                                     VoterRegistration vr = record.voterRegistration();
-                                    return nz(vr == null ? null : vr.totalRegistered());
+                                    Integer total = nz(vr == null ? null : vr.totalRegistered());
+                                    Integer currentYear = record.electionYear();
+                                    return total;
                                 },
                                 (existing, replacement) -> existing // In case of duplicates, keep first
                                 )));
@@ -289,6 +291,10 @@ public class EavsService {
                 .sorted((a, b) -> Integer.compare(a.registeredVoters2024(), b.registeredVoters2024()))
                 .toList();
 
-        return new VoterRegistrationChartResponse(chartData, VoterRegistrationChartResponse.getDefaultMetricLabels());
+        return new VoterRegistrationChartResponse(
+                chartData,
+                VoterRegistrationChartResponse.getDefaultMetricLabels(),
+                "Counties (Ordered from Smallest to Largest by 2024 Registration)",
+                "Number of Registered Voters");
     }
 }

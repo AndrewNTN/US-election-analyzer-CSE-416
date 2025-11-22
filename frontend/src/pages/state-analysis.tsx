@@ -232,7 +232,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     if (normalizedStateKey === "california") {
       return activeVotersDataCaliforniaJson.map(
         (item: ActiveVotersDataItem) => ({
-          jurisdiction: item.eavsRegion,
+          eavsRegion: item.eavsRegion,
           totalActive: item.activeVoters,
           totalRegistered: item.totalVoters,
           totalInactive: item.inactiveVoters,
@@ -240,14 +240,14 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
       );
     } else if (normalizedStateKey === "florida") {
       return activeVotersDataFloridaJson.map((item: ActiveVotersDataItem) => ({
-        jurisdiction: item.eavsRegion,
+        eavsRegion: item.eavsRegion,
         totalActive: item.activeVoters,
         totalRegistered: item.totalVoters,
         totalInactive: item.inactiveVoters,
       }));
     }
     return activeVotersDataJson.map((item: ActiveVotersDataItem) => ({
-      jurisdiction: item.eavsRegion,
+      eavsRegion: item.eavsRegion,
       totalActive: item.activeVoters,
       totalRegistered: item.totalVoters,
       totalInactive: item.inactiveVoters,
@@ -315,6 +315,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
               {selectedDataset === AnalysisType.VOTER_REGISTRATION ? (
                 <VoterRegistrationView
                   normalizedStateKey={normalizedStateKey}
+                  stateFips={stateFipsPrefix}
                 />
               ) : selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY ? (
                 <StateEquipmentSummaryView />

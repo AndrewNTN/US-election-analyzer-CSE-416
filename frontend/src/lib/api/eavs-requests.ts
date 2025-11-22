@@ -154,6 +154,8 @@ export interface VoterRegistrationChartResponse {
     registeredVoters2024: number;
   }[];
   metricLabels: Record<string, string>;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
 }
 
 export const getVoterRegistrationTable = async (

@@ -5,19 +5,18 @@ import {
   useVoterRegistrationTableQuery,
   useVoterRegistrationChartQuery,
 } from "@/lib/api/use-eavs-queries";
-import { getStateFipsCode } from "@/constants/stateFips.ts";
+
 import { useMemo } from "react";
 
 interface VoterRegistrationViewProps {
   normalizedStateKey: string;
+  stateFips: string | undefined;
 }
 
 export function VoterRegistrationView({
   normalizedStateKey,
+  stateFips,
 }: VoterRegistrationViewProps) {
-  // Get state FIPS code
-  const stateFips = getStateFipsCode(normalizedStateKey);
-
   // Fetch data using query hooks
   const { data: tableData } = useVoterRegistrationTableQuery(stateFips);
   const { data: chartData } = useVoterRegistrationChartQuery(stateFips);
@@ -44,7 +43,11 @@ export function VoterRegistrationView({
           Changes in Voter Registration by County
         </h3>
         <div className="h-[350px]">
-          <VoterRegistrationLineChart data={transformedChartData} />
+          <VoterRegistrationLineChart
+            data={transformedChartData}
+            xAxisLabel={chartData?.xAxisLabel}
+            yAxisLabel={chartData?.yAxisLabel}
+          />
         </div>
       </div>
     </div>

@@ -27,10 +27,14 @@ type ChartDataPoint = {
 
 interface VoterRegistrationLineChartProps {
   data: VoterRegistrationData[];
+  xAxisLabel?: string;
+  yAxisLabel?: string;
 }
 
 export function VoterRegistrationLineChart({
   data,
+  xAxisLabel,
+  yAxisLabel,
 }: VoterRegistrationLineChartProps) {
   // Transform data for the line chart
   // The data is already sorted by 2024 registered voters in ascending order
@@ -57,9 +61,7 @@ export function VoterRegistrationLineChart({
       const tooltipData = payload[0].payload;
       return (
         <div className="bg-background border rounded-lg p-3 shadow-lg">
-          <p className="font-medium text-sm mb-2">
-            {tooltipData.eavsRegion}
-          </p>
+          <p className="font-medium text-sm mb-2">{tooltipData.eavsRegion}</p>
           <p className="text-sm text-cyan-600">
             2016: {tooltipData["2016"].toLocaleString()} registered voters
           </p>
@@ -86,8 +88,7 @@ export function VoterRegistrationLineChart({
           <XAxis
             dataKey="jurisdiction"
             label={{
-              value:
-                "Counties (Ordered from Smallest to Largest by 2024 Registration)",
+              value: xAxisLabel,
               position: "insideBottom",
               offset: -10,
             }}
@@ -95,7 +96,7 @@ export function VoterRegistrationLineChart({
           />
           <YAxis
             label={{
-              value: "Number of Registered Voters",
+              value: yAxisLabel,
               angle: -90,
               position: "insideLeft",
               style: { textAnchor: "middle" },
