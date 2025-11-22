@@ -23,7 +23,9 @@ import {
   getVotingEquipmentChart,
   type VotingEquipmentTableResponse,
   type VotingEquipmentChartResponse,
-} from "@/lib/api/eavs-requests";
+  getCvapRegistrationRate,
+  type CvapRegistrationRateResponse,
+} from "@/lib/api/requests.ts";
 
 export const useProvisionalChartQuery = (
   fipsPrefix: string | null | undefined,
@@ -184,4 +186,18 @@ export const useVotingEquipmentChartQuery = (
       return getVotingEquipmentChart(stateName);
     },
     enabled: Boolean(stateName),
+  });
+
+export const useCvapRegistrationRateQuery = (
+  fipsPrefix: string | null | undefined,
+): UseQueryResult<CvapRegistrationRateResponse, Error> =>
+  useQuery({
+    queryKey: ["cvap-registration-rate", fipsPrefix ?? "no-fips"],
+    queryFn: async () => {
+      if (!fipsPrefix) {
+        throw new Error("Missing FIPS prefix for CVAP registration rate query");
+      }
+      return getCvapRegistrationRate(fipsPrefix);
+    },
+    enabled: Boolean(fipsPrefix),
   });

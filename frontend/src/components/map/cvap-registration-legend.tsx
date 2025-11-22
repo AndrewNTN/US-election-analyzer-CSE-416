@@ -1,22 +1,19 @@
 import { Card } from "@/components/ui/card";
-import type { ActiveVotersData } from "@/components/table/state-tables/active-voters-columns";
+import { useCvapRegistrationRateQuery } from "@/lib/api/use-queries";
 
 interface CvapRegistrationLegendProps {
-  data: ActiveVotersData[];
+  fipsPrefix: string | null | undefined;
 }
 
-export function CvapRegistrationLegend({ data }: CvapRegistrationLegendProps) {
-  const regionsWithRate = data.filter(
-    (region) => typeof region.registrationRate === "number",
-  );
+export function CvapRegistrationLegend({
+  fipsPrefix,
+}: CvapRegistrationLegendProps) {
+  const { data: cvapData, isLoading } =
+    useCvapRegistrationRateQuery(fipsPrefix);
 
-  if (regionsWithRate.length === 0) {
+  if (isLoading || !cvapData) {
     return null;
   }
-
-  const rates = regionsWithRate.map((region) => region.registrationRate ?? 0);
-  const total = rates.reduce((sum, rate) => sum + rate, 0);
-  const averageRate = total / rates.length;
 
   const formatRate = (rate: number | undefined) =>
     rate === undefined ? "N/A" : `${rate.toFixed(1)}%`;
@@ -27,8 +24,10 @@ export function CvapRegistrationLegend({ data }: CvapRegistrationLegendProps) {
       <div className="space-y-2 text-sm">
         <div className="flex items-center justify-between">
           <span>
-            Average Rate:{" "}
-            <span className="font-medium">{formatRate(averageRate)}</span>
+            {cvapData.label}:{" "}
+            <span className="font-medium">
+              {formatRate(cvapData.registrationRate)}
+            </span>
           </span>
         </div>
       </div>

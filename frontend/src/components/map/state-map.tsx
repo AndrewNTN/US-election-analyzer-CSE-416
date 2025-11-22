@@ -10,7 +10,6 @@ import type { StateProps, CountyProps } from "@/lib/map.ts";
 import type { StateChoroplethOption } from "@/lib/choropleth.ts";
 import { ChoroplethLegend } from "@/components/map/choropleth-legend";
 import { CvapRegistrationLegend } from "@/components/map/cvap-registration-legend";
-import type { ActiveVotersData as ActiveVotersTableData } from "@/components/table/state-tables/active-voters-columns";
 import {
   Dialog,
   DialogContent,
@@ -42,7 +41,7 @@ interface StateMapProps {
   // censusBlockData?: CensusBlockData[];
   showBubbleChart?: boolean;
   showCvapLegend?: boolean;
-  cvapLegendData?: ActiveVotersTableData[];
+  fipsPrefix?: string | null;
   hasDetailedVoterData?: boolean;
 }
 
@@ -273,7 +272,7 @@ export default function StateMap({
   // censusBlockData = [],
   // showBubbleChart = false,
   showCvapLegend = false,
-  cvapLegendData = [],
+  fipsPrefix,
   hasDetailedVoterData = false,
 }: StateMapProps) {
   const [selectedCounty, setSelectedCounty] = useState<SafeCounty | null>(null);
@@ -355,9 +354,9 @@ export default function StateMap({
             <ChoroplethLegend choroplethOption={choroplethOption} />
           </div>
         )}
-        {showCvapLegend && cvapLegendData.length > 0 ? (
+        {showCvapLegend ? (
           <div className="absolute bottom-32 right-4 z-10 max-w-xs">
-            <CvapRegistrationLegend data={cvapLegendData} />
+            <CvapRegistrationLegend fipsPrefix={fipsPrefix} />
           </div>
         ) : null}
       </div>

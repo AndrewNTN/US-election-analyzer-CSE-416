@@ -3,7 +3,7 @@
 import { Info } from "lucide-react";
 import { DataTable } from "../data-table.tsx";
 import { getMailBallotsRejectedColumns } from "./mail-ballots-rejected-columns.tsx";
-import type { MailBallotsRejectedData } from "@/lib/api/eavs-requests";
+import type { MailBallotsRejectedData } from "@/lib/api/requests.ts";
 
 interface MailBallotsRejectedTableProps {
   data: MailBallotsRejectedData[];

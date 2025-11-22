@@ -1,6 +1,6 @@
 import { BaseBarChart } from "./base-bar-chart";
 import { formatNumber } from "@/lib/utils";
-import { type ActiveVotersChartResponse } from "@/lib/api/eavs-requests";
+import { type ActiveVotersChartResponse } from "@/lib/api/requests.ts";
 
 export interface ActiveVotersBarChartProps {
   stateName: string;

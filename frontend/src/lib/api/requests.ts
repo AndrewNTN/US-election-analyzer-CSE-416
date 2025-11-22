@@ -29,12 +29,12 @@ export interface ProvisionalTableResponse {
 export const getProvisionalChart = async (
   fipsPrefix: string,
 ): Promise<ProvisionalChartResponse> =>
-  fetchJson(`/eavs/provisional/chart/${fipsPrefix}`);
+  fetchJson(`/provisional/chart/${fipsPrefix}`);
 
 export const getProvisionalTable = async (
   fipsPrefix: string,
 ): Promise<ProvisionalTableResponse> =>
-  fetchJson(`/eavs/provisional/table/${fipsPrefix}`);
+  fetchJson(`/provisional/table/${fipsPrefix}`);
 
 export interface ActiveVotersChartResponse {
   totalRegistered: number;
@@ -56,12 +56,12 @@ export interface ActiveVotersTableResponse {
 export const getActiveVotersChart = async (
   fipsPrefix: string,
 ): Promise<ActiveVotersChartResponse> =>
-  fetchJson(`/eavs/active-voters/chart/${fipsPrefix}`);
+  fetchJson(`/active-voters/chart/${fipsPrefix}`);
 
 export const getActiveVotersTable = async (
   fipsPrefix: string,
 ): Promise<ActiveVotersTableResponse> =>
-  fetchJson(`/eavs/active-voters/table/${fipsPrefix}`);
+  fetchJson(`/active-voters/table/${fipsPrefix}`);
 
 export interface PollbookDeletionsChartResponse {
   removedTotal: number;
@@ -123,17 +123,17 @@ export interface MailBallotsRejectedChartResponse {
 export const getPollbookDeletionsChart = async (
   fipsPrefix: string,
 ): Promise<PollbookDeletionsChartResponse> =>
-  fetchJson(`/eavs/pollbook-deletions/chart/${fipsPrefix}`);
+  fetchJson(`/pollbook-deletions/chart/${fipsPrefix}`);
 
 export const getMailBallotsRejectedTable = async (
   fipsPrefix: string,
 ): Promise<MailBallotsRejectedTableResponse> =>
-  fetchJson(`/eavs/mail-ballots-rejected/table/${fipsPrefix}`);
+  fetchJson(`/mail-ballots-rejected/table/${fipsPrefix}`);
 
 export const getMailBallotsRejectedChart = async (
   fipsPrefix: string,
 ): Promise<MailBallotsRejectedChartResponse> =>
-  fetchJson(`/eavs/mail-ballots-rejected/chart/${fipsPrefix}`);
+  fetchJson(`/mail-ballots-rejected/chart/${fipsPrefix}`);
 
 export interface VoterRegistrationTableResponse {
   data: {
@@ -161,12 +161,12 @@ export interface VoterRegistrationChartResponse {
 export const getVoterRegistrationTable = async (
   stateFips: string,
 ): Promise<VoterRegistrationTableResponse> =>
-  fetchJson(`/eavs/voter-registration/table/${stateFips}`);
+  fetchJson(`/voter-registration/table/${stateFips}`);
 
 export const getVoterRegistrationChart = async (
   fipsPrefix: string,
 ): Promise<VoterRegistrationChartResponse> =>
-  fetchJson(`/eavs/voter-registration/chart/${fipsPrefix}`);
+  fetchJson(`/voter-registration/chart/${fipsPrefix}`);
 
 export interface VotingEquipmentTableResponse {
   data: {
@@ -194,11 +194,21 @@ export interface VotingEquipmentChartResponse {
 
 export const getVotingEquipmentTable =
   async (): Promise<VotingEquipmentTableResponse> =>
-    fetchJson(`/eavs/voting-equipment/table`);
+    fetchJson(`/voting-equipment/table`);
 
 export const getVotingEquipmentChart = async (
   stateName: string,
 ): Promise<VotingEquipmentChartResponse> =>
   fetchJson(
-    `/eavs/voting-equipment/chart?stateName=${encodeURIComponent(stateName)}`,
+    `/voting-equipment/chart?stateName=${encodeURIComponent(stateName)}`,
   );
+
+export interface CvapRegistrationRateResponse {
+  registrationRate: number;
+  label: string;
+}
+
+export const getCvapRegistrationRate = async (
+  fipsPrefix: string,
+): Promise<CvapRegistrationRateResponse> =>
+  fetchJson(`/cvap-registration-rate/${fipsPrefix}`);

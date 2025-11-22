@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import { DataTable, DataTablePagination } from "../data-table.tsx";
 import { createProvisionalBallotsColumns } from "./provisional-ballot-columns.tsx";
-import type { ProvisionalTableResponse } from "@/lib/api/eavs-requests";
+import type { ProvisionalTableResponse } from "@/lib/api/requests.ts";
 
 interface ProvisionalBallotsTableProps {
   data: ProvisionalTableResponse;

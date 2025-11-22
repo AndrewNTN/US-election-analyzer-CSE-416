@@ -14,7 +14,7 @@ import {
   type VotingEquipment,
 } from "./voting-equipment-columns.tsx";
 import { VotingEquipmentBarChart } from "@/components/chart/voting-equipment-bar-chart.tsx";
-import { useVotingEquipmentChartQuery } from "@/lib/api/use-eavs-queries";
+import { useVotingEquipmentChartQuery } from "@/lib/api/use-queries.ts";
 
 interface VotingEquipmentTableProps {
   data: VotingEquipment[];

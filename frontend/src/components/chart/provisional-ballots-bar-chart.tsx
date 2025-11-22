@@ -1,6 +1,6 @@
 import { BaseBarChart } from "./base-bar-chart";
 import { formatNumber } from "@/lib/utils";
-import type { ProvisionalChartResponse } from "@/lib/api/eavs-requests.ts";
+import type { ProvisionalChartResponse } from "@/lib/api/requests.ts";
 
 export interface ProvisionalBallotsBarChartProps {
   stateName: string;

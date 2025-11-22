@@ -12,7 +12,7 @@ import type { EquipmentSummary } from "@/components/table/equipment-summary-colu
 import { StateComparisonTable } from "@/components/table/state-comparison-table.tsx";
 import { OptInOptOutTable } from "@/components/table/opt-in-opt-out-table.tsx";
 import { EarlyVotingTable } from "@/components/table/early-voting-table.tsx";
-import { useVotingEquipmentTableQuery } from "@/lib/api/use-eavs-queries";
+import { useVotingEquipmentTableQuery } from "@/lib/api/use-queries.ts";
 import equipmentSummaryDataJson from "../../data/equipmentSummary.json" with { type: "json" };
 import {
   stateComparisonData,

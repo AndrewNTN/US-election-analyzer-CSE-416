@@ -4,7 +4,7 @@ import { hasDetailedVoterData } from "@/constants/states.ts";
 import {
   useVoterRegistrationTableQuery,
   useVoterRegistrationChartQuery,
-} from "@/lib/api/use-eavs-queries";
+} from "@/lib/api/use-queries.ts";
 
 import { useMemo } from "react";
 

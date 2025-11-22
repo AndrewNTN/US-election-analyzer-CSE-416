@@ -1,6 +1,6 @@
 import { BaseBarChart } from "./base-bar-chart";
 import { formatNumber } from "@/lib/utils";
-import { type PollbookDeletionsChartResponse } from "@/lib/api/eavs-requests";
+import { type PollbookDeletionsChartResponse } from "@/lib/api/requests.ts";
 
 export interface PollbookDeletionsBarChartProps {
   stateName: string;

@@ -13,9 +13,12 @@ import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentChartResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentDTO;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentTableResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentYearlyDTO;
+import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
+import edu.sbu.cse416.app.model.CvapData;
 import edu.sbu.cse416.app.model.eavs.*;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
 import edu.sbu.cse416.app.repository.StateVoterRegistrationRepository;
+import edu.sbu.cse416.app.repository.CvapDataRepository;
 import edu.sbu.cse416.app.util.RecordAggregator;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -24,16 +27,19 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 @Service
-public class EavsService {
+public class VoterDataService {
 
     private final EavsDataRepository repo;
     private final StateVoterRegistrationRepository voterRegRepo;
+    private final CvapDataRepository cvapRepo;
 
-    public EavsService(EavsDataRepository repo, StateVoterRegistrationRepository voterRegRepo) {
+    public VoterDataService(EavsDataRepository repo, StateVoterRegistrationRepository voterRegRepo, CvapDataRepository cvapRepo) {
         this.repo = repo;
         this.voterRegRepo = voterRegRepo;
+        this.cvapRepo = cvapRepo;
     }
 
     /**
@@ -403,5 +409,84 @@ public class EavsService {
                 VoterRegistrationChartResponse.getDefaultMetricLabels(),
                 "Counties (Ordered from Smallest to Largest by 2024 Registration)",
                 "Number of Registered Voters");
+    }
+
+    /**
+     * Get CVAP registration rate for an entire state.
+     * Calculates percentage registered as: (total registered voters from EAVS 2024 / total CVAP) * 100
+     */
+    @Cacheable(value = "cvapRegistrationRate", key = "#fipsPrefix")
+    public CvapRegistrationRateResponse getCvapRegistrationRate(String fipsPrefix) {
+        String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
+        
+        // Get EAVS 2024 data for the state
+        List<EavsData> eavsData = repo.findByFipsCode("^" + prefix);
+        
+        // Get CVAP data for the state  
+        List<CvapData> cvapDataList = cvapRepo.findByGeoidPrefix("^" + prefix);
+        
+        // Create map of geoid -> cvap data for easy lookup
+        Map<String, CvapData> cvapMap = new HashMap<>();
+        for (CvapData cvap : cvapDataList) {
+            cvapMap.put(cvap.geoid(), cvap);
+        }
+        
+        // Aggregate totals across all counties
+        long totalRegisteredVoters = 0;
+        long totalCvapEstimate = 0;
+        int matchedCounties = 0;
+        int eavsCounties = 0;
+        
+        for (EavsData eavs : eavsData) {
+            eavsCounties++;
+            if (eavs.fipsCode() == null || eavs.voterRegistration() == null) continue;
+            
+            // Truncate EAVS FIPS code to 5 digits to match CVAP geoid format
+            // EAVS uses 10-digit codes like "1200100000", CVAP uses 5-digit like "12001"
+            String eavsFips = eavs.fipsCode().length() >= 5 
+                ? eavs.fipsCode().substring(0, 5) 
+                : eavs.fipsCode();
+            
+            // Match EAVS data with CVAP data by FIPS code
+            CvapData cvap = cvapMap.get(eavsFips);
+            if (cvap == null) {
+                if (eavsCounties <= 3) {
+                    System.out.println("No CVAP match for EAVS FIPS: " + eavs.fipsCode() + " (truncated: " + eavsFips + ")");
+                }
+                continue;
+            }
+            
+            if (cvap.totalCvapEstimate() == null || cvap.totalCvapEstimate() == 0) {
+                continue;
+            }
+            
+            Integer registered = eavs.voterRegistration().totalRegistered();
+            if (registered == null || registered == 0) continue;
+
+            matchedCounties++;
+            totalRegisteredVoters += registered;
+            totalCvapEstimate += cvap.totalCvapEstimate();
+        }
+        
+        // Calculate state-level registration rate
+        double rate = 0.0;
+        if (totalCvapEstimate > 0) {
+            rate = (totalRegisteredVoters / (double) totalCvapEstimate) * 100;
+            rate = Math.round(rate * 100.0) / 100.0; // Round to 2 decimal places
+        }
+
+        // Log for debugging
+        System.out.println("CVAP Debug - FIPS: " + prefix +
+                          ", EAVS counties: " + eavsCounties + 
+                          ", CVAP counties: " + cvapDataList.size() +
+                          ", Matched: " + matchedCounties +
+                          ", Total Registered: " + totalRegisteredVoters +
+                          ", Total CVAP: " + totalCvapEstimate +
+                          ", Rate: " + rate + "%");
+
+        return new CvapRegistrationRateResponse(
+            rate,
+            CvapRegistrationRateResponse.getDefaultLabel()
+        );
     }
 }

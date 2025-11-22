@@ -1,7 +1,7 @@
 import {
   useActiveVotersChartQuery,
   useActiveVotersTableQuery,
-} from "@/lib/api/use-eavs-queries.ts";
+} from "@/lib/api/use-queries.ts";
 import { ActiveVotersTable } from "../table/state-tables/active-voters-table.tsx";
 import { ActiveVotersBarChart } from "../chart/active-voters-bar-chart";
 

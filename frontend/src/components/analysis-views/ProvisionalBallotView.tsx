@@ -1,7 +1,7 @@
 import {
   useProvisionalChartQuery,
   useProvisionalTableQuery,
-} from "@/lib/api/use-eavs-queries.ts";
+} from "@/lib/api/use-queries.ts";
 import { ProvisionBallotsTable } from "../table/state-tables/provisional-ballot-table.tsx";
 import { ProvisionalBallotsBarChart } from "../chart/provisional-ballots-bar-chart";
 

@@ -3,7 +3,7 @@ import { MailBallotsRejectedBarChart } from "../chart/mail-ballots-rejected-bar-
 import {
   useMailBallotsRejectedChartQuery,
   useMailBallotsRejectedTableQuery,
-} from "@/lib/api/use-eavs-queries.ts";
+} from "@/lib/api/use-queries.ts";
 import { getStateFipsCode } from "@/constants/stateFips.ts";
 
 interface MailBallotsRejectedViewProps {

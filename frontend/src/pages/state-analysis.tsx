@@ -17,9 +17,6 @@ import {
 } from "@/lib/choropleth.ts";
 import StateMap from "@/components/map/state-map.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
-import activeVotersDataJson from "../../data/activeVotersData.json" with { type: "json" };
-import activeVotersDataCaliforniaJson from "../../data/activeVotersData-california.json" with { type: "json" };
-import activeVotersDataFloridaJson from "../../data/activeVotersData-florida.json" with { type: "json" };
 
 // View Components
 import { VoterRegistrationView } from "@/components/analysis-views/VoterRegistrationView";
@@ -33,13 +30,6 @@ import { MailBallotsRejectedView } from "@/components/analysis-views/MailBallots
 
 const statesData = statesJSON as FeatureCollection<Geometry, StateProps>;
 const countiesData = countiesJSON as FeatureCollection<Geometry, CountyProps>;
-
-interface ActiveVotersDataItem {
-  eavsRegion: string;
-  activeVoters: number;
-  totalVoters: number;
-  inactiveVoters: number;
-}
 
 const AnalysisType = {
   PROVISIONAL_BALLOT: "prov-ballot-bchart",
@@ -226,34 +216,6 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     selectedDataset === AnalysisType.VOTER_REGISTRATION &&
     hasDetailedVoterData(normalizedStateKey);
 
-  // Needed for Map Legend
-  // TODO: change this wh
-  const activeVotersData = useMemo(() => {
-    if (normalizedStateKey === "california") {
-      return activeVotersDataCaliforniaJson.map(
-        (item: ActiveVotersDataItem) => ({
-          eavsRegion: item.eavsRegion,
-          totalActive: item.activeVoters,
-          totalRegistered: item.totalVoters,
-          totalInactive: item.inactiveVoters,
-        }),
-      );
-    } else if (normalizedStateKey === "florida") {
-      return activeVotersDataFloridaJson.map((item: ActiveVotersDataItem) => ({
-        eavsRegion: item.eavsRegion,
-        totalActive: item.activeVoters,
-        totalRegistered: item.totalVoters,
-        totalInactive: item.inactiveVoters,
-      }));
-    }
-    return activeVotersDataJson.map((item: ActiveVotersDataItem) => ({
-      eavsRegion: item.eavsRegion,
-      totalActive: item.activeVoters,
-      totalRegistered: item.totalVoters,
-      totalInactive: item.inactiveVoters,
-    }));
-  }, [normalizedStateKey]);
-
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
@@ -300,7 +262,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
             choroplethOption={choroplethOption}
             showBubbleChart={showBubbleChart}
             showCvapLegend={isPoliticalPartyState}
-            cvapLegendData={activeVotersData}
+            fipsPrefix={stateFipsPrefix}
             hasDetailedVoterData={hasDetailedVoterData(normalizedStateKey)}
           />
         </div>
