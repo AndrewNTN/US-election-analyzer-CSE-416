@@ -498,7 +498,7 @@ public class VoterDataService {
                 continue;
             }
 
-            Integer registered = eavs.voterRegistration().totalRegistered();
+            Integer registered = eavs.voterRegistration().totalActive();
             if (registered == null || registered == 0) {
                 continue;
             }
