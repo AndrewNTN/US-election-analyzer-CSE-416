@@ -126,7 +126,6 @@ export default function BaseMap<T = Record<string, unknown>>({
       zoom={zoom}
       zoomSnap={0.5}
       minZoom={minZoom}
-      maxZoom={8}
       maxBounds={[
         [15, -140],
         [56, -54],

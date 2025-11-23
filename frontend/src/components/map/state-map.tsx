@@ -8,6 +8,11 @@ import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
 import type { StateProps, CountyProps } from "@/lib/api/geojson-requests";
 import type { StateChoroplethOption } from "@/lib/choropleth.ts";
+import {
+  generateColorScale,
+  CHOROPLETH_COLORS,
+  STATE_CHOROPLETH_OPTIONS,
+} from "@/lib/choropleth";
 import { ChoroplethLegend } from "@/components/map/choropleth-legend";
 import { CvapRegistrationLegend } from "@/components/map/cvap-registration-legend";
 import {
@@ -305,6 +310,67 @@ export default function StateMap({
     return filtered;
   }, [voterData, partyFilter]);
 
+  // Calculate dynamic color scale based on the current data and option
+  const dynamicScale = useMemo(() => {
+    const data =
+      isDetailedState && currentCountiesData
+        ? currentCountiesData
+        : currentStateData;
+    if (choroplethOption === "off" || !data?.features) return null;
+
+    const values: number[] = [];
+    data.features.forEach((f) => {
+      if (!f.properties) return;
+      const props = f.properties as unknown as Record<string, unknown>;
+      let val: number | undefined;
+
+      switch (choroplethOption) {
+        case STATE_CHOROPLETH_OPTIONS.PROVISIONAL_BALLOTS:
+          val =
+            "PROVISIONAL_BALLOTS_PCT" in props
+              ? (props.PROVISIONAL_BALLOTS_PCT as number)
+              : undefined;
+          break;
+        case STATE_CHOROPLETH_OPTIONS.ACTIVE_VOTERS:
+          val =
+            "ACTIVE_VOTERS_PCT" in props
+              ? (props.ACTIVE_VOTERS_PCT as number)
+              : undefined;
+          break;
+        case STATE_CHOROPLETH_OPTIONS.POLLBOOK_DELETIONS:
+          val =
+            "POLLBOOK_DELETIONS_PCT" in props
+              ? (props.POLLBOOK_DELETIONS_PCT as number)
+              : undefined;
+          break;
+        case STATE_CHOROPLETH_OPTIONS.MAIL_BALLOTS_REJECTED:
+          val =
+            "MAIL_BALLOTS_REJECTED_PCT" in props
+              ? (props.MAIL_BALLOTS_REJECTED_PCT as number)
+              : undefined;
+          break;
+        case STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION:
+          val =
+            "VOTER_REGISTRATION_PCT" in props
+              ? (props.VOTER_REGISTRATION_PCT as number)
+              : undefined;
+          if (val !== undefined && val > 100) val = 100;
+          break;
+      }
+
+      if (val !== undefined && val !== null && !isNaN(val)) {
+        values.push(val);
+      }
+    });
+
+    return generateColorScale(values, CHOROPLETH_COLORS.slice(0, 6));
+  }, [
+    currentStateData,
+    currentCountiesData,
+    isDetailedState,
+    choroplethOption,
+  ]);
+
   return (
     <div className="relative overflow-hidden h-screen">
       <div className="w-full h-full">
@@ -321,8 +387,10 @@ export default function StateMap({
                 data={currentCountiesData}
                 choroplethOption={choroplethOption}
                 stateView
+                colorScale={dynamicScale}
               />
               <OutlineLayer
+                key={`outline-${choroplethOption}`}
                 data={currentCountiesData}
                 stateView
                 enableCountyInteractions={hasDetailedVoterData}
@@ -342,6 +410,7 @@ export default function StateMap({
                 data={currentStateData}
                 choroplethOption={choroplethOption}
                 stateView
+                colorScale={dynamicScale}
               />
               <OutlineLayer data={currentStateData} stateView />
             </>
@@ -353,7 +422,10 @@ export default function StateMap({
         {/* Choropleth Legend - positioned on the map */}
         {choroplethOption && choroplethOption !== "off" && (
           <div className="absolute bottom-32 left-4 z-10 max-w-xs">
-            <ChoroplethLegend choroplethOption={choroplethOption} />
+            <ChoroplethLegend
+              choroplethOption={choroplethOption}
+              colorScale={dynamicScale}
+            />
           </div>
         )}
         {showCvapLegend ? (

@@ -50,7 +50,7 @@ export interface ColorScale {
 export const defaultGrayTint = () => "rgba(220,220,220,0.36)";
 
 // Generic sequential palette for all choropleths (provisional ballots purple scale)
-export const CHOROPLETH_COLORS: string[] = [
+export const CHOROPLETH_COLORS_SPLASH: string[] = [
   "#fcfbfd",
   "#efedf5",
   "#dadaeb",
@@ -61,40 +61,18 @@ export const CHOROPLETH_COLORS: string[] = [
   "#4a1486",
 ];
 
+export const CHOROPLETH_COLORS: string[] = [
+  "#fcfbfd",
+  "#dadaeb",
+  "#9e9ac8",
+  "#6a51a3",
+  "#4a1486",
+];
+
 // Equipment age scale uses the generic palette; breaks tuned for age (years)
 export const equipmentAgeScale: ColorScale = {
-  colors: CHOROPLETH_COLORS.slice(2, 8),
+  colors: CHOROPLETH_COLORS_SPLASH.slice(2, 8),
   breaks: [2, 4, 6, 8, 10, 100],
-};
-
-// Provisional ballots percentage scale (uses generic palette)
-export const provisionalBallotsScale: ColorScale = {
-  colors: CHOROPLETH_COLORS,
-  breaks: [0, 0.1, 0.25, 0.5, 1.0, 2.0, 3.0, 5.0],
-};
-
-// Active voters percentage scale (uses generic palette)
-export const activeVotersScale: ColorScale = {
-  colors: CHOROPLETH_COLORS,
-  breaks: [85, 87, 89, 91, 93, 95, 97, 98],
-};
-
-// Pollbook deletions percentage scale (uses generic palette)
-export const pollbookDeletionsScale: ColorScale = {
-  colors: CHOROPLETH_COLORS,
-  breaks: [0, 1, 2, 3, 4, 5, 6, 8],
-};
-
-// Mail ballots rejected percentage scale (uses generic palette)
-export const mailBallotsRejectedScale: ColorScale = {
-  colors: CHOROPLETH_COLORS,
-  breaks: [0, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-};
-
-// Voter registration percentage scale (uses generic palette)
-export const voterRegistrationScale: ColorScale = {
-  colors: CHOROPLETH_COLORS,
-  breaks: [50, 55, 60, 65, 70, 75, 80, 85],
 };
 
 // Voting equipment type colors (high contrast colors)
@@ -123,30 +101,6 @@ export function getColorFromScale(value: number, scale: ColorScale): string {
   return scale.colors[scale.colors.length - 1];
 }
 
-export function getEquipmentAgeColor(age: number): string {
-  return getColorFromScale(age, equipmentAgeScale);
-}
-
-export function getProvisionalBallotsColor(percentage: number): string {
-  return getColorFromScale(percentage, provisionalBallotsScale);
-}
-
-export function getActiveVotersColor(percentage: number): string {
-  return getColorFromScale(percentage, activeVotersScale);
-}
-
-export function getPollbookDeletionsColor(percentage: number): string {
-  return getColorFromScale(percentage, pollbookDeletionsScale);
-}
-
-export function getMailBallotsRejectedColor(percentage: number): string {
-  return getColorFromScale(percentage, mailBallotsRejectedScale);
-}
-
-export function getVoterRegistrationColor(percentage: number): string {
-  return getColorFromScale(percentage, voterRegistrationScale);
-}
-
 // Get voting equipment type color
 export function getVotingEquipmentTypeColor(
   equipmentType: VotingEquipmentType,
@@ -154,4 +108,73 @@ export function getVotingEquipmentTypeColor(
   return (
     VOTING_EQUIPMENT_COLORS[equipmentType] || VOTING_EQUIPMENT_COLORS.mixed
   );
+}
+// Generate a color scale based on data quantiles
+export function generateColorScale(
+  values: number[],
+  colors: string[],
+): ColorScale {
+  // Filter out invalid values and sort
+  const sorted = values
+    .filter((v) => v !== null && v !== undefined && !isNaN(v))
+    .sort((a, b) => a - b);
+
+  if (sorted.length === 0) {
+    return { colors, breaks: [] };
+  }
+
+  const min = sorted[0];
+  const max = sorted[sorted.length - 1];
+
+  // Handle zero variance (all values are the same)
+  if (min === max) {
+    const numColors = colors.length;
+    const numBreaks = numColors - 1;
+    const breaks: number[] = [];
+
+    // If value is 0, we create an arbitrary small range (0-1) so 0 maps to first bin
+    const upper = max === 0 ? 1 : max;
+
+    for (let i = 1; i <= numBreaks; i++) {
+      breaks.push((upper * i) / numColors);
+    }
+
+    return { colors, breaks };
+  }
+
+  // Calculate quantiles
+  const breaks: number[] = [];
+  const numColors = colors.length;
+  const numBreaks = numColors - 1;
+
+  for (let i = 1; i <= numBreaks; i++) {
+    const percentile = i / numColors;
+    const index = Math.min(
+      Math.floor(percentile * sorted.length),
+      sorted.length - 1,
+    );
+
+    breaks.push(sorted[index]);
+  }
+
+  // Deduplicate breaks
+  const uniqueBreaks = Array.from(new Set(breaks)).sort((a, b) => a - b);
+
+  if (uniqueBreaks.length < numBreaks) {
+    const linearBreaks: number[] = [];
+    const range = max - min;
+    const step = range / numColors;
+
+    for (let i = 1; i <= numBreaks; i++) {
+      linearBreaks.push(min + step * i);
+    }
+
+    // We use the full set of colors
+    return { colors, breaks: linearBreaks };
+  }
+
+  // Otherwise, use the unique quantile breaks
+  const adjustedColors = colors.slice(0, uniqueBreaks.length + 1);
+
+  return { colors: adjustedColors, breaks: uniqueBreaks };
 }

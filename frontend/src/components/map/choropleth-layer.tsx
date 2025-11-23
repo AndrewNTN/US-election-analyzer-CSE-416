@@ -4,12 +4,8 @@ import type { PathOptions, Layer, LeafletMouseEvent } from "leaflet";
 import type { BaseMapProps, MapFeatureProps } from "@/lib/api/geojson-requests";
 import {
   defaultGrayTint,
-  getEquipmentAgeColor,
-  getProvisionalBallotsColor,
-  getActiveVotersColor,
-  getPollbookDeletionsColor,
-  getMailBallotsRejectedColor,
-  getVoterRegistrationColor,
+  getColorFromScale,
+  type ColorScale,
 } from "@/lib/choropleth";
 import {
   SPLASH_CHOROPLETH_OPTIONS,
@@ -21,6 +17,7 @@ interface ChoroplethLayerProps<T extends BaseMapProps = MapFeatureProps> {
   data: FeatureCollection<Geometry, T>;
   choroplethOption?: ChoroplethOption;
   stateView?: boolean;
+  colorScale?: ColorScale | null;
 }
 
 export default function ChoroplethLayer<
@@ -29,7 +26,10 @@ export default function ChoroplethLayer<
   data,
   choroplethOption = STATE_CHOROPLETH_OPTIONS.OFF,
   stateView = false,
+  colorScale,
 }: ChoroplethLayerProps<T>) {
+  // Dynamic scale calculation is now lifted to parent components
+
   const getFeatureStyle = (feature?: Feature<Geometry, T>): PathOptions => {
     if (choroplethOption === "off") {
       return {
@@ -43,63 +43,51 @@ export default function ChoroplethLayer<
 
     let fillColor = defaultGrayTint();
 
-    if (feature?.properties) {
+    if (feature?.properties && colorScale) {
       const props = feature.properties as Record<string, unknown>;
+      let val: number | undefined;
 
       switch (choroplethOption) {
-        // Splash page choropleth options
-        case SPLASH_CHOROPLETH_OPTIONS.EQUIPMENT_AGE: {
-          const equipmentAge =
-            "EQUIPMENT_AGE" in props ? (props.EQUIPMENT_AGE as number) || 0 : 0;
-          fillColor = getEquipmentAgeColor(equipmentAge);
+        case SPLASH_CHOROPLETH_OPTIONS.EQUIPMENT_AGE:
+          val =
+            "EQUIPMENT_AGE" in props
+              ? (props.EQUIPMENT_AGE as number)
+              : undefined;
           break;
-        }
-
-        // State page choropleth options
-        case STATE_CHOROPLETH_OPTIONS.PROVISIONAL_BALLOTS: {
-          const provisionalBallotsPct =
+        case STATE_CHOROPLETH_OPTIONS.PROVISIONAL_BALLOTS:
+          val =
             "PROVISIONAL_BALLOTS_PCT" in props
-              ? (props.PROVISIONAL_BALLOTS_PCT as number) || 0
-              : 0;
-          fillColor = getProvisionalBallotsColor(provisionalBallotsPct);
+              ? (props.PROVISIONAL_BALLOTS_PCT as number)
+              : undefined;
           break;
-        }
-
-        case STATE_CHOROPLETH_OPTIONS.ACTIVE_VOTERS: {
-          const activeVotersPct =
+        case STATE_CHOROPLETH_OPTIONS.ACTIVE_VOTERS:
+          val =
             "ACTIVE_VOTERS_PCT" in props
-              ? (props.ACTIVE_VOTERS_PCT as number) || 0
-              : 0;
-          fillColor = getActiveVotersColor(activeVotersPct);
+              ? (props.ACTIVE_VOTERS_PCT as number)
+              : undefined;
           break;
-        }
-
-        case STATE_CHOROPLETH_OPTIONS.POLLBOOK_DELETIONS: {
-          const pollbookDeletionsPct =
+        case STATE_CHOROPLETH_OPTIONS.POLLBOOK_DELETIONS:
+          val =
             "POLLBOOK_DELETIONS_PCT" in props
-              ? (props.POLLBOOK_DELETIONS_PCT as number) || 0
-              : 0;
-          fillColor = getPollbookDeletionsColor(pollbookDeletionsPct);
+              ? (props.POLLBOOK_DELETIONS_PCT as number)
+              : undefined;
           break;
-        }
-
-        case STATE_CHOROPLETH_OPTIONS.MAIL_BALLOTS_REJECTED: {
-          const mailBallotsRejectedPct =
+        case STATE_CHOROPLETH_OPTIONS.MAIL_BALLOTS_REJECTED:
+          val =
             "MAIL_BALLOTS_REJECTED_PCT" in props
-              ? (props.MAIL_BALLOTS_REJECTED_PCT as number) || 0
-              : 0;
-          fillColor = getMailBallotsRejectedColor(mailBallotsRejectedPct);
+              ? (props.MAIL_BALLOTS_REJECTED_PCT as number)
+              : undefined;
           break;
-        }
-
-        case STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION: {
-          const voterRegistrationPct =
+        case STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION:
+          val =
             "VOTER_REGISTRATION_PCT" in props
-              ? (props.VOTER_REGISTRATION_PCT as number) || 0
-              : 0;
-          fillColor = getVoterRegistrationColor(voterRegistrationPct);
+              ? (props.VOTER_REGISTRATION_PCT as number)
+              : undefined;
           break;
-        }
+      }
+
+      if (val !== undefined && val !== null) {
+        fillColor = getColorFromScale(val, colorScale);
       }
     }
 
@@ -109,6 +97,7 @@ export default function ChoroplethLayer<
       opacity: 0,
       color: "transparent",
       fillOpacity: 0.7,
+      interactive: !stateView,
     };
   };
 

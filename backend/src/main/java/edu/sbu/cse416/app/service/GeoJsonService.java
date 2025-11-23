@@ -104,9 +104,9 @@ public class GeoJsonService {
                     // Active Voters %
                     Double activePct = null;
                     if (eavs.voterRegistration() != null
-                            && eavs.voterRegistration().totalRegistered() != null
-                            && eavs.voterRegistration().totalRegistered() > 0
-                            && eavs.voterRegistration().totalActive() != null) {
+                            && eavs.voterRegistration().totalActive() != null
+                            && eavs.voterRegistration().totalActive() > 0
+                            && eavs.voterRegistration().totalRegistered() != null) {
                         activePct = (eavs.voterRegistration().totalActive()
                                         / (double) eavs.voterRegistration().totalRegistered())
                                 * 100;
@@ -115,12 +115,12 @@ public class GeoJsonService {
                     // Pollbook Deletions %
                     Double pollbookPct = null;
                     if (eavs.voterRegistration() != null
-                            && eavs.voterRegistration().totalRegistered() != null
-                            && eavs.voterRegistration().totalRegistered() > 0
+                            && eavs.voterRegistration().totalActive() != null
+                            && eavs.voterRegistration().totalActive() > 0
                             && eavs.voterDeletion() != null
                             && eavs.voterDeletion().removedTotal() != null) {
                         pollbookPct = (eavs.voterDeletion().removedTotal()
-                                        / (double) eavs.voterRegistration().totalRegistered())
+                                        / (double) eavs.voterRegistration().totalActive())
                                 * 100;
                     }
 
@@ -135,13 +135,13 @@ public class GeoJsonService {
                     // Voter Registration % - Calculate using CVAP data
                     Double voterRegPct = null;
                     if (eavs.voterRegistration() != null
-                            && eavs.voterRegistration().totalRegistered() != null) {
+                            && eavs.voterRegistration().totalActive() != null) {
                         CvapData cvapData = cvapDataRepository.findByGeoid(fips);
                         if (cvapData != null
                                 && cvapData.totalCvapEstimate() != null
                                 && cvapData.totalCvapEstimate() > 0) {
                             voterRegPct =
-                                    (eavs.voterRegistration().totalRegistered() * 100.0) / cvapData.totalCvapEstimate();
+                                    (eavs.voterRegistration().totalActive() * 100.0) / cvapData.totalCvapEstimate();
                         }
                     }
 

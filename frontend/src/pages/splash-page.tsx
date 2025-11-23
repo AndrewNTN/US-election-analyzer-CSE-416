@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { IconChartBar } from "@tabler/icons-react";
 
 import BaseMap from "@/components/map/base-map.tsx";
@@ -19,6 +19,7 @@ import { useStatesGeoJsonQuery } from "@/lib/api/use-queries.ts";
 import {
   SPLASH_CHOROPLETH_OPTIONS,
   SPLASH_CHOROPLETH_LABELS,
+  equipmentAgeScale,
   type SplashChoroplethOption,
 } from "@/lib/choropleth.ts";
 
@@ -45,6 +46,14 @@ export default function SplashPage() {
     type: "FeatureCollection",
     features: [],
   };
+
+  // Calculate dynamic color scale based on the current data and option
+  const dynamicScale = useMemo(() => {
+    if (choroplethOption === SPLASH_CHOROPLETH_OPTIONS.EQUIPMENT_AGE) {
+      return equipmentAgeScale;
+    }
+    return null;
+  }, [choroplethOption]);
 
   if (isLoading) {
     return (
@@ -107,6 +116,7 @@ export default function SplashPage() {
           <ChoroplethLayer
             data={safeStatesData}
             choroplethOption={choroplethOption}
+            colorScale={dynamicScale}
           />
           <OutlineLayer data={safeStatesData} />
         </BaseMap>
@@ -114,7 +124,10 @@ export default function SplashPage() {
         {/* Choropleth Legend */}
         {choroplethOption && choroplethOption !== "off" && (
           <div className="absolute bottom-32 left-4 z-10 max-w-xs">
-            <ChoroplethLegend choroplethOption={choroplethOption} />
+            <ChoroplethLegend
+              choroplethOption={choroplethOption}
+              colorScale={dynamicScale}
+            />
           </div>
         )}
       </div>
