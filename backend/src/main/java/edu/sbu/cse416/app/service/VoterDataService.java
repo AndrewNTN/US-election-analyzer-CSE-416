@@ -79,8 +79,10 @@ public class VoterDataService {
     }
 
     /**
-     * Filter EAVS data to ensure it matches the expected state and has valid FIPS codes.
-     * This prevents cross-state contamination (e.g., Wisconsin towns with FIPS starting with "12").
+     * Filter EAVS data to ensure it matches the expected state and has valid FIPS
+     * codes.
+     * This prevents cross-state contamination (e.g., Wisconsin towns with FIPS
+     * starting with "12").
      */
     /**
      * Helper to filter EAVS data by state name using FipsUtil.
@@ -96,13 +98,30 @@ public class VoterDataService {
     }
 
     /**
-     * Get provisional ballot table data for a FIPS prefix.
+     * Helper to fetch EAVS data by FIPS prefix with fallback to state abbreviation.
+     * Handles Wisconsin (55) specifically by using state abbreviation.
      */
+    private List<EavsData> fetchEavsData(String fipsPrefix) {
+        if ("55".equals(fipsPrefix)) {
+            return repo.findByStateAbbr("WI").stream()
+                    .filter(d -> d.electionYear() != null && d.electionYear() == 2024)
+                    .toList();
+        }
+        return repo.findByFipsCode("^" + fipsPrefix);
+    }
+
+    /**
+     * Helper to fetch and filter EAVS data in one step.
+     */
+    private List<EavsData> getFilteredEavsData(String fipsPrefix) {
+        String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
+        List<EavsData> rawData = fetchEavsData(prefix);
+        return filterByState(rawData, prefix);
+    }
+
     @Cacheable(value = "provisionalTable", key = "#fipsPrefix")
     public ProvisionalTableResponse getProvisionalTable(String fipsPrefix) {
-        String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
-        List<EavsData> data = filterByState(rawData, prefix);
+        List<EavsData> data = getFilteredEavsData(fipsPrefix);
         List<ProvisionalTableResponse.Data> tableData = data.stream()
                 .map(record -> {
                     ProvisionalBallots p = record.provisionalBallots();
@@ -123,9 +142,7 @@ public class VoterDataService {
      */
     @Cacheable(value = "provisionalChart", key = "#fipsPrefix")
     public ProvisionalChartResponse getProvisionalChart(String fipsPrefix) {
-        String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
-        List<EavsData> data = filterByState(rawData, prefix);
+        List<EavsData> data = getFilteredEavsData(fipsPrefix);
 
         ProvisionalChartResponse response =
                 RecordAggregator.aggregate(data, EavsData::provisionalBallots, ProvisionalChartResponse.class);
@@ -149,9 +166,7 @@ public class VoterDataService {
      */
     @Cacheable(value = "activeVotersTable", key = "#fipsPrefix")
     public ActiveVotersTableResponse getActiveVotersTable(String fipsPrefix) {
-        String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
-        List<EavsData> data = filterByState(rawData, prefix);
+        List<EavsData> data = getFilteredEavsData(fipsPrefix);
         List<ActiveVotersTableResponse.Data> tableData = data.stream()
                 .map(record -> {
                     VoterRegistration vr = record.voterRegistration();
@@ -170,9 +185,7 @@ public class VoterDataService {
      */
     @Cacheable(value = "activeVotersChart", key = "#fipsPrefix")
     public ActiveVotersChartResponse getActiveVotersChart(String fipsPrefix) {
-        String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
-        List<EavsData> data = filterByState(rawData, prefix);
+        List<EavsData> data = getFilteredEavsData(fipsPrefix);
 
         ActiveVotersChartResponse response =
                 RecordAggregator.aggregate(data, EavsData::voterRegistration, ActiveVotersChartResponse.class);
@@ -189,9 +202,7 @@ public class VoterDataService {
      */
     @Cacheable(value = "pollbookDeletionsChart", key = "#fipsPrefix")
     public PollbookDeletionsChartResponse getPollbookDeletionsChart(String fipsPrefix) {
-        String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
-        List<EavsData> data = filterByState(rawData, prefix);
+        List<EavsData> data = getFilteredEavsData(fipsPrefix);
 
         PollbookDeletionsChartResponse response =
                 RecordAggregator.aggregate(data, EavsData::voterDeletion, PollbookDeletionsChartResponse.class);
@@ -212,9 +223,7 @@ public class VoterDataService {
      */
     @Cacheable(value = "mailBallotsRejectedTable", key = "#fipsPrefix")
     public MailBallotsRejectedTableResponse getMailBallotsRejectedTable(String fipsPrefix) {
-        String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
-        List<EavsData> data = filterByState(rawData, prefix);
+        List<EavsData> data = getFilteredEavsData(fipsPrefix);
         List<MailBallotsRejectedTableResponse.Data> tableData = data.stream()
                 .map(record -> {
                     MailBallotsRejectedReason mbr = record.mailBallotsRejectedReason();
@@ -247,9 +256,7 @@ public class VoterDataService {
      */
     @Cacheable(value = "mailBallotsRejectedChart", key = "#fipsPrefix")
     public MailBallotsRejectedChartResponse getMailBallotsRejectedChart(String fipsPrefix) {
-        String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> rawData = repo.findByFipsCode("^" + prefix);
-        List<EavsData> data = filterByState(rawData, prefix);
+        List<EavsData> data = getFilteredEavsData(fipsPrefix);
 
         MailBallotsRejectedChartResponse response = RecordAggregator.aggregate(
                 data, EavsData::mailBallotsRejectedReason, MailBallotsRejectedChartResponse.class);
@@ -279,7 +286,8 @@ public class VoterDataService {
      */
     @Cacheable(value = "votingEquipmentTable")
     public VotingEquipmentTableResponse getVotingEquipmentTable() {
-        // Get all data for year 2024 by filtering (continental US states only - exclude territories and non-continental
+        // Get all data for year 2024 by filtering (continental US states only - exclude
+        // territories and non-continental
         // states)
         List<EavsData> allData = repo.findByFipsCodeAllYears("^");
 
@@ -330,7 +338,8 @@ public class VoterDataService {
     }
 
     /**
-     * Get voting equipment data for the chart (aggregated by year for a specific state).
+     * Get voting equipment data for the chart (aggregated by year for a specific
+     * state).
      */
     @Cacheable(value = "votingEquipmentChart", key = "#stateName")
     public VotingEquipmentChartResponse getVotingEquipmentChart(String stateName) {
@@ -404,38 +413,69 @@ public class VoterDataService {
     }
 
     /**
+     * Hardcoded fix for specific California counties with data mismatches.
+     */
+    private static String normalizeFips(String fips) {
+        if (fips == null) {
+            return null;
+        }
+        // Hardcoded fixes for specific data mismatches
+        if ("600100000".equals(fips)) {
+            return "0600100000"; // Alameda County
+        }
+        if ("600900000".equals(fips)) {
+            return "0600900000"; // Calaveras County
+        }
+        return fips;
+    }
+
+    /**
      * Get voter registration chart data for a state FIPS prefix.
      * Returns historical voter registration totals (2016, 2020, 2024) by county.
      */
     @Cacheable(value = "voterRegistrationChart", key = "#fipsPrefix")
     public VoterRegistrationChartResponse getVoterRegistrationChart(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByFipsCodeAllYears("^" + prefix);
+        List<EavsData> data = repo.findByStateAbbr(FipsUtil.getStateAbbr(prefix));
 
-        // Filter and group by jurisdiction, then pivot years into separate fields
-        Map<String, Map<Integer, Integer>> jurisdictionData = data.stream()
+        // Group by NORMALIZED FIPS code
+        Map<String, List<EavsData>> groupedByFips = data.stream()
                 .filter(record -> {
                     Integer year = record.electionYear();
                     return year != null && (year == 2016 || year == 2020 || year == 2024);
                 })
-                .collect(java.util.stream.Collectors.groupingBy(
-                        record -> cleanJurisdictionName(record.jurisdictionName()),
-                        java.util.stream.Collectors.toMap(
-                                EavsData::electionYear,
-                                record -> {
-                                    VoterRegistration vr = record.voterRegistration();
-                                    return nz(vr == null ? null : vr.totalRegistered());
-                                },
-                                (existing, replacement) -> existing // In case of duplicates, keep first
-                                )));
+                .filter(record -> record.fipsCode() != null)
+                .collect(java.util.stream.Collectors.groupingBy(record -> normalizeFips(record.fipsCode())));
 
-        // Convert to chart response data and sort by 2024 registration count
-        List<VoterRegistrationChartResponse.Data> chartData = jurisdictionData.entrySet().stream()
-                .map(entry -> new VoterRegistrationChartResponse.Data(
-                        entry.getKey(),
-                        entry.getValue().getOrDefault(2016, 0),
-                        entry.getValue().getOrDefault(2020, 0),
-                        entry.getValue().getOrDefault(2024, 0)))
+        // Convert to chart response data
+        List<VoterRegistrationChartResponse.Data> chartData = groupedByFips.values().stream()
+                .map(records -> {
+                    // Find name from 2024 record, fallback to first available
+                    String name = records.stream()
+                            .filter(r -> r.electionYear() == 2024)
+                            .findFirst()
+                            .map(r -> cleanJurisdictionName(r.jurisdictionName()))
+                            .orElse(
+                                    records.isEmpty()
+                                            ? "Unknown"
+                                            : cleanJurisdictionName(
+                                                    records.get(0).jurisdictionName()));
+
+                    Map<Integer, Integer> counts = records.stream()
+                            .collect(java.util.stream.Collectors.toMap(
+                                    EavsData::electionYear,
+                                    r -> nz(
+                                            r.voterRegistration() == null
+                                                    ? null
+                                                    : r.voterRegistration().totalRegistered()),
+                                    (a, b) -> a));
+
+                    return new VoterRegistrationChartResponse.Data(
+                            name,
+                            counts.getOrDefault(2016, 0),
+                            counts.getOrDefault(2020, 0),
+                            counts.getOrDefault(2024, 0));
+                })
                 .sorted(Comparator.comparingInt(VoterRegistrationChartResponse.Data::registeredVoters2024))
                 .toList();
 
@@ -448,15 +488,15 @@ public class VoterDataService {
 
     /**
      * Get CVAP registration rate for an entire state.
-     * Calculates percentage registered as: (total registered voters from EAVS 2024 / total CVAP) * 100
+     * Calculates percentage registered as: (total registered voters from EAVS 2024
+     * / total CVAP) * 100
      */
     @Cacheable(value = "cvapRegistrationRate", key = "#fipsPrefix")
     public CvapRegistrationRateResponse getCvapRegistrationRate(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
 
         // Get EAVS 2024 data for the state
-        List<EavsData> rawEavsData = repo.findByFipsCode("^" + prefix);
-        List<EavsData> eavsData = filterByState(rawEavsData, prefix);
+        List<EavsData> eavsData = getFilteredEavsData(prefix);
 
         // Get CVAP data for the state
         List<CvapData> rawCvapData = cvapRepo.findByGeoidPrefix("^" + prefix);
@@ -519,7 +559,8 @@ public class VoterDataService {
 
     /**
      * Get state comparison data for Republican vs Democratic states.
-     * Returns comparison table with mail ballots, drop box, turnout, and voter registration.
+     * Returns comparison table with mail ballots, drop box, turnout, and voter
+     * registration.
      */
     @Cacheable(value = "stateComparison", key = "#republicanStateFips + '-' + #democraticStateFips")
     public StateComparisonResponse getStateComparison(String republicanStateFips, String democraticStateFips) {
@@ -588,7 +629,8 @@ public class VoterDataService {
 
     /**
      * Get early voting comparison data for Republican vs Democratic states.
-     * Returns comparison table with in-person early voting, mail/absentee voting, and total early voting.
+     * Returns comparison table with in-person early voting, mail/absentee voting,
+     * and total early voting.
      */
     @Cacheable(value = "earlyVotingComparison", key = "#republicanStateFips + '-' + #democraticStateFips")
     public EarlyVotingComparisonResponse getEarlyVotingComparison(
@@ -717,7 +759,7 @@ public class VoterDataService {
         Map<String, Object> result = new HashMap<>();
 
         // Get EAVS data for the state
-        List<EavsData> rawEavsData = repo.findByFipsCode("^" + stateFips);
+        List<EavsData> rawEavsData = fetchEavsData(stateFips);
         List<EavsData> eavsData = filterByState(rawEavsData, stateFips);
 
         long inPersonEarlyVoting = 0;
@@ -755,13 +797,14 @@ public class VoterDataService {
     }
 
     /**
-     * Helper method to aggregate state-level data from EAVS and CVAP for state comparison
+     * Helper method to aggregate state-level data from EAVS and CVAP for state
+     * comparison
      */
     private Map<String, Object> getStateAggregateData(String stateFips) {
         Map<String, Object> result = new HashMap<>();
 
         // Get EAVS data for the state
-        List<EavsData> rawEavsData = repo.findByFipsCode("^" + stateFips);
+        List<EavsData> rawEavsData = fetchEavsData(stateFips);
         List<EavsData> eavsData = filterByState(rawEavsData, stateFips);
 
         // Get CVAP data for the state
@@ -798,7 +841,8 @@ public class VoterDataService {
                 stateName = eavs.stateFull();
             }
 
-            // Mail ballots (C8a) - use mailBallotsReturned field (counted ballots, not transmitted)
+            // Mail ballots (C8a) - use mailBallotsReturned field (counted ballots, not
+            // transmitted)
             if (eavs.mailBallotsReturned() != null) {
                 totalMailBallots += nz(eavs.mailBallotsReturned());
             }

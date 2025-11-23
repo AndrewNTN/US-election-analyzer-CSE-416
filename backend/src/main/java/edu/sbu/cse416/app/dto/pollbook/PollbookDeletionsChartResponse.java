@@ -18,7 +18,7 @@ public record PollbookDeletionsChartResponse(
                 "removedDeath", "Deceased",
                 "removedFelony", "Felony Conviction",
                 "removedFailResponse", "Failure to Respond",
-                "removedIncompetentToVote", "Mental Incompetence",
+                "removedIncompetentToVote", "Incompetence",
                 "removedVoterRequest", "Voter Request",
                 "removedDuplicateRecords", "Duplicate");
     }

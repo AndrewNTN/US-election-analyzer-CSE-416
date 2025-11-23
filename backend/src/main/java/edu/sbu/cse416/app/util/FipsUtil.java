@@ -6,64 +6,72 @@ import java.util.Map;
 public class FipsUtil {
 
     private static final Map<String, String> STATE_FIPS_MAP = new HashMap<>();
+    private static final Map<String, String> STATE_ABBR_MAP = new HashMap<>();
 
     static {
-        STATE_FIPS_MAP.put("01", "ALABAMA");
-        STATE_FIPS_MAP.put("02", "ALASKA");
-        STATE_FIPS_MAP.put("04", "ARIZONA");
-        STATE_FIPS_MAP.put("05", "ARKANSAS");
-        STATE_FIPS_MAP.put("06", "CALIFORNIA");
-        STATE_FIPS_MAP.put("08", "COLORADO");
-        STATE_FIPS_MAP.put("09", "CONNECTICUT");
-        STATE_FIPS_MAP.put("10", "DELAWARE");
-        STATE_FIPS_MAP.put("11", "DISTRICT OF COLUMBIA");
-        STATE_FIPS_MAP.put("12", "FLORIDA");
-        STATE_FIPS_MAP.put("13", "GEORGIA");
-        STATE_FIPS_MAP.put("15", "HAWAII");
-        STATE_FIPS_MAP.put("16", "IDAHO");
-        STATE_FIPS_MAP.put("17", "ILLINOIS");
-        STATE_FIPS_MAP.put("18", "INDIANA");
-        STATE_FIPS_MAP.put("19", "IOWA");
-        STATE_FIPS_MAP.put("20", "KANSAS");
-        STATE_FIPS_MAP.put("21", "KENTUCKY");
-        STATE_FIPS_MAP.put("22", "LOUISIANA");
-        STATE_FIPS_MAP.put("23", "MAINE");
-        STATE_FIPS_MAP.put("24", "MARYLAND");
-        STATE_FIPS_MAP.put("25", "MASSACHUSETTS");
-        STATE_FIPS_MAP.put("26", "MICHIGAN");
-        STATE_FIPS_MAP.put("27", "MINNESOTA");
-        STATE_FIPS_MAP.put("28", "MISSISSIPPI");
-        STATE_FIPS_MAP.put("29", "MISSOURI");
-        STATE_FIPS_MAP.put("30", "MONTANA");
-        STATE_FIPS_MAP.put("31", "NEBRASKA");
-        STATE_FIPS_MAP.put("32", "NEVADA");
-        STATE_FIPS_MAP.put("33", "NEW HAMPSHIRE");
-        STATE_FIPS_MAP.put("34", "NEW JERSEY");
-        STATE_FIPS_MAP.put("35", "NEW MEXICO");
-        STATE_FIPS_MAP.put("36", "NEW YORK");
-        STATE_FIPS_MAP.put("37", "NORTH CAROLINA");
-        STATE_FIPS_MAP.put("38", "NORTH DAKOTA");
-        STATE_FIPS_MAP.put("39", "OHIO");
-        STATE_FIPS_MAP.put("40", "OKLAHOMA");
-        STATE_FIPS_MAP.put("41", "OREGON");
-        STATE_FIPS_MAP.put("42", "PENNSYLVANIA");
-        STATE_FIPS_MAP.put("44", "RHODE ISLAND");
-        STATE_FIPS_MAP.put("45", "SOUTH CAROLINA");
-        STATE_FIPS_MAP.put("46", "SOUTH DAKOTA");
-        STATE_FIPS_MAP.put("47", "TENNESSEE");
-        STATE_FIPS_MAP.put("48", "TEXAS");
-        STATE_FIPS_MAP.put("49", "UTAH");
-        STATE_FIPS_MAP.put("50", "VERMONT");
-        STATE_FIPS_MAP.put("51", "VIRGINIA");
-        STATE_FIPS_MAP.put("53", "WASHINGTON");
-        STATE_FIPS_MAP.put("54", "WEST VIRGINIA");
-        STATE_FIPS_MAP.put("55", "WISCONSIN");
-        STATE_FIPS_MAP.put("56", "WYOMING");
-        STATE_FIPS_MAP.put("60", "AMERICAN SAMOA");
-        STATE_FIPS_MAP.put("66", "GUAM");
-        STATE_FIPS_MAP.put("69", "NORTHERN MARIANA ISLANDS");
-        STATE_FIPS_MAP.put("72", "PUERTO RICO");
-        STATE_FIPS_MAP.put("78", "U.S. VIRGIN ISLANDS");
+        addState("01", "ALABAMA", "AL");
+        addState("02", "ALASKA", "AK");
+        addState("04", "ARIZONA", "AZ");
+        addState("05", "ARKANSAS", "AR");
+        addState("06", "CALIFORNIA", "CA");
+        addState("08", "COLORADO", "CO");
+        addState("09", "CONNECTICUT", "CT");
+        addState("10", "DELAWARE", "DE");
+        addState("11", "DISTRICT OF COLUMBIA", "DC");
+        addState("12", "FLORIDA", "FL");
+        addState("13", "GEORGIA", "GA");
+        addState("15", "HAWAII", "HI");
+        addState("16", "IDAHO", "ID");
+        addState("17", "ILLINOIS", "IL");
+        addState("18", "INDIANA", "IN");
+        addState("19", "IOWA", "IA");
+        addState("20", "KANSAS", "KS");
+        addState("21", "KENTUCKY", "KY");
+        addState("22", "LOUISIANA", "LA");
+        addState("23", "MAINE", "ME");
+        addState("24", "MARYLAND", "MD");
+        addState("25", "MASSACHUSETTS", "MA");
+        addState("26", "MICHIGAN", "MI");
+        addState("27", "MINNESOTA", "MN");
+        addState("28", "MISSISSIPPI", "MS");
+        addState("29", "MISSOURI", "MO");
+        addState("30", "MONTANA", "MT");
+        addState("31", "NEBRASKA", "NE");
+        addState("32", "NEVADA", "NV");
+        addState("33", "NEW HAMPSHIRE", "NH");
+        addState("34", "NEW JERSEY", "NJ");
+        addState("35", "NEW MEXICO", "NM");
+        addState("36", "NEW YORK", "NY");
+        addState("37", "NORTH CAROLINA", "NC");
+        addState("38", "NORTH DAKOTA", "ND");
+        addState("39", "OHIO", "OH");
+        addState("40", "OKLAHOMA", "OK");
+        addState("41", "OREGON", "OR");
+        addState("42", "PENNSYLVANIA", "PA");
+        addState("44", "RHODE ISLAND", "RI");
+        addState("45", "SOUTH CAROLINA", "SC");
+        addState("46", "SOUTH DAKOTA", "SD");
+        addState("47", "TENNESSEE", "TN");
+        addState("48", "TEXAS", "TX");
+        addState("49", "UTAH", "UT");
+        addState("50", "VERMONT", "VT");
+        addState("51", "VIRGINIA", "VA");
+        addState("53", "WASHINGTON", "WA");
+        addState("54", "WEST VIRGINIA", "WV");
+        addState("55", "WISCONSIN", "WI");
+        addState("56", "WYOMING", "WY");
+
+        // Territories
+        addState("60", "AMERICAN SAMOA", "AS");
+        addState("66", "GUAM", "GU");
+        addState("69", "NORTHERN MARIANA ISLANDS", "MP");
+        addState("72", "PUERTO RICO", "PR");
+        addState("78", "U.S. VIRGIN ISLANDS", "VI");
+    }
+
+    private static void addState(String fips, String name, String abbr) {
+        STATE_FIPS_MAP.put(fips, name);
+        STATE_ABBR_MAP.put(fips, abbr);
     }
 
     public static String getStateName(String fipsPrefix) {
@@ -72,5 +80,13 @@ public class FipsUtil {
         }
         String stateFips = fipsPrefix.substring(0, 2);
         return STATE_FIPS_MAP.get(stateFips);
+    }
+
+    public static String getStateAbbr(String fipsPrefix) {
+        if (fipsPrefix == null || fipsPrefix.length() < 2) {
+            return null;
+        }
+        String stateFips = fipsPrefix.substring(0, 2);
+        return STATE_ABBR_MAP.get(stateFips);
     }
 }

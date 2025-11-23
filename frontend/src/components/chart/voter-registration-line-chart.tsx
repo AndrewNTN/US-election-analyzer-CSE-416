@@ -87,6 +87,10 @@ export function VoterRegistrationLineChart({
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="jurisdiction"
+            type="number"
+            domain={["auto", "auto"]}
+            allowDecimals={false}
+            scale="linear"
             label={{
               value: xAxisLabel,
               position: "insideBottom",
@@ -100,6 +104,7 @@ export function VoterRegistrationLineChart({
               angle: -90,
               position: "insideLeft",
               style: { textAnchor: "middle" },
+              offset: 10,
             }}
             tick={{ fontSize: 12 }}
             tickFormatter={formatNumber}

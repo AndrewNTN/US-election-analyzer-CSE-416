@@ -16,4 +16,7 @@ public interface EavsDataRepository extends MongoRepository<EavsData, String> {
     /** Fetch EAVS records by FIPS code prefix (regex-based) for all years. */
     @Query("{ 'fipsCode': { $regex: ?0 }, 'jurisdictionName': { $not: { $regex: '^UOCAVA' } } }")
     List<EavsData> findByFipsCodeAllYears(String fipsPrefix);
+
+    /** Fetch EAVS records by 2-letter state abbreviation for all years. */
+    List<EavsData> findByStateAbbr(String stateAbbr);
 }
