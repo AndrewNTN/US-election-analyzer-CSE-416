@@ -102,12 +102,12 @@ public class VoterDataService {
      * Handles Wisconsin (55) specifically by using state abbreviation.
      */
     private List<EavsData> fetchEavsData(String fipsPrefix) {
-        if ("55".equals(fipsPrefix)) {
-            return repo.findByStateAbbr("WI").stream()
-                    .filter(d -> d.electionYear() != null && d.electionYear() == 2024)
-                    .toList();
+        String stateAbbr = FipsUtil.getStateAbbr(fipsPrefix);
+        if (stateAbbr != null) {
+            return repo.findByStateAbbr(stateAbbr);
         }
-        return repo.findByFipsCode("^" + fipsPrefix);
+        // Fallback or empty if not found (shouldn't happen with valid FIPS)
+        return List.of();
     }
 
     /**
@@ -289,7 +289,7 @@ public class VoterDataService {
         // Get all data for year 2024 by filtering (continental US states only - exclude
         // territories and non-continental
         // states)
-        List<EavsData> allData = repo.findByFipsCodeAllYears("^");
+        List<EavsData> allData = repo.findAllNonUocava();
 
         List<String> excludedStates = List.of(
                 "ALASKA",
@@ -318,12 +318,16 @@ public class VoterDataService {
                     state,
                     new VotingEquipmentDTO(
                             state,
+                            record.fipsCode() != null && record.fipsCode().length() >= 2
+                                    ? record.fipsCode().substring(0, 2)
+                                    : null,
                             eq.dreNoVVPAT() != null ? eq.dreNoVVPAT() : 0,
                             eq.dreWithVVPAT() != null ? eq.dreWithVVPAT() : 0,
                             eq.ballotMarkingDevice() != null ? eq.ballotMarkingDevice() : 0,
                             eq.scanner() != null ? eq.scanner() : 0),
                     (v1, v2) -> new VotingEquipmentDTO(
                             state,
+                            v1.stateFips(),
                             v1.dreNoVVPAT() + v2.dreNoVVPAT(),
                             v1.dreWithVVPAT() + v2.dreWithVVPAT(),
                             v1.ballotMarkingDevice() + v2.ballotMarkingDevice(),
@@ -341,14 +345,16 @@ public class VoterDataService {
      * Get voting equipment data for the chart (aggregated by year for a specific
      * state).
      */
-    @Cacheable(value = "votingEquipmentChart", key = "#stateName")
-    public VotingEquipmentChartResponse getVotingEquipmentChart(String stateName) {
+    @Cacheable(value = "votingEquipmentChart", key = "#fipsPrefix")
+    public VotingEquipmentChartResponse getVotingEquipmentChart(String fipsPrefix) {
         // Query all years and filter by state name
-        List<EavsData> allData = repo.findByFipsCodeAllYears("^");
-        List<EavsData> data = allData.stream()
-                .filter(record ->
-                        record.stateFull() != null && record.stateFull().equalsIgnoreCase(stateName))
-                .toList();
+        String stateAbbr = FipsUtil.getStateAbbr(fipsPrefix);
+        List<EavsData> data;
+        if (stateAbbr != null) {
+            data = repo.findByStateAbbrAllYears(stateAbbr);
+        } else {
+            data = List.of();
+        }
 
         if (data.isEmpty()) {
             return new VotingEquipmentChartResponse(
@@ -402,7 +408,7 @@ public class VoterDataService {
 
         List<VoterRegistrationTableResponse.Data> tableData = stateData.get().countyVoterRegistrations().stream()
                 .map(county -> new VoterRegistrationTableResponse.Data(
-                        cleanJurisdictionName(county.countyName()),
+                        cleanJurisdictionName(county.countyName()) + " COUNTY",
                         county.totalRegisteredVoters(),
                         county.democraticVoters(),
                         county.republicanVoters(),
@@ -436,7 +442,8 @@ public class VoterDataService {
     @Cacheable(value = "voterRegistrationChart", key = "#fipsPrefix")
     public VoterRegistrationChartResponse getVoterRegistrationChart(String fipsPrefix) {
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> data = repo.findByStateAbbr(FipsUtil.getStateAbbr(prefix));
+        String stateAbbr = FipsUtil.getStateAbbr(prefix);
+        List<EavsData> data = (stateAbbr != null) ? repo.findByStateAbbrAllYears(stateAbbr) : List.of();
 
         // Group by NORMALIZED FIPS code
         Map<String, List<EavsData>> groupedByFips = data.stream()

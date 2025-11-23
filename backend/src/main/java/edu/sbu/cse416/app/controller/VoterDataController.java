@@ -92,9 +92,9 @@ public class VoterDataController {
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/voting-equipment/chart")
-    public ResponseEntity<VotingEquipmentChartResponse> getVotingEquipmentChart(@RequestParam String stateName) {
-        var dto = voterDataService.getVotingEquipmentChart(stateName);
+    @GetMapping("/voting-equipment/chart/{fipsPrefix}")
+    public ResponseEntity<VotingEquipmentChartResponse> getVotingEquipmentChart(@PathVariable String fipsPrefix) {
+        var dto = voterDataService.getVotingEquipmentChart(fipsPrefix);
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 

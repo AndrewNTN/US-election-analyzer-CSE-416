@@ -59,7 +59,7 @@ export function VotingEquipmentTable({
     selectedRows.length > 0 ? selectedRows[0].original : null;
 
   const { data: chartData } = useVotingEquipmentChartQuery(
-    selectedState?.state,
+    selectedState?.stateFips,
   );
 
   const equipmentByYear = useMemo(() => {

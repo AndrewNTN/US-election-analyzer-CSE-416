@@ -40,8 +40,9 @@ spotless {
   }
 }
 
-// Auto-format on build
+// Auto-format on build and bootRun
 build.dependsOn spotlessApply
+bootRun.dependsOn spotlessApply
 
 // Task to install Python dependencies
 task installPythonDependencies(type: Exec) {

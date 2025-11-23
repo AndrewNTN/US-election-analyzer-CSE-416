@@ -9,14 +9,21 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EavsDataRepository extends MongoRepository<EavsData, String> {
 
-    /** Fetch EAVS records by FIPS code prefix (regex-based) for 2024 only. */
-    @Query("{ 'fipsCode': { $regex: ?0 }, 'jurisdictionName': { $not: { $regex: '^UOCAVA' } }, 'electionYear': 2024 }")
-    List<EavsData> findByFipsCode(String fipsPrefix);
-
-    /** Fetch EAVS records by FIPS code prefix (regex-based) for all years. */
-    @Query("{ 'fipsCode': { $regex: ?0 }, 'jurisdictionName': { $not: { $regex: '^UOCAVA' } } }")
-    List<EavsData> findByFipsCodeAllYears(String fipsPrefix);
-
-    /** Fetch EAVS records by 2-letter state abbreviation for all years. */
+    /**
+     * Fetch EAVS records by 2-letter state abbreviation for 2024 only, excluding
+     * UOCAVA.
+     */
+    @Query("{ 'stateAbbr': ?0, 'electionYear': 2024, 'jurisdictionName': { $not: { $regex: '^UOCAVA' } } }")
     List<EavsData> findByStateAbbr(String stateAbbr);
+
+    /**
+     * Fetch EAVS records by 2-letter state abbreviation for all years, excluding
+     * UOCAVA.
+     */
+    @Query("{ 'stateAbbr': ?0, 'jurisdictionName': { $not: { $regex: '^UOCAVA' } } }")
+    List<EavsData> findByStateAbbrAllYears(String stateAbbr);
+
+    /** Fetch all EAVS records excluding UOCAVA. */
+    @Query("{ 'jurisdictionName': { $not: { $regex: '^UOCAVA' } } }")
+    List<EavsData> findAllNonUocava();
 }

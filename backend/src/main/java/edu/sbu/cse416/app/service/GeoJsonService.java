@@ -35,19 +35,6 @@ public class GeoJsonService {
     }
 
     /**
-     * Helper to filter EAVS data by state name using FipsUtil.
-     */
-    private List<EavsData> filterByState(List<EavsData> data, String fipsPrefix) {
-        String expectedState = FipsUtil.getStateName(fipsPrefix);
-        if (expectedState == null) {
-            return data;
-        }
-        return data.stream()
-                .filter(d -> d.stateFull() != null && d.stateFull().equalsIgnoreCase(expectedState))
-                .toList();
-    }
-
-    /**
      * Get all counties for a specific state with choropleth metrics.
      */
     @Cacheable(value = "countiesByState", key = "#fipsPrefix")
@@ -56,8 +43,13 @@ public class GeoJsonService {
 
         // Fetch EAVS data for this state
         String prefix = (fipsPrefix == null ? "" : fipsPrefix.trim());
-        List<EavsData> rawEavsData = eavsDataRepository.findByFipsCode("^" + prefix);
-        List<EavsData> eavsData = filterByState(rawEavsData, prefix);
+        String stateAbbr = FipsUtil.getStateAbbr(prefix);
+        List<EavsData> eavsData;
+        if (stateAbbr != null) {
+            eavsData = eavsDataRepository.findByStateAbbr(stateAbbr);
+        } else {
+            eavsData = List.of();
+        }
 
         // Build a map of FIPS -> EAVS data for faster lookup
         Map<String, EavsData> eavsMap = new HashMap<>();

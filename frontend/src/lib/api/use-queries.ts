@@ -188,17 +188,17 @@ export const useVotingEquipmentTableQuery = (options?: {
   });
 
 export const useVotingEquipmentChartQuery = (
-  stateName: string | null | undefined,
+  fipsPrefix: string | null | undefined,
 ): UseQueryResult<VotingEquipmentChartResponse, Error> =>
   useQuery({
-    queryKey: ["voting-equipment-chart", stateName ?? "no-state"],
+    queryKey: ["voting-equipment-chart", fipsPrefix ?? "no-fips"],
     queryFn: async () => {
-      if (!stateName) {
-        throw new Error("Missing state name for voting equipment chart query");
+      if (!fipsPrefix) {
+        throw new Error("Missing FIPS prefix for voting equipment chart query");
       }
-      return getVotingEquipmentChart(stateName);
+      return getVotingEquipmentChart(fipsPrefix);
     },
-    enabled: Boolean(stateName),
+    enabled: Boolean(fipsPrefix),
   });
 
 export const useCvapRegistrationRateQuery = (

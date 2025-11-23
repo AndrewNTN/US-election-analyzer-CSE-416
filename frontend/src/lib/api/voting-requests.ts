@@ -197,11 +197,9 @@ export const getVotingEquipmentTable =
     fetchJson(`/voting-equipment/table`);
 
 export const getVotingEquipmentChart = async (
-  stateName: string,
+  fipsPrefix: string,
 ): Promise<VotingEquipmentChartResponse> =>
-  fetchJson(
-    `/voting-equipment/chart?stateName=${encodeURIComponent(stateName)}`,
-  );
+  fetchJson(`/voting-equipment/chart/${fipsPrefix}`);
 
 export interface CvapRegistrationRateResponse {
   registrationRate: number;

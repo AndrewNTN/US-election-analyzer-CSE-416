@@ -2,6 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 export type VotingEquipment = {
   state: string;
+  stateFips: string;
   dreNoVVPAT: number;
   dreWithVVPAT: number;
   ballotMarkingDevice: number;
