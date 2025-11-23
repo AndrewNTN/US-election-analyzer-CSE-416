@@ -42,11 +42,11 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
       fillColor: "transparent",
       fillOpacity: 0,
       weight:
-        isDetailedState || (stateView && !isCounty)
+        !isCounty && (isDetailedState || stateView)
           ? outlineWeight * 3
-          : outlineWeight,
+          : outlineWeight * 2,
       opacity: 1,
-      color: isDetailedState ? "#101010" : outlineColor,
+      color: isDetailedState && !isCounty ? "#101010" : outlineColor,
     };
   };
 

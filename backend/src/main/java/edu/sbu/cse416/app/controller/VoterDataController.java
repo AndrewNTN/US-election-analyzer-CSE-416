@@ -89,13 +89,13 @@ public class VoterDataController {
     @GetMapping("/voting-equipment/table")
     public ResponseEntity<VotingEquipmentTableResponse> getVotingEquipmentTable() {
         var dto = voterDataService.getVotingEquipmentTable();
-        return ResponseEntity.ok(dto);
+        return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 
     @GetMapping("/voting-equipment/chart")
     public ResponseEntity<VotingEquipmentChartResponse> getVotingEquipmentChart(@RequestParam String stateName) {
         var dto = voterDataService.getVotingEquipmentChart(stateName);
-        return ResponseEntity.ok(dto);
+        return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 
     @GetMapping("/cvap-registration-rate/{fipsPrefix}")
@@ -108,14 +108,14 @@ public class VoterDataController {
     public ResponseEntity<StateComparisonResponse> getStateComparison(
             @RequestParam String republicanStateFips, @RequestParam String democraticStateFips) {
         var response = voterDataService.getStateComparison(republicanStateFips, democraticStateFips);
-        return ResponseEntity.ok(response);
+        return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 
     @GetMapping("/early-voting-comparison")
     public ResponseEntity<EarlyVotingComparisonResponse> getEarlyVotingComparison(
             @RequestParam String republicanStateFips, @RequestParam String democraticStateFips) {
         var response = voterDataService.getEarlyVotingComparison(republicanStateFips, democraticStateFips);
-        return ResponseEntity.ok(response);
+        return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 
     @GetMapping("/opt-in-opt-out-comparison")
@@ -124,6 +124,6 @@ public class VoterDataController {
             @RequestParam String optOutSameDayFips,
             @RequestParam String optOutNoSameDayFips) {
         var response = voterDataService.getOptInOptOutComparison(optInFips, optOutSameDayFips, optOutNoSameDayFips);
-        return ResponseEntity.ok(response);
+        return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 }

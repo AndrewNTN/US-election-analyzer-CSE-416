@@ -317,6 +317,7 @@ export default function StateMap({
           {isDetailedState && currentCountiesData ? (
             <>
               <ChoroplethLayer
+                key={`${choroplethOption}-${Boolean(currentCountiesData?.features?.[0]?.properties && "PROVISIONAL_BALLOTS_PCT" in currentCountiesData.features[0].properties)}`}
                 data={currentCountiesData}
                 choroplethOption={choroplethOption}
                 stateView

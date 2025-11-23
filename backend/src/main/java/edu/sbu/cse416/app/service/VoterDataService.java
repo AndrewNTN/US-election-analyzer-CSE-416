@@ -27,8 +27,8 @@ import edu.sbu.cse416.app.repository.CvapDataRepository;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
 import edu.sbu.cse416.app.repository.FelonyVotingRepository;
 import edu.sbu.cse416.app.repository.StateVoterRegistrationRepository;
-import edu.sbu.cse416.app.util.RecordAggregator;
 import edu.sbu.cse416.app.util.FipsUtil;
+import edu.sbu.cse416.app.util.RecordAggregator;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -460,7 +460,7 @@ public class VoterDataService {
 
         // Get CVAP data for the state
         List<CvapData> rawCvapData = cvapRepo.findByGeoidPrefix("^" + prefix);
-        
+
         // Filter CVAP by state name
         String expectedState = FipsUtil.getStateName(prefix);
         List<CvapData> cvapDataList;
@@ -484,7 +484,7 @@ public class VoterDataService {
 
         for (EavsData eavs : eavsData) {
             if (eavs.fipsCode() == null || eavs.voterRegistration() == null) continue;
-            
+
             // Truncate EAVS FIPS code to 5 digits to match CVAP geoid format
             String eavsFips = eavs.fipsCode().length() >= 5 ? eavs.fipsCode().substring(0, 5) : eavs.fipsCode();
 
@@ -506,7 +506,7 @@ public class VoterDataService {
             totalRegisteredVoters += registered;
             totalCvapEstimate += cvap.totalCvapEstimate();
         }
-        
+
         // Calculate state-level registration rate
         double rate = 0.0;
         if (totalCvapEstimate > 0) {
@@ -766,7 +766,7 @@ public class VoterDataService {
 
         // Get CVAP data for the state
         List<CvapData> rawCvapData = cvapRepo.findByGeoidPrefix("^" + stateFips);
-        
+
         // Filter CVAP by state name
         String expectedState = FipsUtil.getStateName(stateFips);
         List<CvapData> cvapDataList;

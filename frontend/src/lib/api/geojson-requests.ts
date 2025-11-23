@@ -7,11 +7,17 @@ export interface BaseMapProps {
 
 export interface StateProps extends BaseMapProps {
   stateFips: string;
+  EQUIPMENT_AGE?: number;
 }
 
 export interface CountyProps extends BaseMapProps {
   geoid: string;
   countyName: string;
+  PROVISIONAL_BALLOTS_PCT?: number;
+  ACTIVE_VOTERS_PCT?: number;
+  POLLBOOK_DELETIONS_PCT?: number;
+  MAIL_BALLOTS_REJECTED_PCT?: number;
+  VOTER_REGISTRATION_PCT?: number;
 }
 
 // Overarching type representing any map feature properties we handle

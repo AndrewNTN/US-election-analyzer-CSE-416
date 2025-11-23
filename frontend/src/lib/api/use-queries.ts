@@ -337,3 +337,5 @@ export const useCountiesGeoJsonQuery = (
     enabled: Boolean(fipsPrefix),
     staleTime: Infinity,
   });
+
+// Hooks removed: useChoroplethDataQuery, useSplashMetricsQuery

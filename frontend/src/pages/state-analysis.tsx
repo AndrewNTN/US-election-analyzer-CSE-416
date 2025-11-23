@@ -123,16 +123,8 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
       return STATE_CHOROPLETH_OPTIONS.OFF;
     }
 
-    // For voter registration, only show choropleth if state has detailed voter data
-    if (
-      selectedDataset === AnalysisType.VOTER_REGISTRATION &&
-      !hasDetailedVoterData(normalizedStateKey)
-    ) {
-      return STATE_CHOROPLETH_OPTIONS.OFF;
-    }
-
     return analysisToChoroplethMap[selectedDataset];
-  }, [isDetailedState, selectedDataset, normalizedStateKey]);
+  }, [isDetailedState, selectedDataset]);
 
   const handleBackToMainMap = () => {
     navigate({ to: "/" });
@@ -209,6 +201,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     };
   }, [allStatesData, normalizedStateKey]);
 
+  // Memoize the current counties data to ensure stable reference for map component
   const currentCountiesData = useMemo((): FeatureCollection<
     Geometry,
     CountyProps

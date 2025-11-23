@@ -70,7 +70,7 @@ export const equipmentAgeScale: ColorScale = {
 // Provisional ballots percentage scale (uses generic palette)
 export const provisionalBallotsScale: ColorScale = {
   colors: CHOROPLETH_COLORS,
-  breaks: [0, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0],
+  breaks: [0, 0.1, 0.25, 0.5, 1.0, 2.0, 3.0, 5.0],
 };
 
 // Active voters percentage scale (uses generic palette)
