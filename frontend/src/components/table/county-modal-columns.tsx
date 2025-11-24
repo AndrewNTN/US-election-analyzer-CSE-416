@@ -1,23 +1,17 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import type { FloridaVoter } from "@/lib/api/voting-requests.ts";
 
-// Sample Voters Table
-export interface SampleVoterRow {
-  id: string;
-  name: string;
-  email: string;
-  party: string;
-  zip: string;
-  registered: string | boolean;
-  mailInVote: boolean;
-}
+export const generateVoterColumns = (
+  labels: string[] = [],
+): ColumnDef<FloridaVoter>[] => {
+  return labels.map((label) => {
+    let accessorKey = label.toLowerCase();
+    if (label === "Name") accessorKey = "name";
+    if (label === "Party") accessorKey = "party";
 
-export const sampleVotersColumns: ColumnDef<SampleVoterRow>[] = [
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "party",
-    header: "Party",
-  },
-];
+    return {
+      accessorKey,
+      header: label,
+    };
+  });
+};

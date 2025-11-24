@@ -7,6 +7,7 @@ import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
 // } from "@/components/map/bubble-chart-layer.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
 import type { StateProps, CountyProps } from "@/lib/api/geojson-requests";
+import { useFloridaVotersQuery } from "@/lib/api/use-queries.ts";
 import type { StateChoroplethOption } from "@/lib/choropleth.ts";
 import {
   generateColorScale,
@@ -32,10 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DataTable } from "@/components/table/data-table";
-import {
-  sampleVotersColumns,
-  type SampleVoterRow,
-} from "@/components/table/county-modal-columns";
+import { generateVoterColumns } from "@/components/table/county-modal-columns";
 
 /** ---------- Types ---------- */
 interface StateMapProps {
@@ -50,225 +48,6 @@ interface StateMapProps {
   hasDetailedVoterData?: boolean;
 }
 
-type SafeCounty = {
-  name: string;
-  statefp: string; // e.g., "01"
-  countyfp: string; // e.g., "001"
-  geoid: string; // e.g., "01001"
-};
-
-type Party = "Democrat" | "Republican";
-
-type Voter = {
-  id: string;
-  name: string;
-  email: string;
-  party: Party;
-  registered: boolean;
-  mailInVote: boolean;
-  zip: string;
-};
-
-type PartyStats = {
-  party: Party;
-  count: number;
-  pct: number;
-};
-
-type DummyVoterData = {
-  geoid: string;
-  total: number;
-  byParty: PartyStats[];
-  votersSample: Voter[];
-};
-
-/** ---------- Utils: schema-safe, seeded RNG, dummy gen ---------- */
-function toSafeCounty(props: unknown): SafeCounty {
-  const p = (props ?? {}) as Record<string, unknown>;
-  const pick = (...keys: string[]) => {
-    for (const k of keys) {
-      const v = p[k];
-      if (v != null && v !== "") return String(v);
-    }
-    return "";
-  };
-
-  return {
-    name: pick("countyName", "NAME", "name") || "Unknown County",
-    statefp:
-      pick("stateFips", "STATEFP", "state", "STATE", "state_code") || "N/A",
-    countyfp: pick("COUNTYFP", "county_code") || "N/A",
-    geoid:
-      pick("geoid", "GEOID", "FIPS", "fips", "id") ||
-      `FAKE-${Math.floor(Math.random() * 10000)}`,
-  };
-}
-
-// Simple deterministic string hash → 32-bit int
-function hash32(s: string): number {
-  let h = 2166136261 >>> 0;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-
-// Mulberry32 PRNG
-function mulberry32(seed: number) {
-  let t = seed >>> 0;
-  return function rand() {
-    t += 0x6d2b79f5;
-    let x = Math.imul(t ^ (t >>> 15), 1 | t);
-    x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
-    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-const FIRST_NAMES = [
-  "Alex",
-  "Taylor",
-  "Jordan",
-  "Casey",
-  "Riley",
-  "Morgan",
-  "Avery",
-  "Sam",
-  "Jamie",
-  "Cameron",
-  "Devin",
-  "Quinn",
-  "Parker",
-  "Drew",
-  "Reese",
-  "Rowan",
-  "Elliot",
-  "Kyle",
-  "Logan",
-  "Harper",
-];
-const LAST_NAMES = [
-  "Smith",
-  "Johnson",
-  "Brown",
-  "Taylor",
-  "Anderson",
-  "Thomas",
-  "Jackson",
-  "White",
-  "Harris",
-  "Martin",
-  "Thompson",
-  "Garcia",
-  "Martinez",
-  "Robinson",
-  "Clark",
-  "Rodriguez",
-  "Lewis",
-  "Lee",
-  "Walker",
-  "Hall",
-];
-
-// Random-ish 3-letter “ZIP” token for demo
-const ZIPS = [
-  "MIA",
-  "LAX",
-  "NYC",
-  "SEA",
-  "DAL",
-  "ATL",
-  "PHL",
-  "BOS",
-  "DEN",
-  "PHX",
-  "MSP",
-  "DTW",
-  "CLT",
-  "HOU",
-  "SFO",
-];
-
-function pickOne<T>(arr: T[], r: () => number): T {
-  return arr[Math.floor(r() * arr.length)];
-}
-
-function makeEmail(name: string, r: () => number): string {
-  const providers = ["example.com", "mail.com", "inbox.com", "post.com"];
-  const handle =
-    name.toLowerCase().replace(/\s+/g, ".") + Math.floor(r() * 100);
-  return `${handle}@${pickOne(providers, r)}`;
-}
-
-// Given a seed, produce stable party distribution that still "looks random"
-function partyMix(rand: () => number): [number, number, number] {
-  // Draw two points on simplex and normalize to 100
-  const d = rand() * 0.6 + 0.2; // 20–80%
-  const r = rand() * (1 - d);
-  const o = 1 - d - r;
-  // randomize which party is "strong"
-  const roll = rand();
-  let dem = d,
-    rep = r,
-    oth = o;
-  if (roll < 0.33) [dem, rep] = [rep, dem];
-  else if (roll < 0.66) [dem, oth] = [oth, dem];
-  // percentages as integers that sum to 100
-  const D = Math.max(5, Math.round(dem * 100));
-  const R = Math.max(5, Math.round(rep * 100));
-  let O = Math.max(2, 100 - D - R);
-  // re-balance if rounding pushed sum off
-  const diff = 100 - (D + R + O);
-  if (diff !== 0) O += diff;
-  return [D, R, O];
-}
-
-function generateDummyVoters(geoid: string, countHint = 180): DummyVoterData {
-  const seed = hash32(geoid);
-  const r = mulberry32(seed);
-
-  // Total voters between ~120 and ~420
-  const total = Math.floor(countHint * (0.7 + r() * 1.6));
-
-  const [demPct, repPct] = partyMix(r);
-  const demCount = Math.round((demPct / 100) * total);
-  const repCount = Math.round((repPct / 100) * total);
-
-  const voters: Voter[] = [];
-  const mkVoter = (party: Party): Voter => {
-    const name = `${pickOne(FIRST_NAMES, r)} ${pickOne(LAST_NAMES, r)}`;
-    return {
-      id: Math.floor(r() * 0xffffffff)
-        .toString(16)
-        .padStart(8, "0"),
-      name,
-      email: makeEmail(name, r),
-      party,
-      registered: r() > 0.05, // ~95% registered
-      mailInVote: r() > 0.7, // ~30% mail-in
-      zip: pickOne(ZIPS, r),
-    };
-  };
-
-  for (let i = 0; i < demCount; i++) voters.push(mkVoter("Democrat"));
-  for (let i = 0; i < repCount; i++) voters.push(mkVoter("Republican"));
-
-  // Stable shuffle based on seed (Fisher–Yates using r)
-  for (let i = voters.length - 1; i > 0; i--) {
-    const j = Math.floor(r() * (i + 1));
-    [voters[i], voters[j]] = [voters[j], voters[i]];
-  }
-
-  const sample = voters.slice(0, 12); // keep modal light
-
-  const byParty: PartyStats[] = [
-    { party: "Democrat", count: demCount, pct: demPct },
-    { party: "Republican", count: repCount, pct: repPct },
-  ];
-
-  return { geoid, total, byParty, votersSample: sample };
-}
-
 /** ---------- Component ---------- */
 export default function StateMap({
   currentStateData,
@@ -281,34 +60,43 @@ export default function StateMap({
   fipsPrefix,
   hasDetailedVoterData = false,
 }: StateMapProps) {
-  const [selectedCounty, setSelectedCounty] = useState<SafeCounty | null>(null);
+  const [selectedCounty, setSelectedCounty] = useState<CountyProps | null>(
+    null,
+  );
   const [partyFilter, setPartyFilter] = useState<string>("all");
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 11,
+  });
+  const [sorting, setSorting] = useState([{ id: "name", desc: false }]);
 
-  // Generate dummy voter data whenever county changes
-  const voterData = useMemo<DummyVoterData | null>(() => {
-    if (!selectedCounty?.geoid) return null;
-    return generateDummyVoters(selectedCounty.geoid);
-  }, [selectedCounty?.geoid]);
+  // Fetch real voter data when a county is selected
+  const sortParam =
+    sorting.length > 0
+      ? `${sorting[0].id},${sorting[0].desc ? "desc" : "asc"}`
+      : undefined;
 
-  const handleCountyChange = (county: SafeCounty | null) => {
+  const { data: votersResponse, isLoading: isVotersLoading } =
+    useFloridaVotersQuery(
+      selectedCounty?.countyName || null,
+      pagination.pageIndex,
+      pagination.pageSize,
+      sortParam,
+      partyFilter,
+    );
+
+  const handleCountyChange = (county: CountyProps | null) => {
     setSelectedCounty(county);
     setPartyFilter("all"); // Reset filter when county changes
+    setPagination({ pageIndex: 0, pageSize: pagination.pageSize }); // Reset pagination
+    setSorting([{ id: "name", desc: false }]); // Reset sorting
   };
 
-  // Prepare data for Sample Voters table - filter by registered voters and party
-  const sampleVotersData: SampleVoterRow[] = useMemo(() => {
-    if (!voterData) return [];
-
-    // Filter for registered voters only
-    let filtered = voterData.votersSample.filter((voter) => voter.registered);
-
-    // Apply party filter
-    if (partyFilter === "Republican" || partyFilter === "Democrat") {
-      filtered = filtered.filter((voter) => voter.party === partyFilter);
-    }
-
-    return filtered;
-  }, [voterData, partyFilter]);
+  // Prepare data for Voters table - filter by registered voters and party
+  const votersData = useMemo(() => {
+    if (!votersResponse) return [];
+    return votersResponse.voters;
+  }, [votersResponse]);
 
   // Calculate dynamic color scale based on the current data and option
   const dynamicScale = useMemo(() => {
@@ -397,8 +185,8 @@ export default function StateMap({
                 onFeatureClick={
                   hasDetailedVoterData
                     ? (feature) => {
-                        const props = feature?.properties ?? null;
-                        handleCountyChange(props ? toSafeCounty(props) : null);
+                        const props = feature?.properties as CountyProps | null;
+                        handleCountyChange(props);
                       }
                     : undefined
                 }
@@ -443,11 +231,11 @@ export default function StateMap({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {selectedCounty?.name ?? "County Details"}
+              {selectedCounty?.countyName ?? "County Details"}
             </DialogTitle>
           </DialogHeader>
 
-          {/* Sample voters */}
+          {/* Voters table */}
           <div className="flex flex-col mt-2 gap-4">
             <div className="flex items-center justify-end gap-2 mb-2">
               <label className="text-sm">Filter by Party:</label>
@@ -458,18 +246,30 @@ export default function StateMap({
                 <SelectContent>
                   <SelectItem value="all">All Parties</SelectItem>
                   <SelectItem value="Republican">Republican</SelectItem>
-                  <SelectItem value="Democrat">Democratic</SelectItem>
+                  <SelectItem value="Democrat">Democrat</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <DataTable
-              data={sampleVotersData}
-              columns={sampleVotersColumns}
-              pageSize={10}
+              data={votersData}
+              columns={generateVoterColumns(votersResponse?.metricLabels)}
+              pageSize={pagination.pageSize}
               showPagination={true}
+              manualPagination={true}
+              pageCount={votersResponse?.totalPages ?? 1}
+              state={{
+                pagination,
+                sorting,
+              }}
+              onPaginationChange={setPagination}
+              onSortingChange={setSorting}
               bodyClassName="text-sm"
-              tableContainerClassName="rounded-lg"
-              emptyMessage="No registered voters match the selected criteria."
+              tableContainerClassName="rounded-lg min-h-[24rem] px-3 flex flex-col justify-center"
+              emptyMessage={
+                isVotersLoading
+                  ? "Loading voters..."
+                  : "No registered voters match the selected criteria."
+              }
               toolbar={
                 <h3 className="text-sm font-semibold mb-2">
                   Registered Voters

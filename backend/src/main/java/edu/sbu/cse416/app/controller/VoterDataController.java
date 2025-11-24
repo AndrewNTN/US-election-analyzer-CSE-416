@@ -11,11 +11,14 @@ import edu.sbu.cse416.app.dto.pollbook.PollbookDeletionsChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalTableResponse;
 import edu.sbu.cse416.app.dto.statecomparison.StateComparisonResponse;
+import edu.sbu.cse416.app.dto.voter.FloridaVotersResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationChartResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationTableResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentChartResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentTableResponse;
 import edu.sbu.cse416.app.service.VoterDataService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -125,5 +128,14 @@ public class VoterDataController {
             @RequestParam String optOutNoSameDayFips) {
         var response = voterDataService.getOptInOptOutComparison(optInFips, optOutSameDayFips, optOutNoSameDayFips);
         return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/florida-voters/{countyName}")
+    public ResponseEntity<FloridaVotersResponse> getFloridaVoters(
+            @PathVariable String countyName,
+            @RequestParam(required = false) String party,
+            @PageableDefault(size = 20) Pageable pageable) {
+        FloridaVotersResponse voters = voterDataService.getFloridaVoters(countyName, party, pageable);
+        return new ResponseEntity<>(voters, HttpStatus.OK);
     }
 }

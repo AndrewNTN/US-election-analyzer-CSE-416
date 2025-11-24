@@ -4,8 +4,9 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/cse416
+      auto-index-creation: true
   cache:
     type: caffeine
-    cache-names: provisionalByFips,provisionalAggregates
+    cache-names: provisionalTable,provisionalChart,activeVotersTable,activeVotersChart,pollbookDeletionsChart,mailBallotsRejectedTable,mailBallotsRejectedChart,votingEquipmentTable,votingEquipmentChart,voterRegistrationTable,voterRegistrationChart,cvapRegistrationRate,stateComparison,earlyVotingComparison,optInOptOutComparison,countiesByState,states
     caffeine:
       spec: maximumSize=500,expireAfterWrite=24h

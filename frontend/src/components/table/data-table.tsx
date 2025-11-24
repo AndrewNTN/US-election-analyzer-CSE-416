@@ -6,6 +6,10 @@ import type {
   Row,
   Table as TanstackTable,
   TableOptions,
+  OnChangeFn,
+  PaginationState,
+  SortingState,
+  TableState,
 } from "@tanstack/react-table";
 import type { HTMLAttributes, ReactNode } from "react";
 import {
@@ -60,6 +64,11 @@ type ManagedDataTableProps<TData, TValue> = SharedDataTableProps<TData> & {
     Omit<TableOptions<TData>, "data" | "columns" | "getCoreRowModel">
   >;
   table?: never;
+  manualPagination?: boolean;
+  pageCount?: number;
+  state?: Partial<TableState>;
+  onPaginationChange?: OnChangeFn<PaginationState>;
+  onSortingChange?: OnChangeFn<SortingState>;
 };
 
 type ControlledDataTableProps<TData> = SharedDataTableProps<TData> & {
@@ -262,6 +271,11 @@ function ManagedDataTable<TData, TValue>({
   columns,
   pageSize = DEFAULT_PAGE_SIZE,
   tableOptions,
+  manualPagination,
+  pageCount,
+  state,
+  onPaginationChange,
+  onSortingChange,
   ...rest
 }: ManagedDataTableProps<TData, TValue>) {
   const table = useReactTable({
@@ -274,6 +288,11 @@ function ManagedDataTable<TData, TValue>({
         pageSize,
       },
     },
+    ...(manualPagination !== undefined && { manualPagination }),
+    ...(pageCount !== undefined && { pageCount }),
+    ...(state !== undefined && { state }),
+    ...(onPaginationChange !== undefined && { onPaginationChange }),
+    ...(onSortingChange !== undefined && { onSortingChange }),
     ...tableOptions,
   });
 

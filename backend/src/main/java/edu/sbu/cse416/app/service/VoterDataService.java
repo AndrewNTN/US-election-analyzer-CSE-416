@@ -14,6 +14,8 @@ import edu.sbu.cse416.app.dto.provisional.ProvisionalChartResponse;
 import edu.sbu.cse416.app.dto.provisional.ProvisionalTableResponse;
 import edu.sbu.cse416.app.dto.statecomparison.StateComparisonResponse;
 import edu.sbu.cse416.app.dto.statecomparison.StateComparisonRow;
+import edu.sbu.cse416.app.dto.voter.FloridaVoterDTO;
+import edu.sbu.cse416.app.dto.voter.FloridaVotersResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationChartResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationTableResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentChartResponse;
@@ -23,10 +25,12 @@ import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentYearlyDTO;
 import edu.sbu.cse416.app.model.CvapData;
 import edu.sbu.cse416.app.model.FelonyVoting;
 import edu.sbu.cse416.app.model.eavs.*;
+import edu.sbu.cse416.app.model.registration.Voter;
 import edu.sbu.cse416.app.repository.CvapDataRepository;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
 import edu.sbu.cse416.app.repository.FelonyVotingRepository;
 import edu.sbu.cse416.app.repository.StateVoterRegistrationRepository;
+import edu.sbu.cse416.app.repository.VoterRepository;
 import edu.sbu.cse416.app.util.FipsUtil;
 import edu.sbu.cse416.app.util.RecordAggregator;
 import java.util.Comparator;
@@ -43,16 +47,19 @@ public class VoterDataService {
     private final StateVoterRegistrationRepository voterRegRepo;
     private final CvapDataRepository cvapRepo;
     private final FelonyVotingRepository felonyVotingRepo;
+    private final VoterRepository voterRepo;
 
     public VoterDataService(
             EavsDataRepository repo,
             StateVoterRegistrationRepository voterRegRepo,
             CvapDataRepository cvapRepo,
-            FelonyVotingRepository felonyVotingRepo) {
+            FelonyVotingRepository felonyVotingRepo,
+            VoterRepository voterRepo) {
         this.repo = repo;
         this.voterRegRepo = voterRegRepo;
         this.cvapRepo = cvapRepo;
         this.felonyVotingRepo = felonyVotingRepo;
+        this.voterRepo = voterRepo;
     }
 
     /**
@@ -896,5 +903,35 @@ public class VoterDataService {
         result.put("stateName", stateName);
 
         return result;
+    }
+
+    /**
+     * Get list of registered voters for a specific Florida county.
+     * Filters for DEM/REP and formats party names.
+     */
+    public FloridaVotersResponse getFloridaVoters(
+            String countyName, String party, org.springframework.data.domain.Pageable pageable) {
+        List<String> partiesToFilter;
+        if ("Republican".equalsIgnoreCase(party)) {
+            partiesToFilter = List.of("REP");
+        } else if ("Democrat".equalsIgnoreCase(party)) {
+            partiesToFilter = List.of("DEM");
+        } else {
+            partiesToFilter = List.of("DEM", "REP");
+        }
+
+        org.springframework.data.domain.Page<Voter> voterPage =
+                voterRepo.findByCountyNameAndPartyInAndNameRegex(countyName, partiesToFilter, "^[a-zA-Z]", pageable);
+
+        List<FloridaVoterDTO> filteredVoters = voterPage.stream()
+                .map(v -> {
+                    String partyName = "DEM".equals(v.party()) ? "Democrat" : "Republican";
+                    return new FloridaVoterDTO(v.name().toUpperCase(), partyName);
+                })
+                .toList();
+
+        List<String> metricLabels = List.of("Name", "Party");
+        return new FloridaVotersResponse(
+                metricLabels, filteredVoters, voterPage.getTotalPages(), voterPage.getTotalElements());
     }
 }

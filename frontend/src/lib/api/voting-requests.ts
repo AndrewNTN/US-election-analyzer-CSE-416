@@ -1,5 +1,9 @@
 import { fetchJson } from "@/lib/api/api-client";
 
+export interface FloridaVoter {
+  name: string;
+  party: string;
+}
 export interface ProvisionalChartResponse {
   provReasonVoterNotOnList?: number;
   provReasonVoterLackedID?: number;
@@ -272,3 +276,36 @@ export const getOptInOptOutComparison = async (
   fetchJson(
     `/opt-in-opt-out-comparison?optInFips=${optInFips}&optOutSameDayFips=${optOutSameDayFips}&optOutNoSameDayFips=${optOutNoSameDayFips}`,
   );
+
+export interface FloridaVotersResponse {
+  metricLabels: string[];
+  voters: FloridaVoter[];
+  totalPages: number;
+  totalElements: number;
+}
+
+export async function getFloridaVoters(
+  countyName: string,
+  page: number,
+  size: number,
+  sort?: string,
+  party?: string,
+): Promise<FloridaVotersResponse> {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    size: size.toString(),
+  });
+
+  if (sort) {
+    params.append("sort", sort);
+  }
+
+  if (party && party !== "all") {
+    params.append("party", party);
+  }
+
+  const response = await fetch(
+    `http://localhost:8080/api/florida-voters/${countyName}?${params.toString()}`,
+  );
+  return response.json();
+}

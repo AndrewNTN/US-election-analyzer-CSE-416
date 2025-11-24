@@ -1,4 +1,8 @@
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import {
+  useQuery,
+  type UseQueryResult,
+  keepPreviousData,
+} from "@tanstack/react-query";
 
 import {
   getProvisionalChart,
@@ -31,6 +35,8 @@ import {
   type EarlyVotingComparisonResponse,
   getOptInOptOutComparison,
   type OptInOptOutComparisonResponse,
+  getFloridaVoters,
+  type FloridaVotersResponse,
 } from "@/lib/api/voting-requests";
 
 import {
@@ -338,4 +344,17 @@ export const useCountiesGeoJsonQuery = (
     staleTime: Infinity,
   });
 
-// Hooks removed: useChoroplethDataQuery, useSplashMetricsQuery
+export const useFloridaVotersQuery = (
+  countyName: string | null,
+  page: number = 0,
+  size: number = 20,
+  sort?: string,
+  party?: string,
+  options?: { enabled?: boolean },
+) =>
+  useQuery<FloridaVotersResponse, Error>({
+    queryKey: ["floridaVoters", countyName, page, size, sort, party],
+    queryFn: () => getFloridaVoters(countyName!, page, size, sort, party),
+    enabled: !!countyName && options?.enabled !== false,
+    placeholderData: keepPreviousData,
+  });
