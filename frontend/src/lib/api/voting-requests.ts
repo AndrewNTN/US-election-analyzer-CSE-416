@@ -309,3 +309,19 @@ export async function getFloridaVoters(
   );
   return response.json();
 }
+
+export interface DropBoxVotingData {
+  eavsRegion: string;
+  totalDropBoxVotes: number;
+  republicanVotes: number;
+  democraticVotes: number;
+  totalVotes: number;
+  republicanPercentage: number;
+  democraticPercentage: number;
+  dropBoxPercentage: number;
+  dominantParty: "republican" | "democratic";
+}
+
+export const getDropBoxVotingData = async (
+  fipsPrefix: string,
+): Promise<DropBoxVotingData[]> => fetchJson(`/drop-box-voting/${fipsPrefix}`);

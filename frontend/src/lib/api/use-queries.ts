@@ -37,6 +37,8 @@ import {
   type OptInOptOutComparisonResponse,
   getFloridaVoters,
   type FloridaVotersResponse,
+  getDropBoxVotingData,
+  type DropBoxVotingData,
 } from "@/lib/api/voting-requests";
 
 import {
@@ -357,4 +359,18 @@ export const useFloridaVotersQuery = (
     queryFn: () => getFloridaVoters(countyName!, page, size, sort, party),
     enabled: !!countyName && options?.enabled !== false,
     placeholderData: keepPreviousData,
+  });
+
+export const useDropBoxVotingDataQuery = (
+  fipsPrefix: string | null | undefined,
+): UseQueryResult<DropBoxVotingData[], Error> =>
+  useQuery({
+    queryKey: ["drop-box-voting", fipsPrefix ?? "no-fips"],
+    queryFn: async () => {
+      if (!fipsPrefix) {
+        throw new Error("Missing FIPS prefix for drop box voting query");
+      }
+      return getDropBoxVotingData(fipsPrefix);
+    },
+    enabled: Boolean(fipsPrefix),
   });

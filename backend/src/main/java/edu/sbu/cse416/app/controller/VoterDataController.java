@@ -3,6 +3,7 @@ package edu.sbu.cse416.app.controller;
 import edu.sbu.cse416.app.dto.activevoters.ActiveVotersChartResponse;
 import edu.sbu.cse416.app.dto.activevoters.ActiveVotersTableResponse;
 import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
+import edu.sbu.cse416.app.dto.dropbox.DropBoxVotingData;
 import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonResponse;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedChartResponse;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedTableResponse;
@@ -17,6 +18,7 @@ import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationTableResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentChartResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentTableResponse;
 import edu.sbu.cse416.app.service.VoterDataService;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -137,5 +139,11 @@ public class VoterDataController {
             @PageableDefault(size = 20) Pageable pageable) {
         FloridaVotersResponse voters = voterDataService.getFloridaVoters(countyName, party, pageable);
         return new ResponseEntity<>(voters, HttpStatus.OK);
+    }
+
+    @GetMapping("/drop-box-voting/{fipsPrefix}")
+    public ResponseEntity<List<DropBoxVotingData>> getDropBoxVotingData(@PathVariable String fipsPrefix) {
+        var response = voterDataService.getDropBoxVotingData(fipsPrefix);
+        return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 }

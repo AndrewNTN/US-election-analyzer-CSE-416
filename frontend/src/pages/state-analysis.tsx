@@ -308,7 +308,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
                 />
               ) : selectedDataset === AnalysisType.DROP_BOX_VOTING ? (
                 <DropBoxVotingView
-                  normalizedStateKey={normalizedStateKey}
+                  stateFipsPrefix={stateFipsPrefix || ""}
                   stateName={formatStateName(stateName)}
                 />
               ) : selectedDataset ===

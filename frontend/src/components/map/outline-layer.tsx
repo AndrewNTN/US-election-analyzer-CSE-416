@@ -24,7 +24,7 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
   outlineColor = "#5d5656",
   outlineWeight = 1,
   hoverColor = "#1a1a1a",
-  hoverWeight = 4,
+  hoverWeight = 6,
   stateView = false,
   enableCountyInteractions = true,
 }: OutlineLayerProps<T>) {
@@ -43,7 +43,7 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
       fillOpacity: 0,
       weight:
         !isCounty && (isDetailedState || stateView)
-          ? outlineWeight * 3
+          ? outlineWeight * 5
           : outlineWeight * 2,
       opacity: 1,
       color: isDetailedState && !isCounty ? "#101010" : outlineColor,

@@ -3,6 +3,7 @@ package edu.sbu.cse416.app.service;
 import edu.sbu.cse416.app.dto.activevoters.ActiveVotersChartResponse;
 import edu.sbu.cse416.app.dto.activevoters.ActiveVotersTableResponse;
 import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
+import edu.sbu.cse416.app.dto.dropbox.DropBoxVotingData;
 import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonResponse;
 import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonRow;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedChartResponse;
@@ -22,10 +23,12 @@ import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentChartResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentDTO;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentTableResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentYearlyDTO;
+import edu.sbu.cse416.app.model.CountyVoteSplit;
 import edu.sbu.cse416.app.model.CvapData;
 import edu.sbu.cse416.app.model.FelonyVoting;
 import edu.sbu.cse416.app.model.eavs.*;
 import edu.sbu.cse416.app.model.registration.Voter;
+import edu.sbu.cse416.app.repository.CountyVoteSplitRepository;
 import edu.sbu.cse416.app.repository.CvapDataRepository;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
 import edu.sbu.cse416.app.repository.FelonyVotingRepository;
@@ -48,18 +51,21 @@ public class VoterDataService {
     private final CvapDataRepository cvapRepo;
     private final FelonyVotingRepository felonyVotingRepo;
     private final VoterRepository voterRepo;
+    private final CountyVoteSplitRepository countyVoteSplitRepo;
 
     public VoterDataService(
             EavsDataRepository repo,
             StateVoterRegistrationRepository voterRegRepo,
             CvapDataRepository cvapRepo,
             FelonyVotingRepository felonyVotingRepo,
-            VoterRepository voterRepo) {
+            VoterRepository voterRepo,
+            CountyVoteSplitRepository countyVoteSplitRepo) {
         this.repo = repo;
         this.voterRegRepo = voterRegRepo;
         this.cvapRepo = cvapRepo;
         this.felonyVotingRepo = felonyVotingRepo;
         this.voterRepo = voterRepo;
+        this.countyVoteSplitRepo = countyVoteSplitRepo;
     }
 
     /**
@@ -767,8 +773,59 @@ public class VoterDataService {
     }
 
     /**
-     * Helper method to aggregate early voting data for a state.
+     * Get drop box voting data for a state FIPS prefix.
      */
+    @Cacheable(value = "dropBoxVotingData", key = "#fipsPrefix")
+    public List<DropBoxVotingData> getDropBoxVotingData(String fipsPrefix) {
+
+        List<CountyVoteSplit> countySplits = countyVoteSplitRepo.findByStateFips(fipsPrefix);
+        List<EavsData> eavsData = getFilteredEavsData(fipsPrefix);
+
+        // Create a map of EavsData by normalized jurisdiction name
+        Map<String, EavsData> eavsMap = eavsData.stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        d -> cleanJurisdictionName(d.jurisdictionName())
+                                .toUpperCase()
+                                .replace(" COUNTY", "")
+                                .trim(),
+                        d -> d,
+                        (a, b) -> a // Merge function if duplicates
+                        ));
+
+        List<DropBoxVotingData> result = new java.util.ArrayList<>();
+
+        for (CountyVoteSplit split : countySplits) {
+            String normalizedName =
+                    split.countyName().toUpperCase().replace(" COUNTY", "").trim();
+            EavsData eavs = eavsMap.get(normalizedName);
+
+            if (eavs != null) {
+                int totalDropBoxVotes = nz(eavs.dropBoxesTotal());
+                int totalBallots = nz(eavs.totalBallots());
+
+                Double dropBoxPercentage = totalBallots > 0 ? (totalDropBoxVotes / (double) totalBallots) * 100 : 0.0;
+
+                String dominantParty = (split.republicanVotes() != null
+                                && split.democraticVotes() != null
+                                && split.republicanVotes() > split.democraticVotes())
+                        ? "republican"
+                        : "democratic";
+
+                result.add(new DropBoxVotingData(
+                        split.countyName(),
+                        totalDropBoxVotes,
+                        split.republicanVotes(),
+                        split.democraticVotes(),
+                        totalBallots,
+                        split.republicanPercentage(),
+                        split.democraticPercentage(),
+                        dropBoxPercentage,
+                        dominantParty));
+            }
+        }
+        return result;
+    }
+
     private Map<String, Object> getEarlyVotingAggregateData(String stateFips) {
         Map<String, Object> result = new HashMap<>();
 

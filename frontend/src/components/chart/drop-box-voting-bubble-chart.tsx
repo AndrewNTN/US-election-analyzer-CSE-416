@@ -9,19 +9,10 @@ import {
   Legend,
   ResponsiveContainer,
   ZAxis,
+  Cell,
 } from "recharts";
 
-export interface DropBoxVotingData {
-  eavsRegion: string;
-  totalDropBoxVotes: number;
-  republicanVotes: number;
-  democraticVotes: number;
-  otherVotes: number;
-  totalVotes: number;
-  republicanPercentage: number;
-  dropBoxPercentage: number;
-  dominantParty: "republican" | "democratic";
-}
+import type { DropBoxVotingData } from "@/lib/api/voting-requests";
 
 interface DropBoxVotingBubbleChartProps {
   data: DropBoxVotingData[];
@@ -36,38 +27,26 @@ interface TooltipData {
   republicanVotes: number;
   democraticVotes: number;
   totalDropBoxVotes: number;
+  totalVotes: number;
+  party: "republican" | "democratic";
 }
 
 export function DropBoxVotingBubbleChart({
   data,
 }: DropBoxVotingBubbleChartProps) {
-  // Split data by party dominance for different colored bubbles
-  const { republicanData, democraticData } = useMemo(() => {
-    const repData = data
-      .filter((d) => d.dominantParty === "republican")
-      .map((d) => ({
-        x: d.republicanPercentage,
-        y: d.dropBoxPercentage,
-        z: d.totalDropBoxVotes / 1000, // Scale for bubble size
-        name: d.eavsRegion,
-        republicanVotes: d.republicanVotes,
-        democraticVotes: d.democraticVotes,
-        totalDropBoxVotes: d.totalDropBoxVotes,
-      }));
-
-    const demData = data
-      .filter((d) => d.dominantParty === "democratic")
-      .map((d) => ({
-        x: d.republicanPercentage,
-        y: d.dropBoxPercentage,
-        z: d.totalDropBoxVotes / 1000, // Scale for bubble size
-        name: d.eavsRegion,
-        republicanVotes: d.republicanVotes,
-        democraticVotes: d.democraticVotes,
-        totalDropBoxVotes: d.totalDropBoxVotes,
-      }));
-
-    return { republicanData: repData, democraticData: demData };
+  // Combine all data into a single array with party indicator
+  const chartData = useMemo(() => {
+    return data.map((d) => ({
+      x: d.republicanPercentage,
+      y: d.dropBoxPercentage,
+      z: d.totalDropBoxVotes,
+      name: d.eavsRegion,
+      republicanVotes: d.republicanVotes,
+      democraticVotes: d.democraticVotes,
+      totalDropBoxVotes: d.totalDropBoxVotes,
+      totalVotes: d.totalVotes,
+      party: d.dominantParty,
+    }));
   }, [data]);
 
   const CustomTooltip = ({
@@ -83,19 +62,22 @@ export function DropBoxVotingBubbleChart({
         <div className="bg-white p-3 border border-gray-300 rounded shadow-lg">
           <p className="font-semibold text-sm mb-1">{data.name}</p>
           <p className="text-xs text-gray-700">
-            Republican Votes: {data.x.toFixed(1)}%
-          </p>
-          <p className="text-xs text-gray-700">
-            Drop Box Voting: {data.y.toFixed(1)}%
+            Republican Vote Percentage: {data.x.toFixed(1)}%
           </p>
           <p className="text-xs text-gray-700">
             Total Drop Box Votes: {data.totalDropBoxVotes.toLocaleString()}
           </p>
           <p className="text-xs text-gray-700">
-            Republican: {data.republicanVotes.toLocaleString()}
+            Drop Box Voting Percentage: {data.y.toFixed(1)}%
           </p>
           <p className="text-xs text-gray-700">
-            Democratic: {data.democraticVotes.toLocaleString()}
+            Total Votes: {data.totalVotes.toLocaleString()}
+          </p>
+          <p className="text-xs text-gray-700">
+            Republican Votes: {data.republicanVotes.toLocaleString()}
+          </p>
+          <p className="text-xs text-gray-700">
+            Democratic Votes: {data.democraticVotes.toLocaleString()}
           </p>
         </div>
       );
@@ -144,27 +126,38 @@ export function DropBoxVotingBubbleChart({
           <ZAxis
             type="number"
             dataKey="z"
-            range={[100, 1000]}
-            name="Total Votes (thousands)"
+            range={[150, 4000]}
+            name="Total Votes"
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend
             verticalAlign="top"
             height={36}
-            wrapperStyle={{ paddingBottom: "10px" }}
+            content={() => (
+              <div className="flex justify-center gap-5 pb-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-600" />
+                  <span className="text-md text-gray-600">
+                    Republican-dominated regions
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-blue-600" />
+                  <span className="text-md text-gray-600">
+                    Democratic-dominated regions
+                  </span>
+                </div>
+              </div>
+            )}
           />
-          <Scatter
-            name="Republican-dominated regions"
-            data={republicanData}
-            fill="#dc2626"
-            fillOpacity={0.7}
-          />
-          <Scatter
-            name="Democratic-dominated regions"
-            data={democraticData}
-            fill="#2563eb"
-            fillOpacity={0.7}
-          />
+          <Scatter name="EAVS Regions" data={chartData} fillOpacity={0.65}>
+            {chartData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={entry.party === "republican" ? "#dc2626" : "#2563eb"}
+              />
+            ))}
+          </Scatter>
         </ScatterChart>
       </ResponsiveContainer>
     </div>
