@@ -8,6 +8,7 @@ export interface BaseMapProps {
 export interface StateProps extends BaseMapProps {
   stateFips: string;
   EQUIPMENT_AGE?: number;
+  dataQualityScore?: number;
 }
 
 export interface CountyProps extends BaseMapProps {

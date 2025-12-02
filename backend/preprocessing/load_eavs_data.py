@@ -30,7 +30,7 @@ CSV_FILES = {
 def clean_numeric_value(val):
     """
     Clean numeric values: treat negative codes (-88, -99, etc.) as 0,
-    handle missing values, and convert to int.
+    handle missing values
     """
     if pd.isna(val):
         return 0
@@ -39,6 +39,44 @@ def clean_numeric_value(val):
         return int(num) if num >= 0 else 0
     except (ValueError, TypeError):
         return 0
+
+def calculate_data_quality_score(row):
+    """
+    Calculate a data completeness score (0-1) based on the presence of key fields.
+    Weighted by importance of the field for the application.
+    """
+    # Define critical fields and their weights
+    # High importance (1.0): Core counts used in main views
+    # Medium importance (0.8): Counts used in secondary views
+    fields = {
+        "A1a": 1.0,  # Total Registered
+        "F1b": 1.0,  # Election Day Ballots
+        "C8a": 1.0,  # Mail Ballots Counted
+        "F1f": 1.0,  # Early In-Person Ballots
+        "E1b": 1.0,  # Provisional Ballots Counted
+        "C9a": 0.8,  # Total Mail Ballots Rejected
+        "E1d": 0.8,  # Total Provisional Ballots Rejected
+        "C6a": 0.8,  # Drop Box Total
+        "A1b": 1.0,  # Active Registered
+        "A1c": 1.0,  # Inactive Registered
+        "A12a": 0.8, # Total Deletions (using A12a if available, or sum of others)
+    }
+
+    total_weight = sum(fields.values())
+    present_weight = 0.0
+
+    for col, weight in fields.items():
+        val = row.get(col)
+        # Check if value is present (not NaN, not empty, not negative code)
+        if pd.notna(val) and str(val).strip() != "":
+            try:
+                num = float(val)
+                if num >= 0: # Valid non-negative number
+                    present_weight += weight
+            except ValueError:
+                pass # Non-numeric value considered missing for these fields
+
+    return round(present_weight / total_weight, 4) if total_weight > 0 else 0.0
 
 
 def load_eavs_2024(collection, csv_path):
@@ -75,8 +113,12 @@ def load_eavs_2024(collection, csv_path):
     # Apply numeric cleaning to all relevant columns
     numeric_cols = (voter_registration_cols + voter_deletion_cols + mail_rejected_cols +
                     provisional_e1_cols + provisional_e2_cols + provisional_e2_other_cols +
-                    equipment_cols + ["C1b", "C6a", "C5a", "F1f", "F1b", "F1d", "F1g", "C8a", "C9a", "B24a"]
+                    equipment_cols + ["C1b", "C6a", "C5a", "F1f", "F1b", "F1d", "F1g", "C8a", "C9a", "B24a", "A12a"]
                     )
+
+    # Calculate data quality score BEFORE cleaning numeric values
+    # This ensures we capture missing/negative values correctly
+    df["dataQualityScore"] = df.apply(calculate_data_quality_score, axis=1)
 
     for col in numeric_cols:
         if col in df.columns:
@@ -87,29 +129,29 @@ def load_eavs_2024(collection, csv_path):
 
     for _, row in df.iterrows():
         # Calculate voter deletion total
-        voter_deletion_total = sum(row[col] for col in voter_deletion_cols if col in row)
+        voter_deletion_total = (row.get("A12a") or 0)
 
         # Calculate provisional other reasons sum
-        provisional_other_sum = sum(row[col] for col in provisional_e2_other_cols if col in row)
+        provisional_other_sum = sum((row[col] or 0) for col in provisional_e2_other_cols if col in row)
 
         # Equipment type counts
-        dre_no_vvpat = sum(row[col] for col in ["F3c_1", "F3c_2", "F3c_3"] if col in row)
-        dre_with_vvpat = sum(row[col] for col in ["F4c_1", "F4c_2", "F4c_3"] if col in row)
-        ballot_marking_device = sum(row[col] for col in ["F5c_1", "F5c_2", "F5c_3"] if col in row)
-        scanner = sum(row[col] for col in ["F6c_1", "F6c_2", "F6c_3"] if col in row)
+        dre_no_vvpat = sum((row[col] or 0) for col in ["F3c_1", "F3c_2", "F3c_3"] if col in row)
+        dre_with_vvpat = sum((row[col] or 0) for col in ["F4c_1", "F4c_2", "F4c_3"] if col in row)
+        ballot_marking_device = sum((row[col] or 0) for col in ["F5c_1", "F5c_2", "F5c_3"] if col in row)
+        scanner = sum((row[col] or 0) for col in ["F6c_1", "F6c_2", "F6c_3"] if col in row)
 
         # Calculate ballot statistics
         # Total ballots = F1b (election day ballots) + C8a (counted mail ballots) + F1f (Early In-Person Ballots Counted) + E1b (provisional ballots counted)
-        election_day_ballots = row.get("F1b", 0)
-        counted_mail_ballots = row.get("C8a", 0)
-        early_in_person_counted = row.get("F1f", 0)
-        provisional_counted = row.get("E1b", 0)
+        election_day_ballots = (row.get("F1b") or 0)
+        counted_mail_ballots = (row.get("C8a") or 0)
+        early_in_person_counted = (row.get("F1f") or 0)
+        provisional_counted = (row.get("E1b") or 0)
         total_ballots = election_day_ballots + counted_mail_ballots + early_in_person_counted + provisional_counted
 
         # Total Rejected ballots = C9a (mail-in ballots rejected) + E1d (provisional ballots rejected) + B24a (UOCAVA ballots rejected)
-        mail_rejected = row.get("C9a", 0)
-        provisional_rejected = row.get("E1d", 0)
-        uocava_rejected = row.get("B24a", 0)
+        mail_rejected = (row.get("C9a") or 0)
+        provisional_rejected = (row.get("E1d") or 0)
+        uocava_rejected = (row.get("B24a") or 0)
         total_rejected_ballots = mail_rejected + provisional_rejected + uocava_rejected
 
         # Rejected ballots % = total rejected ballots / total ballots (avoid division by zero)
@@ -191,7 +233,7 @@ def load_eavs_2024(collection, csv_path):
 
             # Top-level aggregates
             "mailBallotsReturned": row.get("C1b", 0),
-            "mailCountedTotal": row.get("F1d", 0) + row.get("F1g", 0),  # F1d + F1g: Total counted mail ballots
+            "mailCountedTotal": (row.get("F1d") or 0) + (row.get("F1g") or 0),  # F1d + F1g: Total counted mail ballots
             "dropBoxesTotal": row.get("C6a", 0),
             "totalDropBoxesEarlyVoting": row.get("C5a", 0),
             "inPersonEarlyVoting": row.get("F1f", 0),
@@ -199,7 +241,10 @@ def load_eavs_2024(collection, csv_path):
             # Ballot statistics
             "totalBallots": total_ballots,
             "totalRejectedBallots": total_rejected_ballots,
-            "percentageRejectedBallots": round(percentage_rejected_ballots, 2)
+            "percentageRejectedBallots": round(percentage_rejected_ballots, 2),
+
+            # Data Quality Score
+            "dataQualityScore": row.get("dataQualityScore", 0.0)
         }
 
         documents.append(document)
@@ -247,10 +292,10 @@ def load_eavs_2022_2020_2018(collection, csv_path, year):
 
     for _, row in df.iterrows():
         # Equipment type counts
-        dre_no_vvpat = sum(row[col] for col in ["F5c_1", "F5c_2", "F5c_3"] if col in row)
-        dre_with_vvpat = sum(row[col] for col in ["F6c_1", "F6c_2", "F6c_3"] if col in row)
-        ballot_marking_device = sum(row[col] for col in ["F7c_1", "F7c_2", "F7c_3"] if col in row)
-        scanner = sum(row[col] for col in ["F8c_1", "F8c_2", "F8c_3"] if col in row)
+        dre_no_vvpat = sum((row[col] or 0) for col in ["F5c_1", "F5c_2", "F5c_3"] if col in row)
+        dre_with_vvpat = sum((row[col] or 0) for col in ["F6c_1", "F6c_2", "F6c_3"] if col in row)
+        ballot_marking_device = sum((row[col] or 0) for col in ["F7c_1", "F7c_2", "F7c_3"] if col in row)
+        scanner = sum((row[col] or 0) for col in ["F8c_1", "F8c_2", "F8c_3"] if col in row)
 
         # Build the document structure
         document = {

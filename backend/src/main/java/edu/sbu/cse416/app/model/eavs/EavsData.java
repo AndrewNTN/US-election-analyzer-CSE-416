@@ -24,4 +24,5 @@ public record EavsData(
         Integer inPersonEarlyVoting,
         Integer totalRejectedBallots,
         Integer totalBallots,
-        Double percentageRejectedBallots) {}
+        Double percentageRejectedBallots,
+        Double dataQualityScore) {}

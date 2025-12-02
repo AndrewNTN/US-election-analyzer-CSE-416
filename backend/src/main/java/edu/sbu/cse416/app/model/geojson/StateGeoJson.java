@@ -7,7 +7,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public record StateGeoJson(@Id String id, String type, Properties properties, Geometry geometry) {
 
     public record Properties(
-            String stateName, String density, String stateFips, String stateAbbr, Double EQUIPMENT_AGE) {}
+            String stateName,
+            String density,
+            String stateFips,
+            String stateAbbr,
+            Double EQUIPMENT_AGE,
+            Double dataQualityScore) {}
 
     public record Geometry(String type, Object coordinates) {}
 }

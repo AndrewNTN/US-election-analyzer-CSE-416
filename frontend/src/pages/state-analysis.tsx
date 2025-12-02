@@ -214,6 +214,13 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
 
   const detailedState = isDetailedState;
 
+  const dataQualityScore = useMemo(() => {
+    if (currentStateData.features.length > 0) {
+      return currentStateData.features[0].properties.dataQualityScore;
+    }
+    return undefined;
+  }, [currentStateData]);
+
   const showBubbleChart =
     selectedDataset === AnalysisType.VOTER_REGISTRATION &&
     hasDetailedVoterData(normalizedStateKey);
@@ -229,6 +236,24 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
           <h1 className="text-lg font-bold text-gray-900">
             {formatStateName(stateName)}
           </h1>
+          {dataQualityScore !== undefined && (
+            <div className="ml-4 flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-full border">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                EAVS Data Quality Score
+              </span>
+              <span
+                className={`text-sm font-bold ${
+                  dataQualityScore > 0.9
+                    ? "text-green-600"
+                    : dataQualityScore > 0.7
+                      ? "text-yellow-600"
+                      : "text-red-600"
+                }`}
+              >
+                {dataQualityScore?.toFixed(2)}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

@@ -227,9 +227,31 @@ public class GeoJsonService {
                                     state.properties().density(),
                                     state.properties().stateFips(),
                                     state.properties().stateAbbr(),
-                                    equipmentAge),
+                                    equipmentAge,
+                                    calculateStateDataQuality(state.properties().stateFips())),
                             state.geometry());
                 })
                 .toList();
+    }
+
+    private Double calculateStateDataQuality(String stateFips) {
+        if (stateFips == null) return 0.0;
+
+        String stateAbbr = FipsUtil.getStateAbbr(stateFips);
+        List<EavsData> data = eavsDataRepository.findByStateAbbr(stateAbbr);
+
+        double totalScore = 0.0;
+        int count = 0;
+        for (EavsData d : data) {
+            if (d.dataQualityScore() != null) {
+                totalScore += d.dataQualityScore();
+                count++;
+            }
+        }
+        return count > 0 ? totalScore / count : 0.0;
+    }
+
+    private int nz(Integer val) {
+        return val == null ? 0 : val;
     }
 }
