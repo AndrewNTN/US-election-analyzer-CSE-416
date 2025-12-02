@@ -95,7 +95,7 @@ export function DropBoxVotingBubbleChart({
         dominance in 2024 Presidential election.
       </p>
       <ResponsiveContainer width="100%" height="85%">
-        <ScatterChart margin={{ top: 20, right: 30, bottom: 40, left: 40 }}>
+        <ScatterChart margin={{ top: 20, right: 30, bottom: 60, left: 40 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             type="number"
@@ -132,9 +132,9 @@ export function DropBoxVotingBubbleChart({
           <Tooltip content={<CustomTooltip />} />
           <Legend
             verticalAlign="top"
-            height={36}
+            height={55}
             content={() => (
-              <div className="flex justify-center gap-5 pb-2">
+              <div className="flex justify-center gap-5 pb-4">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-600" />
                   <span className="text-md text-gray-600">
