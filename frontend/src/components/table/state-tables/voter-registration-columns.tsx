@@ -8,6 +8,9 @@ export type EAVSRegionVoterData = {
   democraticVoters: number;
   republicanVoters: number;
   unaffiliatedVoters: number;
+  missingNamePct: number;
+  missingAddressPct: number;
+  missingEmailPct: number;
 };
 
 export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
@@ -62,6 +65,54 @@ export const voterRegistrationColumns: ColumnDef<EAVSRegionVoterData>[] = [
       return (
         <div className="text-right text-sm">
           <div>{Number(amount).toLocaleString()}</div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "missingEmailPct",
+    header: () => <div className="text-right">Missing Email %</div>,
+    cell: ({ row }) => {
+      const amount = row.getValue("missingEmailPct");
+      return (
+        <div className="text-right text-sm">
+          <div>
+            {amount !== undefined && amount !== null
+              ? Number(amount).toFixed(2) + "%"
+              : "0.00%"}
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "missingNamePct",
+    header: () => <div className="text-right">Missing Name %</div>,
+    cell: ({ row }) => {
+      const amount = row.getValue("missingNamePct");
+      return (
+        <div className="text-right text-sm">
+          <div>
+            {amount !== undefined && amount !== null
+              ? Number(amount).toFixed(2) + "%"
+              : "0.00%"}
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "missingAddressPct",
+    header: () => <div className="text-right">Missing Address %</div>,
+    cell: ({ row }) => {
+      const amount = row.getValue("missingAddressPct");
+      return (
+        <div className="text-right text-sm">
+          <div>
+            {amount !== undefined && amount !== null
+              ? Number(amount).toFixed(2) + "%"
+              : "0.00%"}
+          </div>
         </div>
       );
     },

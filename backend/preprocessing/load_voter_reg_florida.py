@@ -194,7 +194,6 @@ class FloridaVoterLoader:
 
         valid_voters = []
 
-        # TEMPORARILY SKIP ALL VALIDATION - Accept all records
         for voter_data in voters_data:
             # Create final voter record with null email if not present
             voter_record = {
@@ -218,6 +217,17 @@ class FloridaVoterLoader:
                 self.county_registration_stats[county_name]['republicanVoters'] += 1
             else:
                 self.county_registration_stats[county_name]['unaffiliatedVoters'] += 1
+
+            # Check for missing data
+            if not voter_data.get('name'):
+                self.county_registration_stats[county_name]['missingName'] += 1
+            
+            # Check address completeness (line1 or zip)
+            if not voter_data.get('address_line1') or not voter_data.get('address_zip'):
+                self.county_registration_stats[county_name]['missingAddress'] += 1
+                
+            if not voter_data.get('email'):
+                self.county_registration_stats[county_name]['missingEmail'] += 1
 
         return valid_voters
 
@@ -313,7 +323,7 @@ class FloridaVoterLoader:
             address_parts.append(address_line2)
         if address_city:
             address_parts.append(address_city)
-        address_parts.append(address_state)  # Always include state (now defaults to FL)
+        address_parts.append(address_state)
         if address_zip:
             address_parts.append(address_zip)
         address = ', '.join(address_parts)
@@ -321,7 +331,7 @@ class FloridaVoterLoader:
         # Get email
         email = parts[37].strip() if len(parts) > 37 else ''
 
-        # Check required fields (state no longer checked since it defaults to FL)
+        # Check required fields 
         if not name or not address_line1:
             self.stats['skipped_missing_data'] += 1
             return None
@@ -360,7 +370,10 @@ class FloridaVoterLoader:
                 'totalRegisteredVoters': 0,
                 'democraticVoters': 0,
                 'republicanVoters': 0,
-                'unaffiliatedVoters': 0
+                'unaffiliatedVoters': 0,
+                'missingName': 0,
+                'missingAddress': 0,
+                'missingEmail': 0
             }
 
         try:
@@ -450,12 +463,20 @@ class FloridaVoterLoader:
         # Prepare county registration documents (as array for embedding)
         county_docs = []
         for county_name, stats in self.county_registration_stats.items():
+            total = stats['totalRegisteredVoters']
+            missing_name_pct = (stats['missingName'] / total * 100) if total > 0 else 0
+            missing_address_pct = (stats['missingAddress'] / total * 100) if total > 0 else 0
+            missing_email_pct = (stats['missingEmail'] / total * 100) if total > 0 else 0
+
             county_doc = {
                 'countyName': county_name,
                 'totalRegisteredVoters': stats['totalRegisteredVoters'],
                 'democraticVoters': stats['democraticVoters'],
                 'republicanVoters': stats['republicanVoters'],
-                'unaffiliatedVoters': stats['unaffiliatedVoters']
+                'unaffiliatedVoters': stats['unaffiliatedVoters'],
+                'missingNamePct': round(missing_name_pct, 2),
+                'missingAddressPct': round(missing_address_pct, 2),
+                'missingEmailPct': round(missing_email_pct, 2)
             }
             county_docs.append(county_doc)
 

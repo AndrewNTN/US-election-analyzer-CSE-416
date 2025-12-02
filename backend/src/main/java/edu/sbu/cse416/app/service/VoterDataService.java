@@ -425,7 +425,10 @@ public class VoterDataService {
                         county.totalRegisteredVoters(),
                         county.democraticVoters(),
                         county.republicanVoters(),
-                        county.unaffiliatedVoters()))
+                        county.unaffiliatedVoters(),
+                        county.missingNamePct(),
+                        county.missingAddressPct(),
+                        county.missingEmailPct()))
                 .toList();
 
         return new VoterRegistrationTableResponse(tableData, VoterRegistrationTableResponse.getDefaultMetricLabels());

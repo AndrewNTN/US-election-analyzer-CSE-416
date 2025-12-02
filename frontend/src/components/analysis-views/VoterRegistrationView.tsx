@@ -40,7 +40,7 @@ export function VoterRegistrationView({
       )}
       <div className="mt-4">
         <h3 className="text-lg font-semibold mb-2 text-center text-gray-900">
-          Changes in Voter Registration by County
+          Voter Registration by County
         </h3>
         <div className="h-[350px]">
           <VoterRegistrationLineChart

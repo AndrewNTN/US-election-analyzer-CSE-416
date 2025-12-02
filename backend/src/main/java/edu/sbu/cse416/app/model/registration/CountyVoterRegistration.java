@@ -5,4 +5,7 @@ public record CountyVoterRegistration(
         Integer totalRegisteredVoters,
         Integer democraticVoters,
         Integer republicanVoters,
-        Integer unaffiliatedVoters) {}
+        Integer unaffiliatedVoters,
+        Double missingNamePct,
+        Double missingAddressPct,
+        Double missingEmailPct) {}

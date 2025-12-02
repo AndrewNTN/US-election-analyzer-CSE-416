@@ -146,6 +146,9 @@ export interface VoterRegistrationTableResponse {
     democraticVoters: number;
     republicanVoters: number;
     unaffiliatedVoters: number;
+    missingNamePct: number;
+    missingAddressPct: number;
+    missingEmailPct: number;
   }[];
   metricLabels: Record<string, string>;
 }

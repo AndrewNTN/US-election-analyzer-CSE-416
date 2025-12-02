@@ -10,7 +10,10 @@ public record VoterRegistrationTableResponse(List<Data> data, Map<String, String
             Integer totalRegisteredVoters,
             Integer democraticVoters,
             Integer republicanVoters,
-            Integer unaffiliatedVoters) {}
+            Integer unaffiliatedVoters,
+            Double missingNamePct,
+            Double missingAddressPct,
+            Double missingEmailPct) {}
 
     public static Map<String, String> getDefaultMetricLabels() {
         return Map.of(
@@ -18,6 +21,9 @@ public record VoterRegistrationTableResponse(List<Data> data, Map<String, String
                 "totalRegisteredVoters", "Total Registered",
                 "democraticVoters", "Democratic",
                 "republicanVoters", "Republican",
-                "unaffiliatedVoters", "Unaffiliated");
+                "unaffiliatedVoters", "Unaffiliated",
+                "missingNamePct", "Missing Name %",
+                "missingAddressPct", "Missing Address %",
+                "missingEmailPct", "Missing Email %");
     }
 }
