@@ -83,8 +83,7 @@ public class GeoJsonService {
                                 county.geometry());
                     }
 
-                    // Calculate metrics
-                    // Provisional Ballots %
+                    // Calculate choropleth metrics
                     Double provPct = null;
                     if (eavs.totalBallots() != null
                             && eavs.totalBallots() > 0
@@ -93,7 +92,6 @@ public class GeoJsonService {
                         provPct = (eavs.provisionalBallots().totalProv() / (double) eavs.totalBallots()) * 100;
                     }
 
-                    // Active Voters %
                     Double activePct = null;
                     if (eavs.voterRegistration() != null
                             && eavs.voterRegistration().totalActive() != null
@@ -104,7 +102,6 @@ public class GeoJsonService {
                                 * 100;
                     }
 
-                    // Pollbook Deletions %
                     Double pollbookPct = null;
                     if (eavs.voterRegistration() != null
                             && eavs.voterRegistration().totalActive() != null
@@ -116,7 +113,6 @@ public class GeoJsonService {
                                 * 100;
                     }
 
-                    // Mail Ballots Rejected %
                     Double mailRejectedPct = null;
                     if (eavs.mailCountedTotal() != null
                             && eavs.mailCountedTotal() > 0
@@ -124,7 +120,6 @@ public class GeoJsonService {
                         mailRejectedPct = (eavs.totalRejectedBallots() / (double) eavs.mailCountedTotal()) * 100;
                     }
 
-                    // Voter Registration % - Calculate using CVAP data
                     Double voterRegPct = null;
                     if (eavs.voterRegistration() != null
                             && eavs.voterRegistration().totalActive() != null) {

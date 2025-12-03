@@ -7,7 +7,6 @@ from shapely.geometry import mapping
 from shapely.geometry.base import BaseGeometry
 from pymongo import MongoClient, GEOSPHERE
 
-# Path to local GeoJSON file in resources folder
 SCRIPT_DIR = Path(__file__).parent
 RESOURCES_DIR = SCRIPT_DIR.parent / "src" / "main" / "resources"
 GEOJSON_FILE = RESOURCES_DIR / "us-states.json"

@@ -35,36 +35,60 @@ public class VoterDataController {
         this.voterDataService = voterDataService;
     }
 
+    /**
+     * Get Provisional voting data for a specific state by FIPS prefix.
+     * GET /provisional/table/{fipsPrefix}
+     */
     @GetMapping("/provisional/table/{fipsPrefix}")
     public ResponseEntity<ProvisionalTableResponse> getProvisionalTable(@PathVariable String fipsPrefix) {
         var response = voterDataService.getProvisionalTable(fipsPrefix);
         return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 
+    /**
+     * Get Provisional voting data for a specific state by FIPS prefix.
+     * GET /provisional/chart/{fipsPrefix}
+     */
     @GetMapping("/provisional/chart/{fipsPrefix}")
     public ResponseEntity<ProvisionalChartResponse> getProvisionalChart(@PathVariable String fipsPrefix) {
         var dto = voterDataService.getProvisionalChart(fipsPrefix);
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 
+    /**
+     * Get Active voters data for a specific state by FIPS prefix.
+     * GET /active-voters/table/{fipsPrefix}
+     */
     @GetMapping("/active-voters/table/{fipsPrefix}")
     public ResponseEntity<ActiveVotersTableResponse> getActiveVotersTable(@PathVariable String fipsPrefix) {
         var response = voterDataService.getActiveVotersTable(fipsPrefix);
         return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 
+    /**
+     * Get Active voters data for a specific state by FIPS prefix.
+     * GET /active-voters/chart/{fipsPrefix}
+     */
     @GetMapping("/active-voters/chart/{fipsPrefix}")
     public ResponseEntity<ActiveVotersChartResponse> getActiveVotersChart(@PathVariable String fipsPrefix) {
         var dto = voterDataService.getActiveVotersChart(fipsPrefix);
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 
+    /**
+     * Get Pollbook deletions data for a specific state by FIPS prefix.
+     * GET /pollbook-deletions/chart/{fipsPrefix}
+     */
     @GetMapping("pollbook-deletions/chart/{fipsPrefix}")
     public ResponseEntity<PollbookDeletionsChartResponse> getPollbookDeletionsChart(@PathVariable String fipsPrefix) {
         var dto = voterDataService.getPollbookDeletionsChart(fipsPrefix);
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 
+    /**
+     * Get Mail ballots rejected data for a specific state by FIPS prefix.
+     * GET /mail-ballots-rejected/table/{fipsPrefix}
+     */
     @GetMapping("mail-ballots-rejected/table/{fipsPrefix}")
     public ResponseEntity<MailBallotsRejectedTableResponse> getMailBallotsRejectedTable(
             @PathVariable String fipsPrefix) {
@@ -72,6 +96,10 @@ public class VoterDataController {
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 
+    /**
+     * Get Mail ballots rejected data for a specific state by FIPS prefix.
+     * GET /mail-ballots-rejected/chart/{fipsPrefix}
+     */
     @GetMapping("mail-ballots-rejected/chart/{fipsPrefix}")
     public ResponseEntity<MailBallotsRejectedChartResponse> getMailBallotsRejectedChart(
             @PathVariable String fipsPrefix) {
@@ -79,36 +107,60 @@ public class VoterDataController {
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 
+    /**
+     * Get Voter registration data for a specific state by FIPS prefix.
+     * GET /voter-registration/table/{stateFips}
+     */
     @GetMapping("voter-registration/table/{stateFips}")
     public ResponseEntity<VoterRegistrationTableResponse> getVoterRegistrationTable(@PathVariable String stateFips) {
         var dto = voterDataService.getVoterRegistrationTable(stateFips);
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 
+    /**
+     * Get Voter registration data for a specific state by FIPS prefix.
+     * GET /voter-registration/chart/{fipsPrefix}
+     */
     @GetMapping("voter-registration/chart/{fipsPrefix}")
     public ResponseEntity<VoterRegistrationChartResponse> getVoterRegistrationChart(@PathVariable String fipsPrefix) {
         var dto = voterDataService.getVoterRegistrationChart(fipsPrefix);
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 
+    /**
+     * Get Voting equipment data for all states.
+     * GET /voting-equipment/table
+     */
     @GetMapping("/voting-equipment/table")
     public ResponseEntity<VotingEquipmentTableResponse> getVotingEquipmentTable() {
         var dto = voterDataService.getVotingEquipmentTable();
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 
+    /**
+     * Get Voting equipment data for a specific state by FIPS prefix.
+     * GET /voting-equipment/chart/{fipsPrefix}
+     */
     @GetMapping("/voting-equipment/chart/{fipsPrefix}")
     public ResponseEntity<VotingEquipmentChartResponse> getVotingEquipmentChart(@PathVariable String fipsPrefix) {
         var dto = voterDataService.getVotingEquipmentChart(fipsPrefix);
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
     }
 
+    /**
+     * Get CVAP registration rate data for a specific state by FIPS prefix.
+     * GET /cvap-registration-rate/{fipsPrefix}
+     */
     @GetMapping("/cvap-registration-rate/{fipsPrefix}")
     public ResponseEntity<CvapRegistrationRateResponse> getCvapRegistrationRate(@PathVariable String fipsPrefix) {
         var response = voterDataService.getCvapRegistrationRate(fipsPrefix);
         return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 
+    /**
+     * Get State comparison data for specific states by FIPS prefix.
+     * GET /state-comparison
+     */
     @GetMapping("/state-comparison")
     public ResponseEntity<StateComparisonResponse> getStateComparison(
             @RequestParam String republicanStateFips, @RequestParam String democraticStateFips) {
@@ -116,6 +168,10 @@ public class VoterDataController {
         return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 
+    /**
+     * Get Early voting comparison data for specific states by FIPS prefix.
+     * GET /early-voting-comparison
+     */
     @GetMapping("/early-voting-comparison")
     public ResponseEntity<EarlyVotingComparisonResponse> getEarlyVotingComparison(
             @RequestParam String republicanStateFips, @RequestParam String democraticStateFips) {
@@ -123,6 +179,10 @@ public class VoterDataController {
         return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 
+    /**
+     * Get Opt-in/opt-out comparison data for specific states by FIPS prefix.
+     * GET /opt-in-opt-out-comparison
+     */
     @GetMapping("/opt-in-opt-out-comparison")
     public ResponseEntity<OptInOptOutComparisonResponse> getOptInOptOutComparison(
             @RequestParam String optInFips,
@@ -132,6 +192,10 @@ public class VoterDataController {
         return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 
+    /**
+     * Get Florida voters data for a specific county by name.
+     * GET /florida-voters/{countyName}
+     */
     @GetMapping("/florida-voters/{countyName}")
     public ResponseEntity<FloridaVotersResponse> getFloridaVoters(
             @PathVariable String countyName,
@@ -141,6 +205,10 @@ public class VoterDataController {
         return new ResponseEntity<>(voters, HttpStatus.OK);
     }
 
+    /**
+     * Get Drop box voting data for a specific state by FIPS prefix.
+     * GET /drop-box-voting/{fipsPrefix}
+     */
     @GetMapping("/drop-box-voting/{fipsPrefix}")
     public ResponseEntity<List<DropBoxVotingData>> getDropBoxVotingData(@PathVariable String fipsPrefix) {
         var response = voterDataService.getDropBoxVotingData(fipsPrefix);

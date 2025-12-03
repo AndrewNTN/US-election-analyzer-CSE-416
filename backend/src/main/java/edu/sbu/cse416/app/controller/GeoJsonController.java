@@ -19,7 +19,7 @@ public class GeoJsonController {
     }
 
     /**
-     * Get all counties for a specific state.
+     * Get county geoJSON data for a specific state by FIPS prefix.
      * GET /geojson/counties/state/{fipsPrefix}
      */
     @GetMapping("/counties/state/{fipsPrefix}")

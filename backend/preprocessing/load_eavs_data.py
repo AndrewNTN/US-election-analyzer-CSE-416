@@ -1,23 +1,22 @@
-"""
-Load EAVS (Election Administration and Voting Survey) data into MongoDB.
-Uses pandas for efficient data processing and transformation.
-Supports data from 2016-2024 with year-specific column mappings.
-"""
-
 import pandas as pd
 from pymongo import MongoClient
 import os
 from pathlib import Path
 
-from requests.compat import numeric_types
-from unicodedata import numeric
-
-# MongoDB connection settings
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 DATABASE_NAME = "cse416"
 COLLECTION_NAME = "eavs_data"
 
 RESOURCES_DIR = Path(__file__).parent.parent / "src" / "main" / "resources"
+
+# Data quality score constants
+HIGH_IMPORTANCE_WEIGHT = 1.0
+MEDIUM_IMPORTANCE_WEIGHT = 0.8
+QUALITY_SCORE_PRECISION = 4
+
+# Calculation constants
+PERCENTAGE_MULTIPLIER = 100.0
+PERCENTAGE_PRECISION = 2
 
 CSV_FILES = {
     2024: "2024_EAVS_for_Public_Release_nolabel_V1.csv",
@@ -48,20 +47,20 @@ def calculate_data_quality_score(row):
     Weighted by importance of the field for the application.
     """
     # Define critical fields and their weights
-    # High importance (1.0): Core counts used in main views
-    # Medium importance (0.8): Counts used in secondary views
+    # High importance: Core counts used in main views
+    # Medium importance: Counts used in secondary views
     fields = {
-        "A1a": 1.0,  # Total Registered
-        "F1b": 1.0,  # Election Day Ballots
-        "C8a": 1.0,  # Mail Ballots Counted
-        "F1f": 1.0,  # Early In-Person Ballots
-        "E1b": 1.0,  # Provisional Ballots Counted
-        "C9a": 0.8,  # Total Mail Ballots Rejected
-        "E1d": 0.8,  # Total Provisional Ballots Rejected
-        "C6a": 0.8,  # Drop Box Total
-        "A1b": 1.0,  # Active Registered
-        "A1c": 1.0,  # Inactive Registered
-        "A12a": 0.8,  # Total Deletions
+        "A1a": HIGH_IMPORTANCE_WEIGHT,  # Total Registered
+        "F1b": HIGH_IMPORTANCE_WEIGHT,  # Election Day Ballots
+        "C8a": HIGH_IMPORTANCE_WEIGHT,  # Mail Ballots Counted
+        "F1f": HIGH_IMPORTANCE_WEIGHT,  # Early In-Person Ballots
+        "E1b": HIGH_IMPORTANCE_WEIGHT,  # Provisional Ballots Counted
+        "C9a": MEDIUM_IMPORTANCE_WEIGHT,  # Total Mail Ballots Rejected
+        "E1d": MEDIUM_IMPORTANCE_WEIGHT,  # Total Provisional Ballots Rejected
+        "C6a": MEDIUM_IMPORTANCE_WEIGHT,  # Drop Box Total
+        "A1b": HIGH_IMPORTANCE_WEIGHT,  # Active Registered
+        "A1c": HIGH_IMPORTANCE_WEIGHT,  # Inactive Registered
+        "A12a": MEDIUM_IMPORTANCE_WEIGHT,  # Total Deletions
     }
 
     total_weight = sum(fields.values())
@@ -78,7 +77,7 @@ def calculate_data_quality_score(row):
             except ValueError:
                 pass  # Non-numeric value considered missing for these fields
 
-    return round(present_weight / total_weight, 4) if total_weight > 0 else 0.0
+    return round(present_weight / total_weight, QUALITY_SCORE_PRECISION) if total_weight > 0 else 0.0
 
 
 def load_eavs_2024(collection, csv_path):
@@ -150,7 +149,7 @@ def load_eavs_2024(collection, csv_path):
         total_rejected_ballots = mail_rejected + provisional_rejected + uocava_rejected
 
         # Rejected ballots % = total rejected ballots / total ballots (avoid division by zero)
-        percentage_rejected_ballots = (total_rejected_ballots / total_ballots * 100.0) if total_ballots > 0 else 0.0
+        percentage_rejected_ballots = (total_rejected_ballots / total_ballots * PERCENTAGE_MULTIPLIER) if total_ballots > 0 else 0.0
 
         document = {
             "fipsCode": row["FIPSCode"],
@@ -232,7 +231,7 @@ def load_eavs_2024(collection, csv_path):
 
             "totalBallots": total_ballots,
             "totalRejectedBallots": total_rejected_ballots,
-            "percentageRejectedBallots": round(percentage_rejected_ballots, 2),
+            "percentageRejectedBallots": round(percentage_rejected_ballots, PERCENTAGE_PRECISION),
 
             "dataQualityScore": row.get("dataQualityScore", 0.0)
         }
@@ -262,7 +261,7 @@ def load_eavs_2022_2020_2018(collection, csv_path, year):
 
     print(f"Processing {len(df)} records...")
 
-    # Define equipment columns for these years
+    # Define columns for these years
     numeric_cols = [
         "F5c_1", "F5c_2", "F5c_3",  # DRE no VVPAT
         "F6c_1", "F6c_2", "F6c_3",  # DRE with VVPAT
@@ -347,7 +346,7 @@ def load_eavs_2016(collection, csv_path):
 
     print(f"Processing {len(df)} records...")
 
-    # Define equipment columns for 2016 (different naming)
+    # Define columns for 2016 (different naming)
     numeric_cols = [
         "F7a_Number",  # DRE no VVPAT
         "F7b_Number",  # DRE with VVPAT
@@ -386,7 +385,6 @@ def load_eavs_2016(collection, csv_path):
                 "totalInactive": None
             },
 
-            # Equipment Summary
             "equipment": {
                 "dreNoVVPAT": dre_no_vvpat,
                 "dreWithVVPAT": dre_with_vvpat,

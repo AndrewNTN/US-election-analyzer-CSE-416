@@ -2,10 +2,6 @@ import logging
 from pathlib import Path
 from typing import Dict, List
 from pymongo import MongoClient
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
 
 MONGO_URI = "mongodb://localhost:27017/"
 DATABASE_NAME = "cse416"
