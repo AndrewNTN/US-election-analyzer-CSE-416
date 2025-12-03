@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CountyGeoJsonRepository extends MongoRepository<CountyGeoJson, String> {
-    /** Find all counties by state FIPS code (first 2 digits of geoid). */
     @Query("{ 'properties.geoid': { $regex: '^?0' } }")
     List<CountyGeoJson> findByFipsCode(String fipsPrefix);
 }

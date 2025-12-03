@@ -9,15 +9,16 @@ from pymongo import MongoClient
 import os
 from pathlib import Path
 
+from requests.compat import numeric_types
+from unicodedata import numeric
+
 # MongoDB connection settings
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 DATABASE_NAME = "cse416"
 COLLECTION_NAME = "eavs_data"
 
-# Path to resources directory
 RESOURCES_DIR = Path(__file__).parent.parent / "src" / "main" / "resources"
 
-# CSV files for each year
 CSV_FILES = {
     2024: "2024_EAVS_for_Public_Release_nolabel_V1.csv",
     2022: "2022_EAVS_for_Public_Release_nolabel_V1.1_CSV.csv",
@@ -40,6 +41,7 @@ def clean_numeric_value(val):
     except (ValueError, TypeError):
         return 0
 
+
 def calculate_data_quality_score(row):
     """
     Calculate a data completeness score (0-1) based on the presence of key fields.
@@ -59,7 +61,7 @@ def calculate_data_quality_score(row):
         "C6a": 0.8,  # Drop Box Total
         "A1b": 1.0,  # Active Registered
         "A1c": 1.0,  # Inactive Registered
-        "A12a": 0.8, # Total Deletions (using A12a if available, or sum of others)
+        "A12a": 0.8,  # Total Deletions
     }
 
     total_weight = sum(fields.values())
@@ -71,10 +73,10 @@ def calculate_data_quality_score(row):
         if pd.notna(val) and str(val).strip() != "":
             try:
                 num = float(val)
-                if num >= 0: # Valid non-negative number
+                if num >= 0:  # Valid non-negative number
                     present_weight += weight
             except ValueError:
-                pass # Non-numeric value considered missing for these fields
+                pass  # Non-numeric value considered missing for these fields
 
     return round(present_weight / total_weight, 4) if total_weight > 0 else 0.0
 
@@ -84,7 +86,6 @@ def load_eavs_2024(collection, csv_path):
 
     print(f"Reading 2024 CSV from: {csv_path}")
 
-    # Read CSV with pandas
     df = pd.read_csv(csv_path, dtype=str)
 
     # Strip quotes and whitespace from all string columns
@@ -110,31 +111,25 @@ def load_eavs_2024(collection, csv_path):
         "F6c_1", "F6c_2", "F6c_3",
     ]
 
-    # Apply numeric cleaning to all relevant columns
     numeric_cols = (voter_registration_cols + voter_deletion_cols + mail_rejected_cols +
                     provisional_e1_cols + provisional_e2_cols + provisional_e2_other_cols +
                     equipment_cols + ["C1b", "C6a", "C5a", "F1f", "F1b", "F1d", "F1g", "C8a", "C9a", "B24a", "A12a"]
                     )
 
-    # Calculate data quality score BEFORE cleaning numeric values
-    # This ensures we capture missing/negative values correctly
     df["dataQualityScore"] = df.apply(calculate_data_quality_score, axis=1)
 
+    # Apply numeric cleaning to all relevant columns
     for col in numeric_cols:
         if col in df.columns:
             df[col] = df[col].apply(clean_numeric_value)
 
-    # Build list of documents for MongoDB
     documents = []
 
     for _, row in df.iterrows():
-        # Calculate voter deletion total
         voter_deletion_total = (row.get("A12a") or 0)
 
-        # Calculate provisional other reasons sum
         provisional_other_sum = sum((row[col] or 0) for col in provisional_e2_other_cols if col in row)
 
-        # Equipment type counts
         dre_no_vvpat = sum((row[col] or 0) for col in ["F3c_1", "F3c_2", "F3c_3"] if col in row)
         dre_with_vvpat = sum((row[col] or 0) for col in ["F4c_1", "F4c_2", "F4c_3"] if col in row)
         ballot_marking_device = sum((row[col] or 0) for col in ["F5c_1", "F5c_2", "F5c_3"] if col in row)
@@ -157,7 +152,6 @@ def load_eavs_2024(collection, csv_path):
         # Rejected ballots % = total rejected ballots / total ballots (avoid division by zero)
         percentage_rejected_ballots = (total_rejected_ballots / total_ballots * 100.0) if total_ballots > 0 else 0.0
 
-        # Build the document structure matching the Java model
         document = {
             "fipsCode": row["FIPSCode"],
             "jurisdictionName": row["Jurisdiction_Name"],
@@ -223,7 +217,6 @@ def load_eavs_2024(collection, csv_path):
                 "removedDuplicate": row.get("A12h", 0)
             },
 
-            # Equipment Summary
             "equipment": {
                 "dreNoVVPAT": dre_no_vvpat,
                 "dreWithVVPAT": dre_with_vvpat,
@@ -231,19 +224,16 @@ def load_eavs_2024(collection, csv_path):
                 "scanner": scanner
             },
 
-            # Top-level aggregates
             "mailBallotsReturned": row.get("C1b", 0),
-            "mailCountedTotal": (row.get("F1d") or 0) + (row.get("F1g") or 0),  # F1d + F1g: Total counted mail ballots
+            "mailCountedTotal": (row.get("F1d") or 0) + (row.get("F1g") or 0),
             "dropBoxesTotal": row.get("C6a", 0),
             "totalDropBoxesEarlyVoting": row.get("C5a", 0),
             "inPersonEarlyVoting": row.get("F1f", 0),
 
-            # Ballot statistics
             "totalBallots": total_ballots,
             "totalRejectedBallots": total_rejected_ballots,
             "percentageRejectedBallots": round(percentage_rejected_ballots, 2),
 
-            # Data Quality Score
             "dataQualityScore": row.get("dataQualityScore", 0.0)
         }
 
@@ -262,7 +252,6 @@ def load_eavs_2022_2020_2018(collection, csv_path, year):
 
     print(f"Reading {year} CSV from: {csv_path}")
 
-    # Read CSV with pandas
     df = pd.read_csv(csv_path, dtype=str)
 
     # Strip quotes and whitespace from all string columns
@@ -274,7 +263,7 @@ def load_eavs_2022_2020_2018(collection, csv_path, year):
     print(f"Processing {len(df)} records...")
 
     # Define equipment columns for these years
-    equipment_cols = [
+    numeric_cols = [
         "F5c_1", "F5c_2", "F5c_3",  # DRE no VVPAT
         "F6c_1", "F6c_2", "F6c_3",  # DRE with VVPAT
         "F7c_1", "F7c_2", "F7c_3",  # Ballot marking device
@@ -283,7 +272,7 @@ def load_eavs_2022_2020_2018(collection, csv_path, year):
     ]
 
     # Apply numeric cleaning to all relevant columns
-    for col in equipment_cols:
+    for col in numeric_cols:
         if col in df.columns:
             df[col] = df[col].apply(clean_numeric_value)
 
@@ -312,7 +301,6 @@ def load_eavs_2022_2020_2018(collection, csv_path, year):
                 "totalInactive": None
             },
 
-            # Equipment Summary
             "equipment": {
                 "dreNoVVPAT": dre_no_vvpat,
                 "dreWithVVPAT": dre_with_vvpat,
@@ -349,7 +337,6 @@ def load_eavs_2016(collection, csv_path):
 
     print(f"Reading 2016 CSV from: {csv_path}")
 
-    # Read CSV with pandas (2016 uses different encoding)
     df = pd.read_csv(csv_path, dtype=str, encoding='latin-1')
 
     # Strip quotes and whitespace from all string columns
@@ -361,16 +348,16 @@ def load_eavs_2016(collection, csv_path):
     print(f"Processing {len(df)} records...")
 
     # Define equipment columns for 2016 (different naming)
-    equipment_cols = [
-        "F7a_Number",   # DRE no VVPAT
-        "F7b_Number",   # DRE with VVPAT
-        "F7c_Number",   # Ballot marking device
+    numeric_cols = [
+        "F7a_Number",  # DRE no VVPAT
+        "F7b_Number",  # DRE with VVPAT
+        "F7c_Number",  # Ballot marking device
         "F7d_NumCounters",  # Scanner
         "A1a"  # Total registered
     ]
 
     # Apply numeric cleaning to all relevant columns
-    for col in equipment_cols:
+    for col in numeric_cols:
         if col in df.columns:
             df[col] = df[col].apply(clean_numeric_value)
 
@@ -397,14 +384,6 @@ def load_eavs_2016(collection, csv_path):
                 "totalRegistered": row.get("A1a", 0),
                 "totalActive": None,
                 "totalInactive": None
-            },
-
-            # Equipment Summary
-            "equipment": {
-                "dreNoVVPAT": dre_no_vvpat,
-                "dreWithVVPAT": dre_with_vvpat,
-                "ballotMarkingDevice": ballot_marking_device,
-                "scanner": scanner
             },
 
             # Equipment Summary

@@ -7,7 +7,6 @@ from shapely.geometry import mapping
 from shapely.geometry.base import BaseGeometry
 from pymongo import MongoClient, GEOSPHERE
 
-# Path to local GeoJSON file in resources folder
 SCRIPT_DIR = Path(__file__).parent
 RESOURCES_DIR = SCRIPT_DIR.parent / "src" / "main" / "resources"
 GEOJSON_FILE = RESOURCES_DIR / "counties.json"
@@ -56,7 +55,6 @@ def _validate_and_transform_row(row) -> Optional[Dict]:
     if state_code not in ALLOWED_STATES:
         return None
 
-    # Get geo id
     geo_id = str(props.get("GEOID", "")).strip()
 
     # fallback: construct from state + county FIPS if GEOID is missing
@@ -125,10 +123,8 @@ def load_with_geopandas():
         if doc is None:
             invalid_count += 1
             continue
-        # Check geoid from nested properties
         geoid = doc["properties"]["geoid"]
         if geoid in seen_geo_ids:
-            # skip duplicates in source
             continue
         seen_geo_ids.add(geoid)
         docs.append(doc)

@@ -250,8 +250,4 @@ public class GeoJsonService {
         }
         return count > 0 ? totalScore / count : 0.0;
     }
-
-    private int nz(Integer val) {
-        return val == null ? 0 : val;
-    }
 }

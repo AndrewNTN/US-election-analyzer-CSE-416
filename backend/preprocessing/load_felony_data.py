@@ -15,8 +15,7 @@ logger = logging.getLogger(__name__)
 
 def load_felony_data():
     """Load felony voting rights data from JSON file into MongoDB."""
-    
-    # Check if data already exists
+
     client = MongoClient(MONGO_URI)
     db = client[DATABASE_NAME]
     collection = db[COLLECTION_NAME]
@@ -24,9 +23,9 @@ def load_felony_data():
         logger.info(f"Data already exists in {COLLECTION_NAME}. Skipping load.")
         client.close()
         return
+
     client.close()
 
-    # Get the path to the felony_data.json file
     script_dir = Path(__file__).parent
     json_path = script_dir.parent / "src" / "main" / "resources" / "felony_data.json"
 
@@ -36,7 +35,6 @@ def load_felony_data():
 
     logger.info(f"Reading felony data from {json_path}...")
 
-    # Load the JSON data
     with open(json_path, 'r', encoding='utf-8') as f:
         data: List[Dict] = json.load(f)
 
@@ -46,16 +44,13 @@ def load_felony_data():
 
     logger.info(f"Loaded {len(data)} felony voting rights records")
 
-    # Connect to MongoDB
     client = MongoClient(MONGO_URI)
     db = client[DATABASE_NAME]
     col = db[COLLECTION_NAME]
 
-    # Clear existing data
     deleted_count = col.delete_many({}).deleted_count
     logger.info(f"Deleted {deleted_count} existing records")
 
-    # Insert the data
     try:
         result = col.insert_many(data, ordered=False)
         logger.info(f"Successfully inserted {len(result.inserted_ids)} records")
@@ -64,18 +59,15 @@ def load_felony_data():
         client.close()
         return
 
-    # Create index on stateFips for faster lookups
     try:
         col.create_index("stateFips", unique=True)
         logger.info("Created unique index on stateFips")
     except Exception as e:
         logger.warning(f"Index creation failed (may already exist): {e}")
 
-    # Verify the data
     count = col.count_documents({})
     logger.info(f"Collection now contains {count} documents")
 
-    # Show sample document
     sample = col.find_one()
     if sample:
         logger.info(f"Sample document: {sample}")
@@ -86,4 +78,3 @@ def load_felony_data():
 
 if __name__ == "__main__":
     load_felony_data()
-

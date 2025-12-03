@@ -3,19 +3,13 @@ import csv
 from pathlib import Path
 from typing import Dict, List
 from pymongo import MongoClient
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
 
 MONGO_URI = "mongodb://localhost:27017/"
 DATABASE_NAME = "cse416"
 COLLECTION_NAME = "county_vote_split"
 
-# California state FIPS code
 CALIFORNIA_FIPS = "06"
 
-# Path to California election results CSV
 SCRIPT_DIR = Path(__file__).parent
 RESOURCES_DIR = SCRIPT_DIR.parent / "src" / "main" / "resources"
 CSV_FILE = RESOURCES_DIR / "pres-summary-by-county(california).csv"
@@ -49,8 +43,8 @@ class CaliforniaVoteSplitLoader:
                 reader = csv.reader(f)
 
                 # Skip header rows
-                next(reader)  # Skip candidate names
-                next(reader)  # Skip party affiliations
+                next(reader)
+                next(reader)
 
                 current_county = None
 
@@ -66,7 +60,6 @@ class CaliforniaVoteSplitLoader:
                         current_county = first_col
 
                         # Extract vote counts for ALL candidates (columns 1-7)
-                        # Remove commas and convert to int
                         try:
                             # Validate row has enough columns
                             if len(row) < 8:
@@ -78,7 +71,6 @@ class CaliforniaVoteSplitLoader:
                             dem_votes_str = row[1].strip().replace(',', '').replace('"', '') if row[1] else ""
                             rep_votes_str = row[2].strip().replace(',', '').replace('"', '') if row[2] else ""
 
-                            # Validate strings are not empty and are digits
                             if not dem_votes_str or not rep_votes_str:
                                 logger.warning(f"Empty vote data for {current_county}, skipping")
                                 current_county = None
@@ -92,7 +84,6 @@ class CaliforniaVoteSplitLoader:
                             dem_votes = int(dem_votes_str)
                             rep_votes = int(rep_votes_str)
 
-                            # Validate non-negative values
                             if dem_votes < 0 or rep_votes < 0:
                                 logger.warning(f"Negative vote count for {current_county}, skipping")
                                 current_county = None
@@ -122,7 +113,6 @@ class CaliforniaVoteSplitLoader:
                             current_county = None
 
                     elif first_col and "Percent" in first_col and current_county:
-                        # This is the percentage row
                         try:
                             # Validate row has enough columns
                             if len(row) < 3:
@@ -134,7 +124,6 @@ class CaliforniaVoteSplitLoader:
                             dem_pct_str = row[1].strip().replace('%', '') if row[1] else ""
                             rep_pct_str = row[2].strip().replace('%', '') if row[2] else ""
 
-                            # Validate strings are not empty
                             if not dem_pct_str or not rep_pct_str:
                                 logger.warning(f"Empty percentage data for {current_county}, using 0.0")
                                 current_county = None
@@ -143,9 +132,9 @@ class CaliforniaVoteSplitLoader:
                             dem_pct = float(dem_pct_str)
                             rep_pct = float(rep_pct_str)
 
-                            # Validate percentage range (0-100)
                             if dem_pct < 0 or dem_pct > 100 or rep_pct < 0 or rep_pct > 100:
-                                logger.warning(f"Invalid percentage range for {current_county}: DEM={dem_pct}%, REP={rep_pct}%")
+                                logger.warning(
+                                    f"Invalid percentage range for {current_county}: DEM={dem_pct}%, REP={rep_pct}%")
                                 current_county = None
                                 continue
 
@@ -167,7 +156,6 @@ class CaliforniaVoteSplitLoader:
         documents = []
 
         for data in self.county_vote_data:
-            # Validate all numeric fields
             try:
                 county_name = data.get("countyName", "")
                 if not county_name:
@@ -180,14 +168,13 @@ class CaliforniaVoteSplitLoader:
                 rep_pct = float(data.get("republicanPercentage", 0.0))
                 dem_pct = float(data.get("democraticPercentage", 0.0))
 
-                # Validate non-negative values
                 if rep_votes < 0 or dem_votes < 0 or total_votes < 0:
                     logger.warning(f"Negative vote count for {county_name}, skipping")
                     continue
 
-                # Validate percentage range
                 if rep_pct < 0 or rep_pct > 100 or dem_pct < 0 or dem_pct > 100:
-                    logger.warning(f"Invalid percentage range for {county_name}: DEM={dem_pct}%, REP={rep_pct}%, skipping")
+                    logger.warning(
+                        f"Invalid percentage range for {county_name}: DEM={dem_pct}%, REP={rep_pct}%, skipping")
                     continue
 
             except (ValueError, TypeError) as e:
@@ -206,7 +193,7 @@ class CaliforniaVoteSplitLoader:
 
             documents.append(document)
             logger.info(f"{county_name} County: R={rep_votes} ({rep_pct}%), "
-                       f"D={dem_votes} ({dem_pct}%), Total={total_votes}")
+                        f"D={dem_votes} ({dem_pct}%), Total={total_votes}")
 
         return documents
 
@@ -221,14 +208,11 @@ class CaliforniaVoteSplitLoader:
             db = client[DATABASE_NAME]
             collection = db[COLLECTION_NAME]
 
-            # Clear existing California data
             collection.delete_many({"stateFips": CALIFORNIA_FIPS})
 
-            # Insert new data
             result = collection.insert_many(documents)
             logger.info(f"Inserted {len(result.inserted_ids)} county vote split records")
 
-            # Create indexes (if not already created)
             collection.create_index([("stateFips", 1), ("countyName", 1)], unique=True)
 
             client.close()
@@ -239,14 +223,13 @@ class CaliforniaVoteSplitLoader:
 
 
 def main():
-    """Main execution function"""
     logger.info("Starting California vote split data load")
 
     # Check if data already exists
     client = MongoClient(MONGO_URI)
     db = client[DATABASE_NAME]
     collection = db[COLLECTION_NAME]
-    
+
     # Check specifically for California data
     if collection.count_documents({"stateFips": CALIFORNIA_FIPS}) > 0:
         logger.info(f"California data already exists in {COLLECTION_NAME}. Skipping load.")
@@ -255,14 +238,8 @@ def main():
     client.close()
 
     loader = CaliforniaVoteSplitLoader()
-
-    # Parse CSV file
     loader.parse_csv_file()
-
-    # Prepare documents
     documents = loader.prepare_documents()
-
-    # Load to MongoDB
     loader.load_to_mongodb(documents)
 
     logger.info(f"Completed loading {len(documents)} counties")
@@ -270,4 +247,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -8,14 +8,13 @@ MONGO_URI = "mongodb://localhost:27017/"
 DATABASE_NAME = "cse416"
 COLLECTION_NAME = "cvap_data"
 
-# State FIPS codes for filtering
 ALLOWED_STATES = {'06': 'California', '12': 'Florida', '41': 'Oregon'}
 LINE_NUMBERS = {
-    '1': 'total',       # Total CVAP
-    '4': 'asian',       # Asian Alone
-    '5': 'black',       # Black or African American Alone
-    '7': 'white',       # White Alone
-    '13': 'hispanic'    # Hispanic or Latino
+    '1': 'total',
+    '4': 'asian',
+    '5': 'black',
+    '7': 'white',
+    '13': 'hispanic'
 }
 
 logging.basicConfig(level=logging.INFO)
@@ -48,8 +47,7 @@ def _parse_county_name(geoname: str) -> str:
 
 def load_cvap_data():
     """Load county CVAP data from CSV file into MongoDB."""
-    
-    # Check if data already exists
+
     client = MongoClient(MONGO_URI)
     db = client[DATABASE_NAME]
     collection = db[COLLECTION_NAME]
@@ -57,9 +55,9 @@ def load_cvap_data():
         logger.info(f"Data already exists in {COLLECTION_NAME}. Skipping load.")
         client.close()
         return
+
     client.close()
 
-    # Get the path to the County.csv file
     script_dir = Path(__file__).parent
     csv_path = script_dir.parent / "src" / "main" / "resources" / "CVAP_2019-2023_ACS_csv_files" / "County.csv"
 
@@ -69,10 +67,8 @@ def load_cvap_data():
 
     logger.info(f"Reading CVAP data from {csv_path}...")
 
-    # Dictionary to accumulate data by geoid
     county_data: Dict[str, Dict] = {}
 
-    # Try different encodings
     encodings = ['latin-1', 'cp1252', 'iso-8859-1', 'utf-8']
     reader = None
     file_handle = None
@@ -83,9 +79,8 @@ def load_cvap_data():
             reader = csv.DictReader(file_handle)
             # Test by reading multiple rows to catch encoding errors
             for i, row in enumerate(reader):
-                if i > 100:  # Test first 100 rows
+                if i > 100:
                     break
-            # Reset to beginning
             file_handle.seek(0)
             reader = csv.DictReader(file_handle)
             logger.info(f"Successfully opened file with {encoding} encoding")
@@ -105,16 +100,13 @@ def load_cvap_data():
             geoid = row.get('geoid', '').strip()
             lnnumber = row.get('lnnumber', '').strip()
 
-            # Skip if not a line number we care about
             if lnnumber not in LINE_NUMBERS:
                 continue
 
-            # Extract state FIPS and filter
             state_fips = _extract_state_fips(geoid)
             if state_fips not in ALLOWED_STATES:
                 continue
 
-            # Get county FIPS (last 5 digits of geoid)
             county_fips = _extract_county_fips(geoid)
             if not county_fips:
                 continue
@@ -150,7 +142,6 @@ def load_cvap_data():
         if file_handle:
             file_handle.close()
 
-    # Convert to list
     docs = list(county_data.values())
 
     if not docs:
@@ -186,7 +177,6 @@ def load_cvap_data():
     except Exception as e:
         logger.warning(f"Index creation failed (may already exist): {e}")
 
-    # Verify the data
     count = col.count_documents({})
     logger.info(f"Collection now contains {count} documents")
 
@@ -196,7 +186,6 @@ def load_cvap_data():
         if sample:
             logger.info(f"Sample {state_name} document: {sample}")
 
-    # Show statistics
     ca_count = col.count_documents({"stateName": "California"})
     fl_count = col.count_documents({"stateName": "Florida"})
     logger.info(f"California counties: {ca_count}, Florida counties: {fl_count}")
@@ -207,4 +196,3 @@ def load_cvap_data():
 
 if __name__ == "__main__":
     load_cvap_data()
-

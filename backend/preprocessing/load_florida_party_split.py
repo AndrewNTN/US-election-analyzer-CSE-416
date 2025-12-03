@@ -11,15 +11,12 @@ MONGO_URI = "mongodb://localhost:27017/"
 DATABASE_NAME = "cse416"
 COLLECTION_NAME = "county_vote_split"
 
-# Florida state FIPS code
 FLORIDA_FIPS = "12"
 
-# Path to Florida election results
 SCRIPT_DIR = Path(__file__).parent
 RESOURCES_DIR = SCRIPT_DIR.parent / "src" / "main" / "resources"
 RESULTS_DIR = RESOURCES_DIR / "2024-gen-outputofficial1"
 
-# County code to name mappings
 COUNTY_MAPPINGS = {
     "ALA": "Alachua",
     "BAK": "Baker",
@@ -109,13 +106,12 @@ class FloridaVoteSplitLoader:
         Race RaceSubCategory CandidateCode CandidateName Party ... Votes
         """
         logger.info(f"Processing {file_path.name}")
-        
+
         county_name = COUNTY_MAPPINGS.get(county_code)
         if not county_name:
             logger.warning(f"Unknown county code: {county_code}")
             return
-        
-        # Initialize county data if not exists
+
         if county_name not in self.county_vote_data:
             self.county_vote_data[county_name] = {
                 "stateFips": FLORIDA_FIPS,
@@ -124,46 +120,39 @@ class FloridaVoteSplitLoader:
                 "democraticVotes": 0,
                 "totalVotes": 0
             }
-        
+
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 for line in f:
-                    # Skip empty lines
+
                     if not line or not line.strip():
                         continue
 
                     parts = line.strip().split('\t')
-                    
-                    # Ensure we have enough columns
+
                     if len(parts) < 19:
                         continue
-                    
-                    # Extract relevant fields with null checks
+
                     race = parts[11].strip() if parts[11] else ""
-                    candidate_name = parts[14].strip() if parts[14] else ""
                     party = parts[15].strip() if parts[15] else ""
                     votes_str = parts[18].strip() if parts[18] else "0"
 
-                    # Skip if essential fields are empty
                     if not race:
                         continue
 
                     # Only process Presidential race
                     if "President" not in race:
                         continue
-                    
-                    # Parse votes with comprehensive validation
+
                     try:
-                        # Remove any non-numeric characters except digits
+
                         votes_str_clean = ''.join(c for c in votes_str if c.isdigit() or c == '-')
 
-                        # Check for empty string after cleaning
                         if not votes_str_clean:
                             continue
 
                         votes = int(votes_str_clean)
 
-                        # Validate vote count is non-negative
                         if votes < 0:
                             logger.warning(f"Negative vote count in {file_path.name}: {votes}, skipping")
                             continue
@@ -171,11 +160,9 @@ class FloridaVoteSplitLoader:
                     except (ValueError, TypeError) as e:
                         logger.warning(f"Invalid vote count in {file_path.name}: '{votes_str}', skipping")
                         continue
-                    
-                    # Aggregate all presidential votes for accurate total
+
                     self.county_vote_data[county_name]["totalVotes"] += votes
 
-                    # Track party-specific votes
                     if party == "REP":
                         self.county_vote_data[county_name]["republicanVotes"] += votes
                     elif party == "DEM":
@@ -189,8 +176,7 @@ class FloridaVoteSplitLoader:
         if not RESULTS_DIR.exists():
             logger.error(f"Results directory not found: {RESULTS_DIR}")
             return
-        
-        # Process each county file
+
         for county_code in COUNTY_MAPPINGS.keys():
             file_path = RESULTS_DIR / f"{county_code}_PctResults20241105.txt"
             if file_path.exists():
@@ -201,15 +187,13 @@ class FloridaVoteSplitLoader:
     def calculate_percentages(self) -> List[Dict]:
         """Calculate vote percentages and prepare documents for MongoDB"""
         documents = []
-        
+
         for county_name, data in self.county_vote_data.items():
-            # Validate and sanitize vote counts
             try:
                 rep_votes = int(data.get("republicanVotes", 0))
                 dem_votes = int(data.get("democraticVotes", 0))
                 total_votes = int(data.get("totalVotes", 0))
 
-                # Ensure non-negative values
                 if rep_votes < 0 or dem_votes < 0 or total_votes < 0:
                     logger.warning(f"Negative vote count detected for {county_name}, skipping")
                     continue
@@ -225,7 +209,7 @@ class FloridaVoteSplitLoader:
             else:
                 rep_percentage = 0.0
                 dem_percentage = 0.0
-            
+
             document = {
                 "stateFips": data["stateFips"],
                 "countyName": data["countyName"],
@@ -235,11 +219,11 @@ class FloridaVoteSplitLoader:
                 "republicanPercentage": rep_percentage,
                 "democraticPercentage": dem_percentage
             }
-            
+
             documents.append(document)
             logger.info(f"{data['countyName']} County: R={rep_votes} ({rep_percentage}%), "
-                       f"D={dem_votes} ({dem_percentage}%), Total={total_votes}")
-        
+                        f"D={dem_votes} ({dem_percentage}%), Total={total_votes}")
+
         return documents
 
     def load_to_mongodb(self, documents: List[Dict]) -> None:
@@ -247,59 +231,48 @@ class FloridaVoteSplitLoader:
         if not documents:
             logger.warning("No documents to insert")
             return
-        
+
         try:
             client = MongoClient(MONGO_URI)
             db = client[DATABASE_NAME]
             collection = db[COLLECTION_NAME]
-            
-            # Clear existing Florida data
+
             collection.delete_many({"stateFips": FLORIDA_FIPS})
-            
-            # Insert new data
+
             result = collection.insert_many(documents)
             logger.info(f"Inserted {len(result.inserted_ids)} county vote split records")
-            
-            # Create indexes
+
             collection.create_index([("stateFips", 1), ("countyName", 1)], unique=True)
 
             client.close()
-            
+
         except Exception as e:
             logger.error(f"Error loading data to MongoDB: {e}")
             raise
 
 
 def main():
-    """Main execution function"""
     logger.info("Starting Florida vote split data load")
-    
-    # Check if data already exists
+
     client = MongoClient(MONGO_URI)
     db = client[DATABASE_NAME]
     collection = db[COLLECTION_NAME]
-    
-    # Check specifically for Florida data
+
     if collection.count_documents({"stateFips": FLORIDA_FIPS}) > 0:
         logger.info(f"Florida data already exists in {COLLECTION_NAME}. Skipping load.")
         client.close()
         return
     client.close()
-    
+
     loader = FloridaVoteSplitLoader()
-    
-    # Process all county files
     loader.process_all_counties()
-    
-    # Calculate percentages and prepare documents
+
     documents = loader.calculate_percentages()
-    
-    # Load to MongoDB
+
     loader.load_to_mongodb(documents)
-    
+
     logger.info(f"Completed loading {len(documents)} counties")
 
 
 if __name__ == "__main__":
     main()
-

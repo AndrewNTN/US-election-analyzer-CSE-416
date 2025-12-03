@@ -50,18 +50,15 @@ def _validate_and_transform_row(row) -> Optional[Dict]:
     # row is a GeoPandas Series with geometry
     props = row.drop("geometry").to_dict() if "geometry" in row.index else row.to_dict()
 
-    # Get state FIPS code from "id" field
     state_raw = props.get("id", "")
     state_fips = _normalize_state_fips(state_raw)
 
-    # Filter unallowed states
     if state_fips in UNALLOWED_STATES:
         return None
 
     if not state_fips:
         return None
 
-    # Get state name from "name" field
     state_name = str(props.get("name", "")).strip()
     if not state_name:
         state_name = "Unknown"
@@ -101,7 +98,6 @@ def load_with_geopandas():
 
     gdf = gpd.read_file(GEOJSON_FILE)
 
-    # Ensure geometry column exists
     if "geometry" not in gdf.columns:
         logger.error("No geometry column found in GeoJSON")
         return
@@ -117,10 +113,8 @@ def load_with_geopandas():
         if doc is None:
             invalid_count += 1
             continue
-        # Check stateFips from nested properties
         state_fips = doc["properties"]["stateFips"]
         if state_fips in seen_state_fips:
-            # skip duplicates in source
             continue
         seen_state_fips.add(state_fips)
         docs.append(doc)
