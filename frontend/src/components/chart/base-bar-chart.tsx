@@ -47,7 +47,6 @@ export function BaseBarChart<TData, TMetricKey extends string>({
   tooltipOptions,
   xAxisAngle,
 }: BaseBarChartProps<TData, TMetricKey>) {
-  // Calculate totals for each metric
   const totals: Record<TMetricKey, number> = {} as Record<TMetricKey, number>;
   metricKeys.forEach((key) => {
     totals[key] = barData.reduce<number>(
@@ -63,10 +62,7 @@ export function BaseBarChart<TData, TMetricKey extends string>({
     value: totals[key],
   }));
 
-  // Use provided colors or default to purple
   const colors = barColors || metricKeys.map(() => DEFAULT_BAR_COLOR);
-
-  // Calculate optimal width based on number of bars
   const calculatedWidth = Math.max(
     data.length * PIXELS_PER_BAR + Y_AXIS_PADDING,
     MIN_CHART_WIDTH,

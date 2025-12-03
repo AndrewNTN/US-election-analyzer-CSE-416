@@ -36,10 +36,8 @@ export function VoterRegistrationLineChart({
   xAxisLabel,
   yAxisLabel,
 }: VoterRegistrationLineChartProps) {
-  // Transform data for the line chart
-  // The data is already sorted by 2024 registered voters in ascending order
   const chartData: ChartDataPoint[] = data.map((item, index) => ({
-    jurisdiction: index + 1, // Use index for x-axis (sorted order)
+    jurisdiction: index + 1, // use 1 based index for x-axis
     eavsRegion: item.eavsRegion,
     "2016": item.registeredVoters2016,
     "2020": item.registeredVoters2020,

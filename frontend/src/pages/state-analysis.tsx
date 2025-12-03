@@ -22,7 +22,6 @@ import type { FeatureCollection, Geometry } from "geojson";
 import { MapLoading } from "@/components/ui/map-loading";
 import { MapError } from "@/components/ui/map-error";
 
-// View Components
 import { VoterRegistrationView } from "@/components/analysis-views/VoterRegistrationView";
 import { StateEquipmentSummaryView } from "@/components/analysis-views/StateEquipmentSummaryView";
 import { ProvisionalBallotView } from "@/components/analysis-views/ProvisionalBallotView";
@@ -58,7 +57,6 @@ const analysisTypeLabels: Record<AnalysisTypeValue, string> = {
     "Equipment vs Rejected Ballots",
 };
 
-// Map analysis types to choropleth options
 const analysisToChoroplethMap: Record<
   AnalysisTypeValue,
   StateChoroplethOption
@@ -89,7 +87,6 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     AnalysisType.PROVISIONAL_BALLOT,
   );
 
-  // Check if current state is a detailed state
   const normalizedStateKey = useMemo(
     () => stateName.toLowerCase().replace(/\s+/g, "-"),
     [stateName],
@@ -117,7 +114,6 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
 
   const isPoliticalPartyState = stateDetails?.politicalPartyState ?? false;
 
-  // Set choropleth option based on selected dataset, but only for detailed states
   const choroplethOption = useMemo(() => {
     if (!isDetailedState) {
       return STATE_CHOROPLETH_OPTIONS.OFF;
@@ -130,7 +126,6 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     navigate({ to: "/" });
   };
 
-  // Get available analysis options based on state capabilities
   const availableAnalysisOptions = useMemo<AnalysisTypeValue[]>(
     () =>
       Object.values(AnalysisType).filter((option) => {
@@ -180,7 +175,6 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
   const isLoading = isLoadingStates || (isDetailedState && isLoadingCounties);
   const isError = isErrorStates || (isDetailedState && isErrorCounties);
 
-  // Filter states data to only include the current state
   const currentStateData = useMemo((): FeatureCollection<
     Geometry,
     StateProps
@@ -201,7 +195,6 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     };
   }, [allStatesData, normalizedStateKey]);
 
-  // Memoize the current counties data to ensure stable reference for map component
   const currentCountiesData = useMemo((): FeatureCollection<
     Geometry,
     CountyProps

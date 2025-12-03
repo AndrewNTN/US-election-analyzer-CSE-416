@@ -28,8 +28,6 @@ export default function ChoroplethLayer<
   stateView = false,
   colorScale,
 }: ChoroplethLayerProps<T>) {
-  // Dynamic scale calculation is now lifted to parent components
-
   const getFeatureStyle = (feature?: Feature<Geometry, T>): PathOptions => {
     if (choroplethOption === "off") {
       return {

@@ -32,7 +32,6 @@ export function MailBallotsRejectedBarChart({
   barData,
   metricLabels,
 }: MailBallotsRejectedBarChartProps) {
-  // Transform chart response to array format for BaseBarChart
   const transformedData = [barData];
 
   return (

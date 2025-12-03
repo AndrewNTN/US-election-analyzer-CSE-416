@@ -34,7 +34,6 @@ interface TooltipData {
 export function DropBoxVotingBubbleChart({
   data,
 }: DropBoxVotingBubbleChartProps) {
-  // Combine all data into a single array with party indicator
   const chartData = useMemo(() => {
     return data.map((d) => ({
       x: d.republicanPercentage,

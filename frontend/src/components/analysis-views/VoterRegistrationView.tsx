@@ -17,14 +17,11 @@ export function VoterRegistrationView({
   normalizedStateKey,
   stateFips,
 }: VoterRegistrationViewProps) {
-  // Fetch data using query hooks
   const { data: tableData } = useVoterRegistrationTableQuery(stateFips);
   const { data: chartData } = useVoterRegistrationChartQuery(stateFips);
 
-  // Transform chart data to match expected format
   const transformedChartData = useMemo(() => {
     if (!chartData?.data) return [];
-    // Sort by 2024 registered voters (already sorted from backend)
     return chartData.data.map((item) => ({
       eavsRegion: item.eavsRegion,
       registeredVoters2016: item.registeredVoters2016,

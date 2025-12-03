@@ -2,9 +2,6 @@ import { useMemo, useState } from "react";
 import BaseMap from "@/components/map/base-map.tsx";
 import OutlineLayer from "@/components/map/outline-layer.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
-// import BubbleChartLayer, {
-//   type CensusBlockData,
-// } from "@/components/map/bubble-chart-layer.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
 import type { StateProps, CountyProps } from "@/lib/api/geojson-requests";
 import { useFloridaVotersQuery } from "@/lib/api/use-queries.ts";
@@ -35,27 +32,22 @@ import {
 import { DataTable } from "@/components/table/data-table";
 import { generateVoterColumns } from "@/components/table/county-modal-columns";
 
-/** ---------- Types ---------- */
 interface StateMapProps {
   currentStateData: FeatureCollection<Geometry, StateProps>;
   currentCountiesData: FeatureCollection<Geometry, CountyProps> | null;
   isDetailedState: boolean;
   choroplethOption?: StateChoroplethOption;
-  // censusBlockData?: CensusBlockData[];
   showBubbleChart?: boolean;
   showCvapLegend?: boolean;
   fipsPrefix?: string | null;
   hasDetailedVoterData?: boolean;
 }
 
-/** ---------- Component ---------- */
 export default function StateMap({
   currentStateData,
   currentCountiesData,
   isDetailedState,
   choroplethOption,
-  // censusBlockData = [],
-  // showBubbleChart = false,
   showCvapLegend = false,
   fipsPrefix,
   hasDetailedVoterData = false,
@@ -70,7 +62,6 @@ export default function StateMap({
   });
   const [sorting, setSorting] = useState([{ id: "name", desc: false }]);
 
-  // Fetch real voter data when a county is selected
   const sortParam =
     sorting.length > 0
       ? `${sorting[0].id},${sorting[0].desc ? "desc" : "asc"}`
@@ -87,12 +78,11 @@ export default function StateMap({
 
   const handleCountyChange = (county: CountyProps | null) => {
     setSelectedCounty(county);
-    setPartyFilter("all"); // Reset filter when county changes
-    setPagination({ pageIndex: 0, pageSize: pagination.pageSize }); // Reset pagination
-    setSorting([{ id: "name", desc: false }]); // Reset sorting
+    setPartyFilter("all");
+    setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
+    setSorting([{ id: "name", desc: false }]);
   };
 
-  // Prepare data for Voters table - filter by registered voters and party
   const votersData = useMemo(() => {
     if (!votersResponse) return [];
     return votersResponse.voters;

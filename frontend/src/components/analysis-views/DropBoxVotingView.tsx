@@ -10,7 +10,6 @@ export function DropBoxVotingView({
   stateFipsPrefix,
   stateName,
 }: DropBoxVotingViewProps) {
-  // Get drop box voting data for current state
   const { data } = useDropBoxVotingDataQuery(stateFipsPrefix);
 
   return (

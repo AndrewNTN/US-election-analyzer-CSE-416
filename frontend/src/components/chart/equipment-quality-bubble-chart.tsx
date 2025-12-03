@@ -66,7 +66,7 @@ export function EquipmentQualityBubbleChart({
       .map((d) => ({
         x: d.equipmentQuality,
         y: d.rejectedBallotPercentage,
-        z: d.totalBallots / 10000, // Scale for bubble size
+        z: d.totalBallots,
         name: d.county,
         totalBallots: d.totalBallots,
         rejectedBallots: d.rejectedBallots,
@@ -80,7 +80,7 @@ export function EquipmentQualityBubbleChart({
       .map((d) => ({
         x: d.equipmentQuality,
         y: d.rejectedBallotPercentage,
-        z: d.totalBallots / 10000, // Scale for bubble size
+        z: d.totalBallots,
         name: d.county,
         totalBallots: d.totalBallots,
         rejectedBallots: d.rejectedBallots,

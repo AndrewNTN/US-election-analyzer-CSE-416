@@ -143,12 +143,10 @@ export function DataTableView<TData>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
-                  // Skip placeholders that aren't in the first header group
                   if (header.isPlaceholder && headerGroup.depth > 0) {
                     return null;
                   }
 
-                  // Skip non-grouped columns in non-first rows (they should span from row 0)
                   if (
                     !header.isPlaceholder &&
                     headerGroup.depth > 0 &&
@@ -157,7 +155,6 @@ export function DataTableView<TData>({
                     return null;
                   }
 
-                  // For placeholders in the first row, render with rowSpan covering all rows
                   const headerDepth = table.getHeaderGroups().length;
                   const computedRowSpan = header.isPlaceholder
                     ? headerDepth
@@ -216,7 +213,7 @@ export function DataTableView<TData>({
                     </TableRow>
                   );
                 })}
-                {/* Add invisible placeholder rows to maintain consistent height */}
+                {/* Add placeholder rows to maintain consistent height */}
                 {Array.from({
                   length: Math.max(
                     0,

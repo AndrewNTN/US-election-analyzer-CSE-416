@@ -9,10 +9,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { DataTablePagination, DataTableView } from "./data-table.tsx";
-import {
-  createVotingEquipmentColumns,
-  type VotingEquipment,
-} from "./voting-equipment-columns.tsx";
+import { createVotingEquipmentColumns } from "./voting-equipment-columns.tsx";
+import type { VotingEquipment } from "@/lib/api/voting-requests";
 import { VotingEquipmentBarChart } from "@/components/chart/voting-equipment-bar-chart.tsx";
 import { useVotingEquipmentChartQuery } from "@/lib/api/use-queries.ts";
 

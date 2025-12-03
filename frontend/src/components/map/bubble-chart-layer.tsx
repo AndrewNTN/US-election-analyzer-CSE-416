@@ -15,14 +15,13 @@ interface BubbleChartLayerProps {
   visible: boolean;
 }
 
-// Component to create custom pane for bubble chart
 function BubbleChartPane() {
   const map = useMap();
 
   useEffect(() => {
     if (!map.getPane("bubbleChart")) {
       const bubbleChartPane = map.createPane("bubbleChart");
-      bubbleChartPane.style.zIndex = "700"; // Higher than other layers
+      bubbleChartPane.style.zIndex = "700";
       bubbleChartPane.style.pointerEvents = "auto";
     }
   }, [map]);

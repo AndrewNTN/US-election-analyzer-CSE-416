@@ -175,14 +175,17 @@ export const getVoterRegistrationChart = async (
 ): Promise<VoterRegistrationChartResponse> =>
   fetchJson(`/voter-registration/chart/${fipsPrefix}`);
 
+export interface VotingEquipment {
+  state: string;
+  stateFips: string;
+  dreNoVVPAT: number;
+  dreWithVVPAT: number;
+  ballotMarkingDevice: number;
+  scanner: number;
+}
+
 export interface VotingEquipmentTableResponse {
-  data: {
-    state: string;
-    dreNoVVPAT: number;
-    dreWithVVPAT: number;
-    ballotMarkingDevice: number;
-    scanner: number;
-  }[];
+  data: VotingEquipment[];
   metricLabels: Record<string, string>;
 }
 

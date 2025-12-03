@@ -20,7 +20,6 @@ export function ChoroplethLegend({
     return null;
   }
 
-  // Get the appropriate title and unit
   let title = "";
   let unit = "";
 
@@ -51,11 +50,9 @@ export function ChoroplethLegend({
       break;
   }
 
-  // Helper to format numbers for display
   const formatNumber = (num: number) => {
     if (num === 0) return "0";
     if (Math.abs(num) < 0.01) {
-      // Avoid scientific notation, use up to 5 decimal places for precision
       return new Intl.NumberFormat("en-US", {
         maximumFractionDigits: 5,
         minimumFractionDigits: 2,
@@ -64,7 +61,6 @@ export function ChoroplethLegend({
     return num.toFixed(2);
   };
 
-  // Render sequential color scale legend
   return (
     <Card className="p-3.5">
       <h3 className="text-sm font-semibold mb-3">{title}</h3>

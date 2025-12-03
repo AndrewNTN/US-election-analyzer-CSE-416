@@ -26,7 +26,6 @@ export function ActiveVotersBarChart({
   barData,
   metricLabels,
 }: ActiveVotersBarChartProps) {
-  // Transform single object response into an array for the chart
   const chartData = [
     {
       name: stateName,

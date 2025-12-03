@@ -1,13 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
-export type VotingEquipment = {
-  state: string;
-  stateFips: string;
-  dreNoVVPAT: number;
-  dreWithVVPAT: number;
-  ballotMarkingDevice: number;
-  scanner: number;
-};
+import type { VotingEquipment } from "@/lib/api/voting-requests";
 
 export const createVotingEquipmentColumns = (
   metricLabels?: Record<string, string>,
@@ -67,5 +60,4 @@ export const createVotingEquipmentColumns = (
   },
 ];
 
-// Keep backward compatibility
 export const votingEquipmentColumns = createVotingEquipmentColumns();

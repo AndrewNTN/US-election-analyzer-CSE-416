@@ -1,6 +1,5 @@
 import { fetchJson } from "@/lib/api/api-client";
 import type { FeatureCollection, Geometry } from "geojson";
-// Common base for all map feature properties
 export interface BaseMapProps {
   stateName: string;
 }
@@ -21,7 +20,6 @@ export interface CountyProps extends BaseMapProps {
   VOTER_REGISTRATION_PCT?: number;
 }
 
-// Overarching type representing any map feature properties we handle
 export type MapFeatureProps = StateProps | CountyProps;
 
 export const getStatesGeoJson = async (

@@ -6,6 +6,8 @@ import type { FeatureCollection, Geometry } from "geojson";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+const DEFAULT_CENTER: LatLngExpression = [38.5, -99.0];
+
 // FitBoundsToGeoJSON component to automatically zoom to fit the GeoJSON data
 function FitBoundsToGeoJSON<T = Record<string, unknown>>({
   geoJsonData,
@@ -36,18 +38,16 @@ const CustomPanes = () => {
     if (!map.getPane("labels")) {
       const labelsPane = map.createPane("labels");
       labelsPane.style.zIndex = "650";
-      labelsPane.style.pointerEvents = "none"; // Prevent labels from blocking mouse events
+      labelsPane.style.pointerEvents = "none";
     }
 
-    // Create a custom pane for the base tiles with lower z-index
     if (!map.getPane("baseTiles")) {
       const baseTilesPane = map.createPane("baseTiles");
-      baseTilesPane.style.zIndex = "100"; // Lower than overlays (200)
+      baseTilesPane.style.zIndex = "100";
     }
 
     map.zoomControl.setPosition("bottomright");
 
-    // Add custom styling to prevent zoom controls from being cut off using relative positioning
     const zoomControl = map.zoomControl.getContainer();
     if (zoomControl) {
       zoomControl.style.position = "relative";
@@ -56,7 +56,6 @@ const CustomPanes = () => {
       zoomControl.style.transform = "translate(-50%, -100%)";
     }
 
-    // Also add padding to the map container to ensure controls don't get cut off
     const mapContainer = map.getContainer();
     if (mapContainer) {
       mapContainer.style.paddingBottom = "50px";
@@ -89,7 +88,7 @@ interface BaseMapProps<T = Record<string, unknown>>
 }
 
 export default function BaseMap<T = Record<string, unknown>>({
-  center = [38.5, -99.0],
+  center = DEFAULT_CENTER,
   zoom = 4,
   style = {
     width: "100%",
@@ -105,18 +104,12 @@ export default function BaseMap<T = Record<string, unknown>>({
 
   useEffect(() => {
     const updateMinZoom = () => {
-      // Consider screens 1366px and below as laptop/small screens
       const isSmallScreen = window.innerWidth <= 1366;
       setMinZoom(isSmallScreen ? 4 : 5);
     };
 
-    // Set initial value
     updateMinZoom();
-
-    // Listen for window resize
     window.addEventListener("resize", updateMinZoom);
-
-    // Cleanup listener
     return () => window.removeEventListener("resize", updateMinZoom);
   }, []);
 
@@ -129,7 +122,7 @@ export default function BaseMap<T = Record<string, unknown>>({
       maxBounds={[
         [15, -140],
         [56, -54],
-      ]} // Constrain view to roughly continental US area
+      ]}
       maxBoundsViscosity={0.95}
       style={style}
       className={className}

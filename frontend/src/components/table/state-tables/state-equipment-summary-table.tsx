@@ -23,7 +23,6 @@ interface StateEquipmentSummaryTableProps {
 export function StateEquipmentSummaryTable({
   data,
 }: StateEquipmentSummaryTableProps) {
-  // Initialize sorting with make first, then model
   const [sorting, setSorting] = useState<SortingState>([
     { id: "make", desc: false },
     { id: "model", desc: false },

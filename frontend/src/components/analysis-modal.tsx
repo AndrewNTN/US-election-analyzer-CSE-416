@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog.tsx";
 import { VotingEquipmentTable } from "@/components/table/voting-equipment-table.tsx";
-import type { VotingEquipment } from "@/components/table/voting-equipment-columns.tsx";
+import type { VotingEquipment } from "@/lib/api/voting-requests";
 import { EquipmentSummaryTable } from "@/components/table/equipment-summary-table";
 import type { EquipmentSummary } from "@/components/table/equipment-summary-columns.tsx";
 import { StateComparisonTable } from "@/components/table/state-comparison-table.tsx";
@@ -48,7 +48,6 @@ export default function AnalysisModal({
   onOpenChange,
   selectedAnalysis,
 }: AnalysisModalProps) {
-  // Only query voting equipment data when US Voting Equipment analysis is selected
   const {
     data: votingEquipmentTableData,
     isLoading: isVotingEquipmentLoading,
@@ -56,14 +55,12 @@ export default function AnalysisModal({
     enabled: selectedAnalysis?.title === AnalysisOption.US_VOTING_EQUIPMENT,
   });
 
-  // Only query state comparison data when Republican vs Democratic analysis is selected
   const { data: stateComparisonData, isLoading: isStateComparisonLoading } =
     useStateComparisonQuery("12", "06", {
       enabled:
         selectedAnalysis?.title === AnalysisOption.REPUBLICAN_VS_DEMOCRATIC,
     });
 
-  // Only query early voting comparison data when Early Voting Comparison analysis is selected
   const {
     data: earlyVotingComparisonData,
     isLoading: isEarlyVotingComparisonLoading,
@@ -71,7 +68,6 @@ export default function AnalysisModal({
     enabled: selectedAnalysis?.title === AnalysisOption.EARLY_VOTING_COMPARISON,
   });
 
-  // Only query opt-in vs opt-out comparison data when Opt-in vs Opt-out analysis is selected
   const {
     data: optInOptOutComparisonData,
     isLoading: isOptInOptOutComparisonLoading,
@@ -191,14 +187,12 @@ export default function AnalysisModal({
     }
   };
 
-  // Set taller height for US Voting Equipment to accommodate bar charts
   const isVotingEquipmentAnalysis =
     selectedAnalysis?.title === AnalysisOption.US_VOTING_EQUIPMENT;
   const dialogHeightClass = isVotingEquipmentAnalysis
     ? "h-auto h-[47vw] max-h-[85vw]"
     : "h-auto max-h-[95vw]";
 
-  // Set narrower width for comparison tables
   const isComparisonTable =
     selectedAnalysis?.title === AnalysisOption.REPUBLICAN_VS_DEMOCRATIC ||
     selectedAnalysis?.title === AnalysisOption.EARLY_VOTING_COMPARISON ||

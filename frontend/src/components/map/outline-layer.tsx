@@ -31,7 +31,6 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
   const router = useRouter();
 
   const getFeatureStyle = (feature?: Feature<Geometry, T>): PathOptions => {
-    // Check if this state is in our detailed states
     const isDetailedState =
       feature?.properties?.stateName &&
       Object.keys(DETAILED_STATES).includes(
@@ -73,15 +72,12 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
           }
         },
         click: () => {
-          // Only handle navigation for state features and when not in state view
           if (feature.properties.stateName && !stateView) {
             const stateName = formatStateNameForUrl(
               feature.properties.stateName,
             );
             router.navigate({ to: `/state/${stateName}` });
           }
-
-          // Only handle county clicks if interactions are enabled
           if (onFeatureClick && (!isCounty || enableCountyInteractions)) {
             onFeatureClick(feature);
           }

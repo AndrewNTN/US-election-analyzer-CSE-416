@@ -47,7 +47,6 @@ export default function SplashPage() {
     features: [],
   };
 
-  // Calculate dynamic color scale based on the current data and option
   const dynamicScale = useMemo(() => {
     if (choroplethOption === SPLASH_CHOROPLETH_OPTIONS.EQUIPMENT_AGE) {
       return equipmentAgeScale;
