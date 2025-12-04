@@ -11,7 +11,7 @@ import {
   hasDetailedVoterData,
   hasDropBoxVoting,
 } from "@/constants/states.ts";
-import { getStateFipsCode } from "@/constants/stateFips.ts";
+
 import { Button } from "@/components/ui/button.tsx";
 import {
   STATE_CHOROPLETH_OPTIONS,
@@ -78,9 +78,13 @@ const analysisToChoroplethMap: Record<
 
 interface StateAnalysisProps {
   stateName: string;
+  stateFips?: string;
 }
 
-export default function StateAnalysis({ stateName }: StateAnalysisProps) {
+export default function StateAnalysis({
+  stateName,
+  stateFips,
+}: StateAnalysisProps) {
   const navigate = useNavigate();
 
   const [selectedDataset, setSelectedDataset] = useState<AnalysisTypeValue>(
@@ -92,15 +96,7 @@ export default function StateAnalysis({ stateName }: StateAnalysisProps) {
     [stateName],
   );
 
-  const formattedStateName = useMemo(
-    () => formatStateName(stateName),
-    [stateName],
-  );
-
-  const stateFipsPrefix = useMemo(
-    () => getStateFipsCode(formattedStateName),
-    [formattedStateName],
-  );
+  const stateFipsPrefix = useMemo(() => stateFips, [stateFips]);
 
   const isDetailedState = useMemo(
     () => Object.keys(DETAILED_STATES).includes(normalizedStateKey),

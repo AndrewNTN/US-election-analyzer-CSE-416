@@ -11,7 +11,7 @@ public record StateGeoJson(@Id String id, String type, Properties properties, Ge
             String density,
             String stateFips,
             String stateAbbr,
-            Double EQUIPMENT_AGE,
+            Double equipmentAge,
             Double dataQualityScore) {}
 
     public record Geometry(String type, Object coordinates) {}

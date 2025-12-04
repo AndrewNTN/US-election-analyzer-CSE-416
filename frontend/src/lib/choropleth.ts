@@ -5,11 +5,11 @@ export const SPLASH_CHOROPLETH_OPTIONS = {
 } as const;
 
 export const STATE_CHOROPLETH_OPTIONS = {
-  PROVISIONAL_BALLOTS: "provisional_ballots",
-  ACTIVE_VOTERS: "active_voters",
-  POLLBOOK_DELETIONS: "pollbook_deletions",
-  MAIL_BALLOTS_REJECTED: "mail_ballots_rejected",
-  VOTER_REGISTRATION: "voter_registration",
+  PROVISIONAL_BALLOTS: "provisionalBallots",
+  ACTIVE_VOTERS: "activeVoters",
+  POLLBOOK_DELETIONS: "pollbookDeletions",
+  MAIL_BALLOTS_REJECTED: "mailBallotsRejected",
+  VOTER_REGISTRATION: "voterRegistration",
   OFF: "off",
 } as const;
 
@@ -21,6 +21,7 @@ export type StateChoroplethOption =
 
 export type ChoroplethOption = SplashChoroplethOption | StateChoroplethOption;
 
+// Labels in the UI for choropleth options
 export const SPLASH_CHOROPLETH_LABELS: Record<SplashChoroplethOption, string> =
   {
     [SPLASH_CHOROPLETH_OPTIONS.OFF]: "Off",

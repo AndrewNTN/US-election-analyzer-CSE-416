@@ -4,7 +4,11 @@ import type { PathOptions, Layer, LeafletMouseEvent } from "leaflet";
 import { useRouter } from "@tanstack/react-router";
 import { DETAILED_STATES } from "@/constants/states.ts";
 import { formatStateNameForUrl } from "@/lib/utils";
-import type { BaseMapProps, MapFeatureProps } from "@/lib/api/geojson-requests";
+import type {
+  BaseMapProps,
+  MapFeatureProps,
+  StateProps,
+} from "@/lib/api/geojson-requests";
 
 interface OutlineLayerProps<T extends BaseMapProps = MapFeatureProps> {
   data: FeatureCollection<Geometry, T>;
@@ -76,7 +80,14 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
             const stateName = formatStateNameForUrl(
               feature.properties.stateName,
             );
-            router.navigate({ to: `/state/${stateName}` });
+            const stateFips =
+              "stateFips" in feature.properties
+                ? (feature.properties as unknown as StateProps).stateFips
+                : undefined;
+            router.navigate({
+              to: `/state/${stateName}`,
+              search: { stateFips },
+            });
           }
           if (onFeatureClick && (!isCounty || enableCountyInteractions)) {
             onFeatureClick(feature);

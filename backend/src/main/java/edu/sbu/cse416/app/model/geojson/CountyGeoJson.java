@@ -10,11 +10,11 @@ public record CountyGeoJson(@Id String id, String type, Properties properties, G
             String geoid,
             String stateName,
             String countyName,
-            Double PROVISIONAL_BALLOTS_PCT,
-            Double ACTIVE_VOTERS_PCT,
-            Double POLLBOOK_DELETIONS_PCT,
-            Double MAIL_BALLOTS_REJECTED_PCT,
-            Double VOTER_REGISTRATION_PCT) {}
+            Double provisionalBallotsPct,
+            Double activeVotersPct,
+            Double pollbookDeletionsPct,
+            Double mailBallotsRejectedPct,
+            Double voterRegistrationPct) {}
 
     public record Geometry(String type, Object coordinates) {}
 }

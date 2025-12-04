@@ -48,38 +48,38 @@ export default function ChoroplethLayer<
       switch (choroplethOption) {
         case SPLASH_CHOROPLETH_OPTIONS.EQUIPMENT_AGE:
           val =
-            "EQUIPMENT_AGE" in props
-              ? (props.EQUIPMENT_AGE as number)
+            "equipmentAge" in props
+              ? (props.equipmentAge as number)
               : undefined;
           break;
         case STATE_CHOROPLETH_OPTIONS.PROVISIONAL_BALLOTS:
           val =
-            "PROVISIONAL_BALLOTS_PCT" in props
-              ? (props.PROVISIONAL_BALLOTS_PCT as number)
+            "provisionalBallotsPct" in props
+              ? (props.provisionalBallotsPct as number)
               : undefined;
           break;
         case STATE_CHOROPLETH_OPTIONS.ACTIVE_VOTERS:
           val =
-            "ACTIVE_VOTERS_PCT" in props
-              ? (props.ACTIVE_VOTERS_PCT as number)
+            "activeVotersPct" in props
+              ? (props.activeVotersPct as number)
               : undefined;
           break;
         case STATE_CHOROPLETH_OPTIONS.POLLBOOK_DELETIONS:
           val =
-            "POLLBOOK_DELETIONS_PCT" in props
-              ? (props.POLLBOOK_DELETIONS_PCT as number)
+            "pollbookDeletionsPct" in props
+              ? (props.pollbookDeletionsPct as number)
               : undefined;
           break;
         case STATE_CHOROPLETH_OPTIONS.MAIL_BALLOTS_REJECTED:
           val =
-            "MAIL_BALLOTS_REJECTED_PCT" in props
-              ? (props.MAIL_BALLOTS_REJECTED_PCT as number)
+            "mailBallotsRejectedPct" in props
+              ? (props.mailBallotsRejectedPct as number)
               : undefined;
           break;
         case STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION:
           val =
-            "VOTER_REGISTRATION_PCT" in props
-              ? (props.VOTER_REGISTRATION_PCT as number)
+            "voterRegistrationPct" in props
+              ? (props.voterRegistrationPct as number)
               : undefined;
           break;
       }
