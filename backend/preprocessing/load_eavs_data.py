@@ -72,10 +72,10 @@ def calculate_data_quality_score(row):
         if pd.notna(val) and str(val).strip() != "":
             try:
                 num = float(val)
-                if num >= 0:  # Valid non-negative number
+                if num >= 0: 
                     present_weight += weight
             except ValueError:
-                pass  # Non-numeric value considered missing for these fields
+                pass
 
     return round(present_weight / total_weight, QUALITY_SCORE_PRECISION) if total_weight > 0 else 0.0
 
@@ -158,14 +158,12 @@ def load_eavs_2024(collection, csv_path):
             "stateAbbr": row["State_Abbr"],
             "electionYear": 2024,
 
-            # Voter Registration (A1a-A1c)
             "voterRegistration": {
                 "totalRegistered": row.get("A1a", 0),
                 "totalActive": row.get("A1b", 0),
                 "totalInactive": row.get("A1c", 0)
             },
 
-            # Mail Ballots Rejected Reason (C9b-C9q)
             "mailBallotsRejectedReason": {
                 "late": row.get("C9b", 0),
                 "missingVoterSignature": row.get("C9c", 0),
@@ -185,7 +183,6 @@ def load_eavs_2024(collection, csv_path):
                 "noBallotApplication": row.get("C9q", 0)
             },
 
-            # Provisional Ballots (E1a-E1e, E2a-E2i, E2j-E2l)
             "provisionalBallots": {
                 "totalProv": row.get("E1a", 0),
                 "provCountFullyCounted": row.get("E1b", 0),
@@ -204,7 +201,6 @@ def load_eavs_2024(collection, csv_path):
                 "provReasonOther": provisional_other_sum
             },
 
-            # Voter Deletion (A12b-A12h)
             "voterDeletion": {
                 "removedTotal": voter_deletion_total,
                 "removedMoved": row.get("A12b", 0),
@@ -275,7 +271,6 @@ def load_eavs_2022_2020_2018(collection, csv_path, year):
         if col in df.columns:
             df[col] = df[col].apply(clean_numeric_value)
 
-    # Build list of documents for MongoDB
     documents = []
 
     for _, row in df.iterrows():
@@ -285,7 +280,6 @@ def load_eavs_2022_2020_2018(collection, csv_path, year):
         ballot_marking_device = sum((row[col] or 0) for col in ["F7c_1", "F7c_2", "F7c_3"] if col in row)
         scanner = sum((row[col] or 0) for col in ["F8c_1", "F8c_2", "F8c_3"] if col in row)
 
-        # Build the document structure
         document = {
             "fipsCode": row["FIPSCode"],
             "jurisdictionName": row["Jurisdiction_Name"],
@@ -293,7 +287,6 @@ def load_eavs_2022_2020_2018(collection, csv_path, year):
             "stateAbbr": row["State_Abbr"],
             "electionYear": year,
 
-            # Voter Registration - only total registered
             "voterRegistration": {
                 "totalRegistered": row.get("A1a", 0),
                 "totalActive": None,
@@ -307,7 +300,6 @@ def load_eavs_2022_2020_2018(collection, csv_path, year):
                 "scanner": scanner
             },
 
-            # Null fields not needed for these years
             "mailBallotsRejectedReason": None,
             "provisionalBallots": None,
             "voterDeletion": None,
@@ -360,7 +352,6 @@ def load_eavs_2016(collection, csv_path):
         if col in df.columns:
             df[col] = df[col].apply(clean_numeric_value)
 
-    # Build list of documents for MongoDB
     documents = []
 
     for _, row in df.iterrows():
@@ -370,7 +361,6 @@ def load_eavs_2016(collection, csv_path):
         ballot_marking_device = row.get("F7c_Number", 0)
         scanner = row.get("F7d_NumCounters", 0)
 
-        # Build the document structure
         document = {
             "fipsCode": row["FIPSCode"],
             "jurisdictionName": row["JurisdictionName"],
@@ -378,7 +368,6 @@ def load_eavs_2016(collection, csv_path):
             "stateAbbr": row["State"],
             "electionYear": 2016,
 
-            # Voter Registration - only total registered
             "voterRegistration": {
                 "totalRegistered": row.get("A1a", 0),
                 "totalActive": None,
@@ -392,7 +381,6 @@ def load_eavs_2016(collection, csv_path):
                 "scanner": scanner
             },
 
-            # Null fields not needed for 2016
             "mailBallotsRejectedReason": None,
             "provisionalBallots": None,
             "voterDeletion": None,
@@ -419,7 +407,6 @@ def load_eavs_2016(collection, csv_path):
 def load_eavs_data():
     """Main function to load all EAVS data from 2016-2024."""
 
-    # Connect to MongoDB
     client = MongoClient(MONGO_URI)
     db = client[DATABASE_NAME]
     collection = db[COLLECTION_NAME]
