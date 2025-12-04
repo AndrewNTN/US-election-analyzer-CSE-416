@@ -6,14 +6,10 @@ import { ActiveVotersTable } from "../table/state-tables/active-voters-table.tsx
 import { ActiveVotersBarChart } from "../chart/active-voters-bar-chart";
 
 interface ActiveVotersViewProps {
-  stateName: string;
   stateFipsPrefix?: string;
 }
 
-export function ActiveVotersView({
-  stateName,
-  stateFipsPrefix,
-}: ActiveVotersViewProps) {
+export function ActiveVotersView({ stateFipsPrefix }: ActiveVotersViewProps) {
   const {
     data: chartData,
     isPending: chartLoading,
@@ -32,9 +28,7 @@ export function ActiveVotersView({
       {chartLoading ? (
         <p>Loading active voters data...</p>
       ) : errorMessage ? (
-        <p className="py-8">
-          Error loading {stateName} data: {errorMessage}
-        </p>
+        <p className="py-8">Error loading data: {errorMessage}</p>
       ) : (
         <>
           {chartData &&
@@ -58,7 +52,6 @@ export function ActiveVotersView({
                     Active Voters Status
                   </h3>
                   <ActiveVotersBarChart
-                    stateName={stateName}
                     barData={chartData}
                     metricLabels={chartData.metricLabels}
                   />

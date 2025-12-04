@@ -1,5 +1,6 @@
 export interface StateDetails {
   name: string;
+  fips: string;
   politicalDominance: "republican" | "democratic";
   registrationType: "opt-in" | "opt-out";
   sameDayRegistration: boolean;
@@ -11,6 +12,7 @@ export interface StateDetails {
 export const DETAILED_STATES = {
   florida: {
     name: "florida",
+    fips: "12",
     politicalDominance: "republican",
     registrationType: "opt-in",
     sameDayRegistration: false,
@@ -20,6 +22,7 @@ export const DETAILED_STATES = {
   },
   california: {
     name: "california",
+    fips: "06",
     politicalDominance: "democratic",
     registrationType: "opt-out",
     sameDayRegistration: true,
@@ -29,6 +32,7 @@ export const DETAILED_STATES = {
   },
   oregon: {
     name: "oregon",
+    fips: "41",
     politicalDominance: "democratic",
     registrationType: "opt-out",
     sameDayRegistration: false,
@@ -42,6 +46,10 @@ export type DetailedStateName = keyof typeof DETAILED_STATES;
 
 export function getStateDetails(stateName: string): StateDetails | undefined {
   return DETAILED_STATES[stateName as DetailedStateName];
+}
+
+export function getStateDetailsByFips(fips: string): StateDetails | undefined {
+  return Object.values(DETAILED_STATES).find((state) => state.fips === fips);
 }
 
 export function hasDetailedVoterData(stateName: string): boolean {

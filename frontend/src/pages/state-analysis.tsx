@@ -304,36 +304,22 @@ export default function StateAnalysis({
             </h2>
             <div className="mt-4">
               {selectedDataset === AnalysisType.VOTER_REGISTRATION ? (
-                <VoterRegistrationView
-                  normalizedStateKey={normalizedStateKey}
-                  stateFips={stateFipsPrefix}
-                />
+                <VoterRegistrationView stateFipsPrefix={stateFipsPrefix} />
               ) : selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY ? (
                 <StateEquipmentSummaryView />
               ) : selectedDataset === AnalysisType.PROVISIONAL_BALLOT ? (
-                <ProvisionalBallotView
-                  stateFipsPrefix={stateFipsPrefix}
-                  stateName={formatStateName(stateName)}
-                />
+                <ProvisionalBallotView stateFipsPrefix={stateFipsPrefix} />
               ) : selectedDataset === AnalysisType.ACTIVE_VOTERS_2024 ? (
-                <ActiveVotersView
-                  stateName={formatStateName(stateName)}
-                  stateFipsPrefix={stateFipsPrefix}
-                />
+                <ActiveVotersView stateFipsPrefix={stateFipsPrefix} />
               ) : selectedDataset === AnalysisType.DROP_BOX_VOTING ? (
-                <DropBoxVotingView
-                  stateFipsPrefix={stateFipsPrefix || ""}
-                  stateName={formatStateName(stateName)}
-                />
+                <DropBoxVotingView stateFipsPrefix={stateFipsPrefix} />
               ) : selectedDataset ===
                 AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS ? (
-                <EquipmentQualityView stateName={formatStateName(stateName)} />
+                <EquipmentQualityView />
               ) : selectedDataset === AnalysisType.POLLBOOK_DELETIONS_2024 ? (
-                <PollbookDeletionsView stateName={formatStateName(stateName)} />
+                <PollbookDeletionsView stateFipsPrefix={stateFipsPrefix} />
               ) : selectedDataset === AnalysisType.MAIL_BALLOTS_REJECTED ? (
-                <MailBallotsRejectedView
-                  stateName={formatStateName(stateName)}
-                />
+                <MailBallotsRejectedView stateFipsPrefix={stateFipsPrefix} />
               ) : (
                 <p className="text-xs text-muted-foreground text-center">
                   {analysisTypeLabels[selectedDataset]} visualization will be

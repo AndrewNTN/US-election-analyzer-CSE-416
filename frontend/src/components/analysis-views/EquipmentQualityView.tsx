@@ -1,11 +1,7 @@
 import { EquipmentQualityBubbleChart } from "../chart/equipment-quality-bubble-chart";
 import equipmentQualityDataJson from "../../../data/equipmentQualityVsRejectedBallots.json" with { type: "json" };
 
-interface EquipmentQualityViewProps {
-  stateName: string;
-}
-
-export function EquipmentQualityView({ stateName }: EquipmentQualityViewProps) {
+export function EquipmentQualityView() {
   // Get equipment quality data for current state
   const getEquipmentQualityData = () => {
     // The JSON has the structure: { equipmentQualityData: [...], regressionCoefficients: {...} }
@@ -34,7 +30,6 @@ export function EquipmentQualityView({ stateName }: EquipmentQualityViewProps) {
   return (
     <div className="h-[600px]">
       <EquipmentQualityBubbleChart
-        stateName={stateName}
         data={getEquipmentQualityData().data}
         regressionCoefficients={
           getEquipmentQualityData().regressionCoefficients

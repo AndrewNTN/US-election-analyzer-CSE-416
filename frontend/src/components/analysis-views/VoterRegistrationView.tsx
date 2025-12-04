@@ -1,6 +1,6 @@
 import { VoterRegistrationTable } from "../table/state-tables/voter-registration-table.tsx";
 import { VoterRegistrationLineChart } from "../chart/voter-registration-line-chart";
-import { hasDetailedVoterData } from "@/constants/states.ts";
+import { getStateDetailsByFips } from "@/constants/states.ts";
 import {
   useVoterRegistrationTableQuery,
   useVoterRegistrationChartQuery,
@@ -9,16 +9,14 @@ import {
 import { useMemo } from "react";
 
 interface VoterRegistrationViewProps {
-  normalizedStateKey: string;
-  stateFips: string | undefined;
+  stateFipsPrefix: string | undefined;
 }
 
 export function VoterRegistrationView({
-  normalizedStateKey,
-  stateFips,
+  stateFipsPrefix,
 }: VoterRegistrationViewProps) {
-  const { data: tableData } = useVoterRegistrationTableQuery(stateFips);
-  const { data: chartData } = useVoterRegistrationChartQuery(stateFips);
+  const { data: tableData } = useVoterRegistrationTableQuery(stateFipsPrefix);
+  const { data: chartData } = useVoterRegistrationChartQuery(stateFipsPrefix);
 
   const transformedChartData = useMemo(() => {
     if (!chartData?.data) return [];
@@ -41,9 +39,15 @@ export function VoterRegistrationView({
     );
   }, [transformedChartData]);
 
+  const hasDetailedData = useMemo(() => {
+    if (!stateFipsPrefix) return false;
+    const stateDetails = getStateDetailsByFips(stateFipsPrefix);
+    return stateDetails?.hasDetailedVoterData ?? false;
+  }, [stateFipsPrefix]);
+
   return (
     <div>
-      {hasDetailedVoterData(normalizedStateKey) && (
+      {hasDetailedData && (
         <VoterRegistrationTable data={tableData?.data || []} />
       )}
       {(hasNonZeroData && (

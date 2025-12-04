@@ -40,7 +40,6 @@ export interface RegressionCoefficients {
 interface EquipmentQualityBubbleChartProps {
   data: EquipmentQualityData[];
   regressionCoefficients: RegressionCoefficients;
-  stateName: string;
 }
 
 interface TooltipData {

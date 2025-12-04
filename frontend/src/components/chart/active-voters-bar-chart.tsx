@@ -3,7 +3,6 @@ import { formatNumber } from "@/lib/utils";
 import { type ActiveVotersChartResponse } from "@/lib/api/voting-requests";
 
 export interface ActiveVotersBarChartProps {
-  stateName: string;
   barData: ActiveVotersChartResponse;
   metricLabels?: Record<string, string>;
 }
@@ -22,13 +21,11 @@ const DEFAULT_METRIC_LABELS: Record<MetricKey, string> = {
 };
 
 export function ActiveVotersBarChart({
-  stateName,
   barData,
   metricLabels,
 }: ActiveVotersBarChartProps) {
   const chartData = [
     {
-      name: stateName,
       totalActive: barData.totalActive,
       totalRegistered: barData.totalRegistered,
       totalInactive: barData.totalInactive,
@@ -39,7 +36,6 @@ export function ActiveVotersBarChart({
 
   return (
     <BaseBarChart
-      stateName={stateName}
       barData={chartData}
       metricKeys={METRIC_KEYS}
       metricLabels={labels}

@@ -7,12 +7,10 @@ import { ProvisionalBallotsBarChart } from "../chart/provisional-ballots-bar-cha
 
 interface ProvisionalBallotViewProps {
   stateFipsPrefix: string | undefined;
-  stateName: string;
 }
 
 export function ProvisionalBallotView({
   stateFipsPrefix,
-  stateName,
 }: ProvisionalBallotViewProps) {
   const {
     data: provChartData,
@@ -37,9 +35,7 @@ export function ProvisionalBallotView({
       {provLoading ? (
         <p>Loading provisional ballot data...</p>
       ) : provErrorMessage ? (
-        <p className="py-8">
-          Error loading {stateName} data: {provErrorMessage}
-        </p>
+        <p className="py-8">Error loading data: {provErrorMessage}</p>
       ) : (
         <>
           {provChartData &&
@@ -64,10 +60,7 @@ export function ProvisionalBallotView({
                   <h3 className="text-lg font-semibold mb-4 text-center text-gray-900">
                     Provisional Ballots by Reason
                   </h3>
-                  <ProvisionalBallotsBarChart
-                    stateName={stateName}
-                    barData={provChartData}
-                  />
+                  <ProvisionalBallotsBarChart barData={provChartData} />
                 </div>
               )}
             </>

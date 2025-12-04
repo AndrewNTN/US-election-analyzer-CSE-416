@@ -12,7 +12,6 @@ import type { TooltipProps } from "recharts";
 import { ChartTooltip, type ChartTooltipOptions } from "./chart-tooltip";
 
 interface BaseBarChartProps<TData, TMetricKey extends string> {
-  stateName: string;
   barData: TData[];
   metricKeys: readonly TMetricKey[];
   metricLabels: Record<TMetricKey, string>;
@@ -34,7 +33,6 @@ const MIN_CHART_WIDTH = 400;
 const Y_AXIS_PADDING = 100;
 
 export function BaseBarChart<TData, TMetricKey extends string>({
-  stateName,
   barData,
   metricKeys,
   metricLabels,
@@ -108,7 +106,7 @@ export function BaseBarChart<TData, TMetricKey extends string>({
                 />
               )}
             />
-            <Bar dataKey="value" name={stateName} maxBarSize={80}>
+            <Bar dataKey="value" maxBarSize={80}>
               {data.map((_, index) => (
                 <Cell
                   key={`cell-${index}`}

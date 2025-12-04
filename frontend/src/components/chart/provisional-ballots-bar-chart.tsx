@@ -3,7 +3,6 @@ import { formatNumber } from "@/lib/utils";
 import type { ProvisionalChartResponse } from "@/lib/api/voting-requests";
 
 export interface ProvisionalBallotsBarChartProps {
-  stateName: string;
   barData: ProvisionalChartResponse;
 }
 
@@ -21,14 +20,12 @@ const METRIC_KEYS = [
 ] as const;
 
 export function ProvisionalBallotsBarChart({
-  stateName,
   barData,
 }: ProvisionalBallotsBarChartProps) {
   const { metricLabels, ...numericData } = barData;
 
   return (
     <BaseBarChart
-      stateName={stateName}
       barData={[numericData]}
       metricKeys={METRIC_KEYS}
       metricLabels={metricLabels ?? {}}

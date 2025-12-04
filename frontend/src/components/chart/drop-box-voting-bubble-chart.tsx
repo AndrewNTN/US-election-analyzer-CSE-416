@@ -16,7 +16,6 @@ import type { DropBoxVotingData } from "@/lib/api/voting-requests";
 
 interface DropBoxVotingBubbleChartProps {
   data: DropBoxVotingData[];
-  stateName: string;
 }
 
 interface TooltipData {

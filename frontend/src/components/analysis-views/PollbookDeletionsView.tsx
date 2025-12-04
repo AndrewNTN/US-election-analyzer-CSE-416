@@ -3,18 +3,16 @@ import {
   usePollbookDeletionsChartQuery,
   useActiveVotersTableQuery,
 } from "@/lib/api/use-queries.ts";
-import { getStateFipsCode } from "@/constants/stateFips.ts";
+
 import { ActiveVotersTable } from "../table/state-tables/active-voters-table.tsx";
 
 interface PollbookDeletionsViewProps {
-  stateName: string;
+  stateFipsPrefix: string | undefined;
 }
 
 export function PollbookDeletionsView({
-  stateName,
+  stateFipsPrefix,
 }: PollbookDeletionsViewProps) {
-  const stateFipsPrefix = getStateFipsCode(stateName);
-
   const {
     data: chartData,
     isPending: chartLoading,
@@ -57,9 +55,7 @@ export function PollbookDeletionsView({
       {tableLoading ? (
         <p>Loading active voters data...</p>
       ) : tableErrorMessage ? (
-        <p className="py-8">
-          Error loading {stateName} table data: {tableErrorMessage}
-        </p>
+        <p className="py-8">Error loading table data: {tableErrorMessage}</p>
       ) : tableData ? (
         <ActiveVotersTable
           data={tableData.data}
@@ -74,12 +70,9 @@ export function PollbookDeletionsView({
         {chartLoading ? (
           <p>Loading pollbook deletions data...</p>
         ) : chartErrorMessage ? (
-          <p className="py-8">
-            Error loading {stateName} data: {chartErrorMessage}
-          </p>
+          <p className="py-8">Error loading data: {chartErrorMessage}</p>
         ) : chartData ? (
           <PollbookDeletionsBarChart
-            stateName={stateName}
             barData={chartData}
             metricLabels={chartData.metricLabels}
           />

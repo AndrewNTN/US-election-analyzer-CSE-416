@@ -3,7 +3,6 @@ import { formatNumber } from "@/lib/utils";
 import { type PollbookDeletionsChartResponse } from "@/lib/api/voting-requests";
 
 export interface PollbookDeletionsBarChartProps {
-  stateName: string;
   barData: PollbookDeletionsChartResponse;
   metricLabels?: Record<string, string>;
 }
@@ -30,13 +29,11 @@ const DEFAULT_METRIC_LABELS: Record<MetricKey, string> = {
 };
 
 export function PollbookDeletionsBarChart({
-  stateName,
   barData,
   metricLabels,
 }: PollbookDeletionsBarChartProps) {
   const chartData = [
     {
-      name: stateName,
       ...barData,
     },
   ];
@@ -45,7 +42,6 @@ export function PollbookDeletionsBarChart({
 
   return (
     <BaseBarChart
-      stateName={stateName}
       barData={chartData}
       metricKeys={METRIC_KEYS}
       metricLabels={labels}

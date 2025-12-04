@@ -3,7 +3,6 @@ import { formatNumber } from "@/lib/utils";
 import type { MailBallotsRejectedChartResponse } from "@/lib/api/voting-requests";
 
 export interface MailBallotsRejectedBarChartProps {
-  stateName: string;
   barData: MailBallotsRejectedChartResponse;
   metricLabels: Record<string, string>;
 }
@@ -28,7 +27,6 @@ const METRIC_KEYS = [
 ] as const;
 
 export function MailBallotsRejectedBarChart({
-  stateName,
   barData,
   metricLabels,
 }: MailBallotsRejectedBarChartProps) {
@@ -36,7 +34,6 @@ export function MailBallotsRejectedBarChart({
 
   return (
     <BaseBarChart
-      stateName={stateName}
       barData={transformedData}
       metricKeys={METRIC_KEYS}
       metricLabels={metricLabels}

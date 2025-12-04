@@ -4,17 +4,14 @@ import {
   useMailBallotsRejectedChartQuery,
   useMailBallotsRejectedTableQuery,
 } from "@/lib/api/use-queries.ts";
-import { getStateFipsCode } from "@/constants/stateFips.ts";
 
 interface MailBallotsRejectedViewProps {
-  stateName: string;
+  stateFipsPrefix: string | undefined;
 }
 
 export function MailBallotsRejectedView({
-  stateName,
+  stateFipsPrefix,
 }: MailBallotsRejectedViewProps) {
-  const stateFipsPrefix = getStateFipsCode(stateName);
-
   const {
     data: chartData,
     isPending: chartLoading,
@@ -42,9 +39,7 @@ export function MailBallotsRejectedView({
       {tableLoading ? (
         <p>Loading mail ballots rejected data...</p>
       ) : tableErrorMessage ? (
-        <p className="py-8">
-          Error loading {stateName} table data: {tableErrorMessage}
-        </p>
+        <p className="py-8">Error loading table data: {tableErrorMessage}</p>
       ) : tableData ? (
         <MailBallotsRejectedTable
           data={tableData.data}
@@ -59,12 +54,9 @@ export function MailBallotsRejectedView({
         {chartLoading ? (
           <p>Loading mail ballots rejected data...</p>
         ) : chartErrorMessage ? (
-          <p className="py-8">
-            Error loading {stateName} data: {chartErrorMessage}
-          </p>
+          <p className="py-8">Error loading data: {chartErrorMessage}</p>
         ) : chartData ? (
           <MailBallotsRejectedBarChart
-            stateName={stateName}
             barData={chartData}
             metricLabels={chartData.metricLabels}
           />
