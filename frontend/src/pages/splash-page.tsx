@@ -106,7 +106,6 @@ export default function SplashPage() {
         </div>
       </div>
 
-      {/* Analysis drawer */}
       <AnalysisDrawer open={open} onOpenChange={setOpen} />
 
       {/* Map in background */}
