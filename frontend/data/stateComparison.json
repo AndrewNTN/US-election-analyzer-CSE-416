@@ -1,27 +1,3 @@
-{
-  "republicanState": {
-    "state": "Florida",
-    "felonyVotingRights": "Completed Sentence",
-    "mailBallots": 1352700,
-    "mailBallotsPercentage": 12.5,
-    "dropBoxBallots": 346290,
-    "dropBoxBallotsPercentage": 3.2,
-    "totalVotesCast": 10821600,
-    "turnoutPercentage": 66.8,
-    "registeredVoters": 16200000,
-    "voterRegistrationRate": 78.5
-  },
-  "democraticState": {
-    "state": "California",
-    "felonyVotingRights": "Rights Restored After Prison",
-    "mailBallots": 13721664,
-    "mailBallotsPercentage": 87.6,
-    "dropBoxBallots": 3884672,
-    "dropBoxBallotsPercentage": 24.8,
-    "totalVotesCast": 15664000,
-    "turnoutPercentage": 71.2,
-    "registeredVoters": 22000000,
-    "voterRegistrationRate": 82.1
-  }
-}
-
+version https://git-lfs.github.com/spec/v1
+oid sha256:b64e3ebcd17c859936fdc1dc71df211a9a117f57e377768ee869f628c42e0370
+size 742

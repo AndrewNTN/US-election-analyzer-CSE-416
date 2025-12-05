@@ -9,6 +9,9 @@ import type {
   MapFeatureProps,
   StateProps,
 } from "@/lib/api/geojson-requests";
+import { renderToString } from "react-dom/server";
+import { StateTooltip } from "./state-tooltip";
+import { getStateDetails } from "@/constants/states";
 
 interface OutlineLayerProps<T extends BaseMapProps = MapFeatureProps> {
   data: FeatureCollection<Geometry, T>;
@@ -58,6 +61,25 @@ export default function OutlineLayer<T extends BaseMapProps = MapFeatureProps>({
       const isCounty = feature.properties && "geoid" in feature.properties;
       const shouldEnableHover =
         !stateView || (isCounty && enableCountyInteractions);
+
+      if (!isCounty && !stateView && feature.properties.stateName) {
+        const stateName = feature.properties.stateName;
+        const details = getStateDetails(formatStateNameForUrl(stateName));
+
+        const tooltipContent = renderToString(
+          <StateTooltip stateName={stateName} details={details} />,
+        );
+
+        layer.bindTooltip(tooltipContent, {
+          permanent: false,
+          sticky: true,
+          direction: "auto",
+          className:
+            "!bg-transparent !border-0 !shadow-none !p-0 before:!hidden",
+          opacity: 1,
+          pane: "stateTooltip",
+        });
+      }
 
       layer.on({
         mouseover: (e: LeafletMouseEvent) => {

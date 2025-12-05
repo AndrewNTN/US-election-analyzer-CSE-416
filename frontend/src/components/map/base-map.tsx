@@ -46,6 +46,13 @@ const CustomPanes = () => {
       baseTilesPane.style.zIndex = "100";
     }
 
+    // Create a custom pane for state tooltips so they appear above labels
+    if (!map.getPane("stateTooltip")) {
+      const tooltipPane = map.createPane("stateTooltip");
+      tooltipPane.style.zIndex = "700";
+      tooltipPane.style.pointerEvents = "none";
+    }
+
     map.zoomControl.setPosition("bottomright");
 
     const zoomControl = map.zoomControl.getContainer();
