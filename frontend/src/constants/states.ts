@@ -7,6 +7,7 @@ export interface StateDetails {
   hasDetailedVoterData: boolean;
   hasDropBoxVoting: boolean;
   politicalPartyState: boolean;
+  hasGinglesChart: boolean;
 }
 
 export const DETAILED_STATES = {
@@ -19,6 +20,7 @@ export const DETAILED_STATES = {
     hasDetailedVoterData: true,
     hasDropBoxVoting: true,
     politicalPartyState: true,
+    hasGinglesChart: true,
   },
   california: {
     name: "california",
@@ -29,6 +31,7 @@ export const DETAILED_STATES = {
     hasDetailedVoterData: false,
     hasDropBoxVoting: true,
     politicalPartyState: true,
+    hasGinglesChart: false,
   },
   oregon: {
     name: "oregon",
@@ -39,6 +42,7 @@ export const DETAILED_STATES = {
     hasDetailedVoterData: false,
     hasDropBoxVoting: false,
     politicalPartyState: false,
+    hasGinglesChart: false,
   },
 } as const satisfies Record<string, StateDetails>;
 
@@ -60,4 +64,9 @@ export function hasDetailedVoterData(stateName: string): boolean {
 export function hasDropBoxVoting(stateName: string): boolean {
   const state = getStateDetails(stateName);
   return state?.hasDropBoxVoting ?? false;
+}
+
+export function hasGinglesChart(stateName: string): boolean {
+  const state = getStateDetails(stateName);
+  return state?.hasGinglesChart ?? false;
 }

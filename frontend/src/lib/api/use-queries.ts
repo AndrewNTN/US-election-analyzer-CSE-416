@@ -39,6 +39,8 @@ import {
   type FloridaVotersResponse,
   getDropBoxVotingData,
   type DropBoxVotingData,
+  getGinglesChartData,
+  type GinglesChartResponse,
 } from "@/lib/api/voting-requests";
 
 import {
@@ -371,6 +373,20 @@ export const useDropBoxVotingDataQuery = (
         throw new Error("Missing FIPS prefix for drop box voting query");
       }
       return getDropBoxVotingData(fipsPrefix);
+    },
+    enabled: Boolean(fipsPrefix),
+  });
+
+export const useGinglesChartQuery = (
+  fipsPrefix: string | null | undefined,
+): UseQueryResult<GinglesChartResponse, Error> =>
+  useQuery({
+    queryKey: ["gingles-chart", fipsPrefix ?? "no-fips"],
+    queryFn: async () => {
+      if (!fipsPrefix) {
+        throw new Error("Missing FIPS prefix for Gingles chart query");
+      }
+      return getGinglesChartData(fipsPrefix);
     },
     enabled: Boolean(fipsPrefix),
   });

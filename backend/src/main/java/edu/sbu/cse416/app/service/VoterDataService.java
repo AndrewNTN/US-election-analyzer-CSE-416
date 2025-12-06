@@ -6,6 +6,7 @@ import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
 import edu.sbu.cse416.app.dto.dropbox.DropBoxVotingData;
 import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonResponse;
 import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonRow;
+import edu.sbu.cse416.app.dto.gingles.GinglesChartResponse;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedChartResponse;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedTableResponse;
 import edu.sbu.cse416.app.dto.optinoptout.OptInOptOutComparisonResponse;
@@ -26,12 +27,14 @@ import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentYearlyDTO;
 import edu.sbu.cse416.app.model.CountyVoteSplit;
 import edu.sbu.cse416.app.model.CvapData;
 import edu.sbu.cse416.app.model.FelonyVoting;
+import edu.sbu.cse416.app.model.GinglesChartData;
 import edu.sbu.cse416.app.model.eavs.*;
 import edu.sbu.cse416.app.model.registration.Voter;
 import edu.sbu.cse416.app.repository.CountyVoteSplitRepository;
 import edu.sbu.cse416.app.repository.CvapDataRepository;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
 import edu.sbu.cse416.app.repository.FelonyVotingRepository;
+import edu.sbu.cse416.app.repository.GinglesChartDataRepository;
 import edu.sbu.cse416.app.repository.StateVoterRegistrationRepository;
 import edu.sbu.cse416.app.repository.VoterRepository;
 import edu.sbu.cse416.app.util.FipsUtil;
@@ -67,6 +70,7 @@ public class VoterDataService {
     private final FelonyVotingRepository felonyVotingRepo;
     private final VoterRepository voterRepo;
     private final CountyVoteSplitRepository countyVoteSplitRepo;
+    private final GinglesChartDataRepository ginglesChartDataRepo;
 
     public VoterDataService(
             EavsDataRepository repo,
@@ -74,13 +78,15 @@ public class VoterDataService {
             CvapDataRepository cvapRepo,
             FelonyVotingRepository felonyVotingRepo,
             VoterRepository voterRepo,
-            CountyVoteSplitRepository countyVoteSplitRepo) {
+            CountyVoteSplitRepository countyVoteSplitRepo,
+            GinglesChartDataRepository ginglesChartDataRepo) {
         this.repo = repo;
         this.voterRegRepo = voterRegRepo;
         this.cvapRepo = cvapRepo;
         this.felonyVotingRepo = felonyVotingRepo;
         this.voterRepo = voterRepo;
         this.countyVoteSplitRepo = countyVoteSplitRepo;
+        this.ginglesChartDataRepo = ginglesChartDataRepo;
     }
 
     /**
@@ -955,5 +961,61 @@ public class VoterDataService {
         List<String> metricLabels = List.of("Name", "Party");
         return new FloridaVotersResponse(
                 metricLabels, filteredVoters, voterPage.getTotalPages(), voterPage.getTotalElements());
+    }
+
+    /**
+     * Get Gingles Chart data for a specific state.
+     * Returns precinct-level voting data with county demographics and regression
+     * curves.
+     */
+    @Cacheable(value = "ginglesChartData", key = "#fipsPrefix")
+    public GinglesChartResponse getGinglesChartData(String fipsPrefix) {
+        var data = ginglesChartDataRepo.findByStateFips(fipsPrefix);
+
+        if (data.isEmpty()) {
+            return null;
+        }
+
+        GinglesChartData chartData = data.get();
+
+        // Convert precincts to DTOs with flattened demographics
+        List<GinglesChartResponse.PrecinctDataDTO> precinctDTOs = chartData.precincts().stream()
+                .map(p -> new GinglesChartResponse.PrecinctDataDTO(
+                        p.precinctId(),
+                        p.precinctName(),
+                        p.countyName(),
+                        p.republicanVotes(),
+                        p.democraticVotes(),
+                        p.totalVotes(),
+                        p.republicanPercentage(),
+                        p.democraticPercentage(),
+                        p.demographics().getOrDefault("white", 0.0),
+                        p.demographics().getOrDefault("black", 0.0),
+                        p.demographics().getOrDefault("hispanic", 0.0),
+                        p.demographics().getOrDefault("asian", 0.0)))
+                .toList();
+
+        // Convert regression curves to DTOs
+        java.util.Map<String, GinglesChartResponse.DemographicCurvesDTO> curveDTOs = new java.util.HashMap<>();
+
+        for (var entry : chartData.regressionCurves().entrySet()) {
+            String demographic = entry.getKey();
+            GinglesChartData.DemographicCurves curves = entry.getValue();
+
+            List<double[]> repCurve = curves.republican().stream()
+                    .map(point -> new double[] {point.get(0), point.get(1)})
+                    .toList();
+
+            List<double[]> demCurve = curves.democratic().stream()
+                    .map(point -> new double[] {point.get(0), point.get(1)})
+                    .toList();
+
+            curveDTOs.put(demographic, new GinglesChartResponse.DemographicCurvesDTO(repCurve, demCurve));
+        }
+
+        GinglesChartResponse.MetadataDTO metadata = new GinglesChartResponse.MetadataDTO(
+                chartData.metadata().totalPrecincts(), chartData.metadata().totalCounties());
+
+        return new GinglesChartResponse(precinctDTOs, curveDTOs, metadata);
     }
 }

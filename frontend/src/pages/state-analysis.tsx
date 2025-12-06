@@ -10,6 +10,7 @@ import {
   getStateDetails,
   hasDetailedVoterData,
   hasDropBoxVoting,
+  hasGinglesChart,
 } from "@/constants/states.ts";
 
 import { Button } from "@/components/ui/button.tsx";
@@ -30,6 +31,7 @@ import { DropBoxVotingView } from "@/components/analysis-views/DropBoxVotingView
 import { EquipmentQualityView } from "@/components/analysis-views/EquipmentQualityView";
 import { PollbookDeletionsView } from "@/components/analysis-views/PollbookDeletionsView";
 import { MailBallotsRejectedView } from "@/components/analysis-views/MailBallotsRejectedView";
+import { GinglesChartView } from "@/components/analysis-views/GinglesChartView";
 
 const AnalysisType = {
   PROVISIONAL_BALLOT: "prov-ballot-bchart",
@@ -41,6 +43,7 @@ const AnalysisType = {
   DROP_BOX_VOTING: "drop-box-voting",
   EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS:
     "equipment-quality-vs-rejected-ballots",
+  GINGLES_CHART: "gingles-chart",
 } as const;
 
 type AnalysisTypeValue = (typeof AnalysisType)[keyof typeof AnalysisType];
@@ -55,6 +58,7 @@ const analysisTypeLabels: Record<AnalysisTypeValue, string> = {
   [AnalysisType.DROP_BOX_VOTING]: "Drop Box Voting",
   [AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS]:
     "Equipment vs Rejected Ballots",
+  [AnalysisType.GINGLES_CHART]: "Gingles Chart",
 };
 
 const analysisToChoroplethMap: Record<
@@ -74,6 +78,7 @@ const analysisToChoroplethMap: Record<
   [AnalysisType.DROP_BOX_VOTING]: STATE_CHOROPLETH_OPTIONS.OFF,
   [AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS]:
     STATE_CHOROPLETH_OPTIONS.OFF,
+  [AnalysisType.GINGLES_CHART]: STATE_CHOROPLETH_OPTIONS.OFF,
 };
 
 interface StateAnalysisProps {
@@ -127,6 +132,9 @@ export default function StateAnalysis({
       Object.values(AnalysisType).filter((option) => {
         if (option === AnalysisType.DROP_BOX_VOTING) {
           return hasDropBoxVoting(normalizedStateKey);
+        }
+        if (option === AnalysisType.GINGLES_CHART) {
+          return hasGinglesChart(normalizedStateKey);
         }
         return true;
       }),
@@ -320,6 +328,8 @@ export default function StateAnalysis({
                 <PollbookDeletionsView stateFipsPrefix={stateFipsPrefix} />
               ) : selectedDataset === AnalysisType.MAIL_BALLOTS_REJECTED ? (
                 <MailBallotsRejectedView stateFipsPrefix={stateFipsPrefix} />
+              ) : selectedDataset === AnalysisType.GINGLES_CHART ? (
+                <GinglesChartView stateFipsPrefix={stateFipsPrefix} />
               ) : (
                 <p className="text-xs text-muted-foreground text-center">
                   {analysisTypeLabels[selectedDataset]} visualization will be

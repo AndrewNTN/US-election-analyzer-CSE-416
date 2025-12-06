@@ -5,6 +5,7 @@ import edu.sbu.cse416.app.dto.activevoters.ActiveVotersTableResponse;
 import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
 import edu.sbu.cse416.app.dto.dropbox.DropBoxVotingData;
 import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonResponse;
+import edu.sbu.cse416.app.dto.gingles.GinglesChartResponse;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedChartResponse;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedTableResponse;
 import edu.sbu.cse416.app.dto.optinoptout.OptInOptOutComparisonResponse;
@@ -212,6 +213,17 @@ public class VoterDataController {
     @GetMapping("/drop-box-voting/{fipsPrefix}")
     public ResponseEntity<List<DropBoxVotingData>> getDropBoxVotingData(@PathVariable String fipsPrefix) {
         var response = voterDataService.getDropBoxVotingData(fipsPrefix);
+        return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
+    }
+
+    /**
+     * Get Gingles Chart data for a specific state by FIPS prefix.
+     * Returns precinct-level voting data with demographics and regression curves.
+     * GET /gingles-chart/{fipsPrefix}
+     */
+    @GetMapping("/gingles-chart/{fipsPrefix}")
+    public ResponseEntity<GinglesChartResponse> getGinglesChart(@PathVariable String fipsPrefix) {
+        var response = voterDataService.getGinglesChartData(fipsPrefix);
         return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 }

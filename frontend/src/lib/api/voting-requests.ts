@@ -331,3 +331,38 @@ export interface DropBoxVotingData {
 export const getDropBoxVotingData = async (
   fipsPrefix: string,
 ): Promise<DropBoxVotingData[]> => fetchJson(`/drop-box-voting/${fipsPrefix}`);
+
+export interface GinglesPrecinctData {
+  precinctId: string;
+  precinctName: string;
+  countyName: string;
+  republicanVotes: number;
+  democraticVotes: number;
+  totalVotes: number;
+  republicanPercentage: number;
+  democraticPercentage: number;
+  white: number;
+  black: number;
+  hispanic: number;
+  asian: number;
+}
+
+export interface GinglesDemographicCurves {
+  republican: [number, number][];
+  democratic: [number, number][];
+}
+
+export interface GinglesChartMetadata {
+  totalPrecincts: number;
+  totalCounties: number;
+}
+
+export interface GinglesChartResponse {
+  precincts: GinglesPrecinctData[];
+  regressionCurves: Record<string, GinglesDemographicCurves>;
+  metadata: GinglesChartMetadata;
+}
+
+export const getGinglesChartData = async (
+  fipsPrefix: string,
+): Promise<GinglesChartResponse> => fetchJson(`/gingles-chart/${fipsPrefix}`);

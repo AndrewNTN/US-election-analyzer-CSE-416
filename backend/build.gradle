@@ -49,7 +49,7 @@ task installPythonDependencies(type: Exec) {
     description = 'Install required Python packages for preprocessing'
     group = 'application'
 
-    commandLine 'python', '-m', 'pip', 'install', 'geopandas', 'pymongo', 'shapely', 'openpyxl', 'requests', 'python-dotenv'
+    commandLine 'python', '-m', 'pip', 'install', 'geopandas', 'pymongo', 'shapely', 'openpyxl', 'requests', 'python-dotenv', 'scipy', 'numpy', 'maup'
 
     doFirst {
         println '================================================'
@@ -185,6 +185,20 @@ task runCACountyVoteSplitsPreprocessing(type: Exec) {
     }
 }
 
+task runGinglesPreprocessing(type: Exec) {
+    description = 'Run Python preprocessing script to load Gingles data into MongoDB'
+    group = 'application'
+
+    workingDir file('preprocessing')
+    commandLine 'python', 'load_gingles_data.py'
+
+    doLast {
+        println '================================================'
+        println 'Gingles data preprocessing completed successfully!'
+        println '================================================'
+    }
+}
+
 // Make bootRun depend on the Python preprocessing tasks
 runCountiesPreprocessing.dependsOn installPythonDependencies
 runStatesPreprocessing.dependsOn runCountiesPreprocessing
@@ -193,4 +207,5 @@ runCvapPreprocessing.dependsOn runFelonyPreprocessing
 runEavsPreprocessing.dependsOn runCvapPreprocessing
 runFLCountyVoteSplitsPreprocessing.dependsOn runEavsPreprocessing
 runCACountyVoteSplitsPreprocessing.dependsOn runFLCountyVoteSplitsPreprocessing
-bootRun.dependsOn runCACountyVoteSplitsPreprocessing
+runGinglesPreprocessing.dependsOn runCACountyVoteSplitsPreprocessing
+bootRun.dependsOn runGinglesPreprocessing
