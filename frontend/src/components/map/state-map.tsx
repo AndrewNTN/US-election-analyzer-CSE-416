@@ -2,8 +2,10 @@ import { useMemo, useState } from "react";
 import BaseMap from "@/components/map/base-map.tsx";
 import OutlineLayer from "@/components/map/outline-layer.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
+import EquipmentChoroplethLayer from "@/components/map/equipment-choropleth-layer.tsx";
 import type { FeatureCollection, Geometry } from "geojson";
 import type { StateProps, CountyProps } from "@/lib/api/geojson-requests";
+import type { CountyEquipmentType } from "@/lib/api/voting-requests";
 import { useFloridaVotersQuery } from "@/lib/api/use-queries.ts";
 import type { StateChoroplethOption } from "@/lib/choropleth.ts";
 import {
@@ -13,6 +15,7 @@ import {
 } from "@/lib/choropleth";
 import { ChoroplethLegend } from "@/components/map/choropleth-legend";
 import { CvapRegistrationLegend } from "@/components/map/cvap-registration-legend";
+import { EquipmentLegend } from "@/components/map/equipment-legend";
 import {
   Dialog,
   DialogContent,
@@ -41,6 +44,8 @@ interface StateMapProps {
   showCvapLegend?: boolean;
   fipsPrefix?: string | null;
   hasDetailedVoterData?: boolean;
+  equipmentTypeData?: CountyEquipmentType[];
+  equipmentLabels?: Record<string, string>;
 }
 
 export default function StateMap({
@@ -51,6 +56,8 @@ export default function StateMap({
   showCvapLegend = false,
   fipsPrefix,
   hasDetailedVoterData = false,
+  equipmentTypeData,
+  equipmentLabels,
 }: StateMapProps) {
   const [selectedCounty, setSelectedCounty] = useState<CountyProps | null>(
     null,
@@ -94,7 +101,12 @@ export default function StateMap({
       isDetailedState && currentCountiesData
         ? currentCountiesData
         : currentStateData;
-    if (choroplethOption === "off" || !data?.features) return null;
+    if (
+      choroplethOption === "off" ||
+      choroplethOption === STATE_CHOROPLETH_OPTIONS.VOTING_EQUIPMENT ||
+      !data?.features
+    )
+      return null;
 
     const values: number[] = [];
     data.features.forEach((f) => {
@@ -160,13 +172,21 @@ export default function StateMap({
         >
           {isDetailedState && currentCountiesData ? (
             <>
-              <ChoroplethLayer
-                key={`${choroplethOption}-${Boolean(currentCountiesData?.features?.[0]?.properties && "provisionalBallotsPct" in currentCountiesData.features[0].properties)}`}
-                data={currentCountiesData}
-                choroplethOption={choroplethOption}
-                stateView
-                colorScale={dynamicScale}
-              />
+              {choroplethOption === STATE_CHOROPLETH_OPTIONS.VOTING_EQUIPMENT &&
+              equipmentTypeData ? (
+                <EquipmentChoroplethLayer
+                  geoJsonData={currentCountiesData}
+                  equipmentData={equipmentTypeData}
+                />
+              ) : (
+                <ChoroplethLayer
+                  key={`${choroplethOption}-${Boolean(currentCountiesData?.features?.[0]?.properties && "provisionalBallotsPct" in currentCountiesData.features[0].properties)}`}
+                  data={currentCountiesData}
+                  choroplethOption={choroplethOption}
+                  stateView
+                  colorScale={dynamicScale}
+                />
+              )}
               <OutlineLayer
                 key={`outline-${choroplethOption}`}
                 data={currentCountiesData}
@@ -198,14 +218,19 @@ export default function StateMap({
         </BaseMap>
 
         {/* Choropleth Legend - positioned on the map */}
-        {choroplethOption && choroplethOption !== "off" && (
+        {choroplethOption === STATE_CHOROPLETH_OPTIONS.VOTING_EQUIPMENT &&
+        equipmentTypeData ? (
+          <div className="absolute bottom-32 left-4 z-10 max-w-xs">
+            <EquipmentLegend equipmentLabels={equipmentLabels} />
+          </div>
+        ) : choroplethOption && choroplethOption !== "off" ? (
           <div className="absolute bottom-32 left-4 z-10 max-w-xs">
             <ChoroplethLegend
               choroplethOption={choroplethOption}
               colorScale={dynamicScale}
             />
           </div>
-        )}
+        ) : null}
         {showCvapLegend ? (
           <div className="absolute bottom-32 right-4 z-10 max-w-xs">
             <CvapRegistrationLegend fipsPrefix={fipsPrefix} />

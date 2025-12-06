@@ -20,6 +20,8 @@ import edu.sbu.cse416.app.dto.voter.FloridaVoterDTO;
 import edu.sbu.cse416.app.dto.voter.FloridaVotersResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationChartResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationTableResponse;
+import edu.sbu.cse416.app.dto.votingequipment.CountyEquipmentTypeDTO;
+import edu.sbu.cse416.app.dto.votingequipment.CountyEquipmentTypeResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentChartResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentDTO;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentTableResponse;
@@ -1017,5 +1019,65 @@ public class VoterDataService {
                 chartData.metadata().totalPrecincts(), chartData.metadata().totalCounties());
 
         return new GinglesChartResponse(precinctDTOs, curveDTOs, metadata);
+    }
+
+    /**
+     * Get county-level voting equipment types for a state.
+     * Determines dominant equipment type per county based on equipment counts.
+     */
+    @Cacheable(value = "countyEquipmentTypes", key = "#fipsPrefix")
+    public CountyEquipmentTypeResponse getCountyEquipmentTypes(String fipsPrefix) {
+        List<EavsData> data = fetchEavsData(fipsPrefix);
+
+        List<CountyEquipmentTypeDTO> countyData = data.stream()
+                .filter(record -> record.equipment() != null)
+                .map(record -> {
+                    Equipment eq = record.equipment();
+                    int dreNoVvpat = nz(eq.dreNoVVPAT());
+                    int dreWithVvpat = nz(eq.dreWithVVPAT());
+                    int bmd = nz(eq.ballotMarkingDevice());
+                    int scanner = nz(eq.scanner());
+
+                    String equipmentType = determineEquipmentType(dreNoVvpat, dreWithVvpat, bmd, scanner);
+
+                    return new CountyEquipmentTypeDTO(
+                            record.fipsCode(),
+                            cleanJurisdictionName(record.jurisdictionName()),
+                            equipmentType,
+                            dreNoVvpat,
+                            dreWithVvpat,
+                            bmd,
+                            scanner);
+                })
+                .sorted(Comparator.comparing(CountyEquipmentTypeDTO::jurisdictionName))
+                .toList();
+
+        return new CountyEquipmentTypeResponse(countyData, CountyEquipmentTypeResponse.getDefaultEquipmentLabels());
+    }
+
+    /**
+     * Determine the dominant equipment type for a county.
+     * Returns "mixed" if no single equipment type has > 50% of total.
+     */
+    private String determineEquipmentType(int dreNoVvpat, int dreWithVvpat, int bmd, int scanner) {
+        int total = dreNoVvpat + dreWithVvpat + bmd + scanner;
+
+        if (total == 0) {
+            return "mixed";
+        }
+
+        double threshold = total * 0.5;
+
+        if (dreNoVvpat > threshold) {
+            return "dre_no_vvpat";
+        } else if (dreWithVvpat > threshold) {
+            return "dre_with_vvpat";
+        } else if (bmd > threshold) {
+            return "ballot_marking_device";
+        } else if (scanner > threshold) {
+            return "scanner";
+        } else {
+            return "mixed";
+        }
     }
 }

@@ -41,6 +41,8 @@ import {
   type DropBoxVotingData,
   getGinglesChartData,
   type GinglesChartResponse,
+  getCountyEquipmentTypes,
+  type CountyEquipmentTypeResponse,
 } from "@/lib/api/voting-requests";
 
 import {
@@ -387,6 +389,20 @@ export const useGinglesChartQuery = (
         throw new Error("Missing FIPS prefix for Gingles chart query");
       }
       return getGinglesChartData(fipsPrefix);
+    },
+    enabled: Boolean(fipsPrefix),
+  });
+
+export const useCountyEquipmentTypesQuery = (
+  fipsPrefix: string | null | undefined,
+): UseQueryResult<CountyEquipmentTypeResponse, Error> =>
+  useQuery({
+    queryKey: ["county-equipment-types", fipsPrefix ?? "no-fips"],
+    queryFn: async () => {
+      if (!fipsPrefix) {
+        throw new Error("Missing FIPS prefix for county equipment types query");
+      }
+      return getCountyEquipmentTypes(fipsPrefix);
     },
     enabled: Boolean(fipsPrefix),
   });

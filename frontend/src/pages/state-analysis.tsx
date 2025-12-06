@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import {
   useStatesGeoJsonQuery,
   useCountiesGeoJsonQuery,
+  useCountyEquipmentTypesQuery,
 } from "@/lib/api/use-queries.ts";
 import type { CountyProps, StateProps } from "@/lib/api/geojson-requests";
 import {
@@ -74,7 +75,8 @@ const analysisToChoroplethMap: Record<
     STATE_CHOROPLETH_OPTIONS.MAIL_BALLOTS_REJECTED,
   [AnalysisType.VOTER_REGISTRATION]:
     STATE_CHOROPLETH_OPTIONS.VOTER_REGISTRATION,
-  [AnalysisType.STATE_EQUIPMENT_SUMMARY]: STATE_CHOROPLETH_OPTIONS.OFF,
+  [AnalysisType.STATE_EQUIPMENT_SUMMARY]:
+    STATE_CHOROPLETH_OPTIONS.VOTING_EQUIPMENT,
   [AnalysisType.DROP_BOX_VOTING]: STATE_CHOROPLETH_OPTIONS.OFF,
   [AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS]:
     STATE_CHOROPLETH_OPTIONS.OFF,
@@ -175,6 +177,13 @@ export default function StateAnalysis({
     isError: isErrorCounties,
     refetch: refetchCounties,
   } = useCountiesGeoJsonQuery(stateFipsPrefix);
+
+  // Fetch equipment types when State Equipment Summary is selected
+  const { data: equipmentTypesData } = useCountyEquipmentTypesQuery(
+    selectedDataset === AnalysisType.STATE_EQUIPMENT_SUMMARY
+      ? stateFipsPrefix
+      : null,
+  );
 
   const isLoading = isLoadingStates || (isDetailedState && isLoadingCounties);
   const isError = isErrorStates || (isDetailedState && isErrorCounties);
@@ -300,6 +309,8 @@ export default function StateAnalysis({
               showCvapLegend={isPoliticalPartyState}
               fipsPrefix={stateFipsPrefix}
               hasDetailedVoterData={hasDetailedVoterData(normalizedStateKey)}
+              equipmentTypeData={equipmentTypesData?.data}
+              equipmentLabels={equipmentTypesData?.equipmentLabels}
             />
           )}
         </div>

@@ -366,3 +366,30 @@ export interface GinglesChartResponse {
 export const getGinglesChartData = async (
   fipsPrefix: string,
 ): Promise<GinglesChartResponse> => fetchJson(`/gingles-chart/${fipsPrefix}`);
+
+export type VotingEquipmentType =
+  | "dre_no_vvpat"
+  | "dre_with_vvpat"
+  | "ballot_marking_device"
+  | "scanner"
+  | "mixed";
+
+export interface CountyEquipmentType {
+  fipsCode: string;
+  jurisdictionName: string;
+  equipmentType: VotingEquipmentType;
+  dreNoVVPAT: number;
+  dreWithVVPAT: number;
+  ballotMarkingDevice: number;
+  scanner: number;
+}
+
+export interface CountyEquipmentTypeResponse {
+  data: CountyEquipmentType[];
+  equipmentLabels: Record<string, string>;
+}
+
+export const getCountyEquipmentTypes = async (
+  fipsPrefix: string,
+): Promise<CountyEquipmentTypeResponse> =>
+  fetchJson(`/voting-equipment/types/${fipsPrefix}`);

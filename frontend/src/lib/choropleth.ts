@@ -10,6 +10,7 @@ export const STATE_CHOROPLETH_OPTIONS = {
   POLLBOOK_DELETIONS: "pollbookDeletions",
   MAIL_BALLOTS_REJECTED: "mailBallotsRejected",
   VOTER_REGISTRATION: "voterRegistration",
+  VOTING_EQUIPMENT: "votingEquipment",
   OFF: "off",
 } as const;
 

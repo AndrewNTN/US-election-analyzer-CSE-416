@@ -16,6 +16,7 @@ import edu.sbu.cse416.app.dto.statecomparison.StateComparisonResponse;
 import edu.sbu.cse416.app.dto.voter.FloridaVotersResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationChartResponse;
 import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationTableResponse;
+import edu.sbu.cse416.app.dto.votingequipment.CountyEquipmentTypeResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentChartResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentTableResponse;
 import edu.sbu.cse416.app.service.VoterDataService;
@@ -146,6 +147,16 @@ public class VoterDataController {
     public ResponseEntity<VotingEquipmentChartResponse> getVotingEquipmentChart(@PathVariable String fipsPrefix) {
         var dto = voterDataService.getVotingEquipmentChart(fipsPrefix);
         return (dto == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(dto);
+    }
+
+    /**
+     * Get county-level voting equipment types for a specific state by FIPS prefix.
+     * GET /voting-equipment/types/{fipsPrefix}
+     */
+    @GetMapping("/voting-equipment/types/{fipsPrefix}")
+    public ResponseEntity<CountyEquipmentTypeResponse> getCountyEquipmentTypes(@PathVariable String fipsPrefix) {
+        var response = voterDataService.getCountyEquipmentTypes(fipsPrefix);
+        return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 
     /**
