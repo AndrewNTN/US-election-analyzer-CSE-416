@@ -334,7 +334,7 @@ export default function StateAnalysis({
                 <DropBoxVotingView stateFipsPrefix={stateFipsPrefix} />
               ) : selectedDataset ===
                 AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS ? (
-                <EquipmentQualityView />
+                <EquipmentQualityView stateFipsPrefix={stateFipsPrefix} />
               ) : selectedDataset === AnalysisType.POLLBOOK_DELETIONS_2024 ? (
                 <PollbookDeletionsView stateFipsPrefix={stateFipsPrefix} />
               ) : selectedDataset === AnalysisType.MAIL_BALLOTS_REJECTED ? (

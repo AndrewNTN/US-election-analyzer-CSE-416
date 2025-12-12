@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import {
+  ScatterChart,
   Scatter,
   XAxis,
   YAxis,
@@ -8,8 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
   ZAxis,
-  Line,
-  ComposedChart,
+  Cell,
 } from "recharts";
 
 export interface EquipmentQualityData {
@@ -42,7 +42,7 @@ interface EquipmentQualityBubbleChartProps {
   regressionCoefficients: RegressionCoefficients;
 }
 
-interface TooltipData {
+interface ChartDataPoint {
   x: number;
   y: number;
   z: number;
@@ -52,53 +52,49 @@ interface TooltipData {
   mailInRejected: number;
   provisionalRejected: number;
   uocavaRejected: number;
+  party: "republican" | "democratic";
 }
 
 export function EquipmentQualityBubbleChart({
   data,
   regressionCoefficients,
 }: EquipmentQualityBubbleChartProps) {
-  // Split data by party dominance for different colored bubbles
-  const { republicanData, democraticData, regressionLines } = useMemo(() => {
-    const repData = data
-      .filter((d) => d.dominantParty === "republican")
-      .map((d) => ({
-        x: d.equipmentQuality,
-        y: d.rejectedBallotPercentage,
-        z: d.totalBallots,
-        name: d.county,
-        totalBallots: d.totalBallots,
-        rejectedBallots: d.rejectedBallots,
-        mailInRejected: d.mailInRejected,
-        provisionalRejected: d.provisionalRejected,
-        uocavaRejected: d.uocavaRejected,
-      }));
-
-    const demData = data
-      .filter((d) => d.dominantParty === "democratic")
-      .map((d) => ({
-        x: d.equipmentQuality,
-        y: d.rejectedBallotPercentage,
-        z: d.totalBallots,
-        name: d.county,
-        totalBallots: d.totalBallots,
-        rejectedBallots: d.rejectedBallots,
-        mailInRejected: d.mailInRejected,
-        provisionalRejected: d.provisionalRejected,
-        uocavaRejected: d.uocavaRejected,
-      }));
+  const { chartData, regressionLines } = useMemo(() => {
+    // Map all data points for a single Scatter with Cell coloring
+    const allData: ChartDataPoint[] = data.map((d) => ({
+      x: d.equipmentQuality,
+      y: d.rejectedBallotPercentage,
+      z: d.totalBallots,
+      name: d.county,
+      totalBallots: d.totalBallots,
+      rejectedBallots: d.rejectedBallots,
+      mailInRejected: d.mailInRejected,
+      provisionalRejected: d.provisionalRejected,
+      uocavaRejected: d.uocavaRejected,
+      party: d.dominantParty,
+    }));
 
     // Generate regression line data points
     // y = ax^2 + bx + c (quadratic regression)
-    const generateRegressionLine = (
-      coeffs: { a: number; b: number; c: number },
-      minX = 60,
-      maxX = 90,
-    ) => {
+    const generateRegressionLine = (coeffs: {
+      a: number;
+      b: number;
+      c: number;
+    }) => {
+      // Find min/max x values from data to constrain regression line
+      const xValues = data.map((d) => d.equipmentQuality);
+      const yValues = data.map((d) => d.rejectedBallotPercentage);
+      const minX = Math.min(...xValues);
+      const maxX = Math.max(...xValues);
+      const maxY = Math.max(...yValues) + 0.5; // Cap Y at data max + 0.5%
+
       const points = [];
-      for (let x = minX; x <= maxX; x += 1) {
+      for (let x = minX; x <= maxX; x += 0.005) {
         const y = coeffs.a * x * x + coeffs.b * x + coeffs.c;
-        points.push({ x, y });
+        // Only include points within reasonable Y range (0 to maxY)
+        if (y >= 0 && y <= maxY) {
+          points.push({ x, y });
+        }
       }
       return points;
     };
@@ -111,8 +107,7 @@ export function EquipmentQualityBubbleChart({
     );
 
     return {
-      republicanData: repData,
-      democraticData: demData,
+      chartData: allData,
       regressionLines: {
         republican: repRegressionLine,
         democratic: demRegressionLine,
@@ -125,40 +120,27 @@ export function EquipmentQualityBubbleChart({
     payload,
   }: {
     active?: boolean;
-    payload?: Array<{ payload: TooltipData }>;
+    payload?: Array<{ payload: ChartDataPoint }>;
   }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
 
       // Check if this is scatter data (has name property) or regression line data (doesn't)
       if (!data.name) {
-        // This is a regression line point, don't show tooltip
         return null;
       }
 
       return (
         <div className="bg-white p-3 border border-gray-300 rounded shadow-lg">
-          <p className="font-semibold text-sm mb-1">{data.name} County</p>
+          <p className="font-semibold text-sm mb-1">{data.name}</p>
           <p className="text-xs text-gray-700">
-            Equipment Quality: {data.x?.toFixed(0) ?? "N/A"}
+            Equipment Quality: {data.x?.toFixed(2) ?? "N/A"}
           </p>
           <p className="text-xs text-gray-700">
             Rejected Ballots: {data.y?.toFixed(2) ?? "N/A"}%
           </p>
           <p className="text-xs text-gray-700">
             Total Ballots: {data.totalBallots?.toLocaleString() ?? "N/A"}
-          </p>
-          <p className="text-xs text-gray-700 mt-1 font-semibold">
-            Rejected Breakdown:
-          </p>
-          <p className="text-xs text-gray-700 ml-2">
-            Mail-in: {data.mailInRejected?.toLocaleString() ?? "N/A"}
-          </p>
-          <p className="text-xs text-gray-700 ml-2">
-            Provisional: {data.provisionalRejected?.toLocaleString() ?? "N/A"}
-          </p>
-          <p className="text-xs text-gray-700 ml-2">
-            UOCAVA: {data.uocavaRejected?.toLocaleString() ?? "N/A"}
           </p>
         </div>
       );
@@ -176,15 +158,16 @@ export function EquipmentQualityBubbleChart({
         dominance. Lines show quadratic regression by party.
       </p>
       <ResponsiveContainer width="100%" height="85%">
-        <ComposedChart margin={{ top: 20, right: 30, bottom: 40, left: 40 }}>
+        <ScatterChart margin={{ top: 20, right: 30, bottom: 60, left: 40 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             type="number"
             dataKey="x"
             name="Equipment Quality"
-            domain={[60, 90]}
+            domain={["dataMin", "dataMax"]}
+            tickFormatter={(value) => value.toFixed(2)}
             label={{
-              value: "Equipment Quality Score",
+              value: "Equipment Quality Score (0-1)",
               position: "insideBottom",
               offset: -20,
             }}
@@ -207,51 +190,72 @@ export function EquipmentQualityBubbleChart({
             type="number"
             dataKey="z"
             range={[100, 1000]}
-            name="Total Ballots (10k)"
+            name="Total Ballots"
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip
+            content={<CustomTooltip />}
+            cursor={{ strokeWidth: 0 }}
+            isAnimationActive={false}
+            wrapperStyle={{ zIndex: 100 }}
+          />
           <Legend
             verticalAlign="top"
-            height={36}
-            wrapperStyle={{ paddingBottom: "10px" }}
+            height={55}
+            content={() => (
+              <div className="flex justify-center gap-5 pb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-600" />
+                  <span className="text-md text-gray-600">
+                    Republican counties
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-blue-600" />
+                  <span className="text-md text-gray-600">
+                    Democratic counties
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-6 h-0 border-t-2 border-dashed"
+                    style={{ borderColor: "#dc2626" }}
+                  />
+                  <span className="text-md text-gray-600">Rep. regression</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-6 h-0 border-t-2 border-dashed"
+                    style={{ borderColor: "#2563eb" }}
+                  />
+                  <span className="text-md text-gray-600">Dem. regression</span>
+                </div>
+              </div>
+            )}
           />
-
-          {/* Regression lines */}
-          <Line
-            type="monotone"
+          <Scatter name="Counties" data={chartData} fillOpacity={0.7}>
+            {chartData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={entry.party === "republican" ? "#dc2626" : "#2563eb"}
+              />
+            ))}
+          </Scatter>
+          {/* Draw regression lines using Scatter with line prop for smoothness */}
+          <Scatter
             data={regressionLines.republican}
-            dataKey="y"
-            stroke="#dc2626"
-            strokeWidth={2}
-            dot={false}
-            name="Republican regression"
-            strokeDasharray="5 5"
+            line={{ stroke: "#dc2626", strokeWidth: 2, strokeDasharray: "5 5" }}
+            shape={() => <g />}
+            legendType="none"
+            isAnimationActive={false}
           />
-          <Line
-            type="monotone"
+          <Scatter
             data={regressionLines.democratic}
-            dataKey="y"
-            stroke="#2563eb"
-            strokeWidth={2}
-            dot={false}
-            name="Democratic regression"
-            strokeDasharray="5 5"
+            line={{ stroke: "#2563eb", strokeWidth: 2, strokeDasharray: "5 5" }}
+            shape={() => <g />}
+            legendType="none"
+            isAnimationActive={false}
           />
-
-          {/* Scatter plots */}
-          <Scatter
-            name="Republican counties"
-            data={republicanData}
-            fill="#dc2626"
-            fillOpacity={0.7}
-          />
-          <Scatter
-            name="Democratic counties"
-            data={democraticData}
-            fill="#2563eb"
-            fillOpacity={0.7}
-          />
-        </ComposedChart>
+        </ScatterChart>
       </ResponsiveContainer>
     </div>
   );

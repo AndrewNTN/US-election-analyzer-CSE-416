@@ -93,13 +93,15 @@ def parse_scanning_rate(rate_str):
     return None
 
 
-def calculate_quality_score(row):
+def calculate_quality_score(row, age=None):
     """
     Calculate quality score (0-1) based on:
-    - Security Risks (40%): No risks = 1.0, has risks = 0.3
-    - VVPAT Support (25%): TRUE = 1.0, FALSE/None = 0.4
-    - Certification Level (25%): VVSG 2.0 = 1.0, VVSG 1.0/1.1 = 0.7, other = 0.4
+    - Security Risks (25%): No risks = 1.0, has risks = 0.3
+    - VVPAT Support (15%): TRUE = 1.0, FALSE/None = 0.4
+    - Certification Level (15%): VVSG 2.0 = 1.0, VVSG 1.0/1.1 = 0.7, other = 0.4
     - Discontinued Status (10%): Active = 1.0, Discontinued = 0.5
+    - Technology Type (20%): Scanner = 1.0, BMD = 0.8, DRE+VVPAT = 0.6, DRE = 0.3
+    - Equipment Age (15%): 0-5 years = 1.0, 6-10 years = 0.8, 11-15 years = 0.6, 16+ years = 0.4
     """
     # Security score
     security_risks = row.get("Security Risks", "")
@@ -132,12 +134,40 @@ def calculate_quality_score(row):
         active_score = 0.5
     else:
         active_score = 1.0
+
+    # Technology Type score
+    eq_type = str(row.get("Equipment Type", "")).lower()
+    if "scanner" in eq_type:
+        tech_score = 1.0
+    elif "bmd" in eq_type or "marking" in eq_type:
+        tech_score = 0.8
+    elif "dre" in eq_type or "direct" in eq_type or "touchscreen" in eq_type:
+        if vvpat is True:
+            tech_score = 0.6
+        else:
+            tech_score = 0.3
+    else:
+        tech_score = 0.5
+
+    # Age score - newer equipment is better
+    if age is None or age <= 0:
+        age_score = 0.7  # Unknown age, neutral score
+    elif age <= 5:
+        age_score = 1.0  # Very new
+    elif age <= 10:
+        age_score = 0.8  # Relatively new
+    elif age <= 15:
+        age_score = 0.6  # Getting old
+    else:
+        age_score = 0.4  # Old equipment
     
     quality = (
-        0.40 * security_score +
-        0.25 * vvpat_score +
-        0.25 * cert_score +
-        0.10 * active_score
+        0.25 * security_score +
+        0.15 * vvpat_score +
+        0.15 * cert_score +
+        0.10 * active_score +
+        0.20 * tech_score +
+        0.15 * age_score
     )
     
     return round(quality, 2)
@@ -260,7 +290,7 @@ def load_equipment_data():
             age = CURRENT_YEAR - first_year
         
         # Calculate quality score
-        quality = calculate_quality_score(row)
+        quality = calculate_quality_score(row, age)
         
         # Calculate simulated metrics
         error_rate, reliability, scan_rate = calculate_simulated_metrics(row, age)

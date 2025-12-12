@@ -441,3 +441,35 @@ export const getCountyEquipmentTypes = async (
   fipsPrefix: string,
 ): Promise<CountyEquipmentTypeResponse> =>
   fetchJson(`/voting-equipment/types/${fipsPrefix}`);
+
+// Equipment Quality vs Rejected Ballots Chart
+export interface EquipmentQualityData {
+  county: string;
+  equipmentQuality: number;
+  rejectedBallotPercentage: number;
+  totalBallots: number;
+  rejectedBallots: number;
+  dominantParty: "republican" | "democratic";
+  mailInRejected: number;
+  provisionalRejected: number;
+  uocavaRejected: number;
+}
+
+export interface RegressionCoefficients {
+  a: number;
+  b: number;
+  c: number;
+}
+
+export interface EquipmentQualityChartResponse {
+  equipmentQualityData: EquipmentQualityData[];
+  regressionCoefficients: {
+    republican: RegressionCoefficients;
+    democratic: RegressionCoefficients;
+  };
+}
+
+export const getEquipmentQualityChart = async (
+  fipsPrefix: string,
+): Promise<EquipmentQualityChartResponse> =>
+  fetchJson(`/equipment-quality-chart/${fipsPrefix}`);

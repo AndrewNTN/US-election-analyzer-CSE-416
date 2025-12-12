@@ -6,8 +6,11 @@ import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
 import edu.sbu.cse416.app.dto.dropbox.DropBoxVotingData;
 import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonResponse;
 import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonRow;
+import edu.sbu.cse416.app.dto.equipment.EquipmentQualityChartDTO;
+import edu.sbu.cse416.app.dto.equipment.EquipmentQualityChartResponse;
 import edu.sbu.cse416.app.dto.equipment.EquipmentSummaryDTO;
 import edu.sbu.cse416.app.dto.equipment.EquipmentSummaryResponse;
+import edu.sbu.cse416.app.dto.equipment.RegressionCoefficientsDTO;
 import edu.sbu.cse416.app.dto.equipment.StateEquipmentSummaryDTO;
 import edu.sbu.cse416.app.dto.equipment.StateEquipmentSummaryResponse;
 import edu.sbu.cse416.app.dto.gingles.GinglesChartResponse;
@@ -1149,5 +1152,295 @@ public class VoterDataService {
                 .toList();
 
         return new StateEquipmentSummaryResponse(summaryData, StateEquipmentSummaryResponse.getDefaultMetricLabels());
+    }
+
+    /**
+     * Get equipment quality vs rejected ballots data for the bubble chart.
+     * Returns county-level data points and quadratic regression coefficients for
+     * each party.
+     */
+    @Cacheable(value = "equipmentQualityChart", key = "#fipsPrefix")
+    public EquipmentQualityChartResponse getEquipmentQualityVsRejectedBallots(String fipsPrefix) {
+        List<EavsData> eavsData = fetchEavsData(fipsPrefix);
+        List<CountyVoteSplit> voteSplits = countyVoteSplitRepo.findByStateFips(fipsPrefix);
+        List<EquipmentData> equipmentData = equipmentDataRepo.findAll();
+
+        if (eavsData.isEmpty()) {
+            return null;
+        }
+
+        // Calculate average quality scores by equipment type
+        Map<String, Double> typeQualityScores = calculateEquipmentTypeQualityScores(equipmentData);
+
+        // Create a map of county name to vote split for party lookup
+        Map<String, CountyVoteSplit> voteSplitMap = voteSplits.stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        v -> v.countyName().toUpperCase().replace(" COUNTY", "").trim(), v -> v, (a, b) -> a));
+
+        // Build county data points
+        List<EquipmentQualityChartDTO> dataPoints = new java.util.ArrayList<>();
+
+        for (EavsData eavs : eavsData) {
+            if (eavs.equipment() == null || eavs.percentageRejectedBallots() == null) {
+                continue;
+            }
+
+            String countyName = cleanJurisdictionName(eavs.jurisdictionName());
+            String normalizedName =
+                    countyName.toUpperCase().replace(" COUNTY", "").trim();
+
+            // Calculate equipment quality for this county
+            Double qualityScore = calculateCountyEquipmentQuality(eavs.equipment(), typeQualityScores);
+            if (qualityScore == null || qualityScore == 0.0) {
+                continue;
+            }
+
+            // Determine dominant party
+            CountyVoteSplit voteSplit = voteSplitMap.get(normalizedName);
+            String dominantParty = "republican"; // default
+            if (voteSplit != null) {
+                dominantParty = voteSplit.democraticPercentage() != null
+                                && voteSplit.republicanPercentage() != null
+                                && voteSplit.democraticPercentage() > voteSplit.republicanPercentage()
+                        ? "democratic"
+                        : "republican";
+            }
+
+            // Get rejected ballot breakdown
+            Integer mailInRejected = sumMailRejected(eavs.mailBallotsRejectedReason());
+            Integer provisionalRejected = eavs.provisionalBallots() != null
+                    ? nz(eavs.provisionalBallots().provRejected())
+                    : 0;
+
+            dataPoints.add(new EquipmentQualityChartDTO(
+                    countyName,
+                    Math.round(qualityScore * ROUNDING_PRECISION) / ROUNDING_PRECISION,
+                    eavs.percentageRejectedBallots(),
+                    nz(eavs.totalBallots()),
+                    nz(eavs.totalRejectedBallots()),
+                    dominantParty,
+                    mailInRejected,
+                    provisionalRejected,
+                    0 // UOCAVA rejected not tracked separately
+                    ));
+        }
+
+        // Calculate regression coefficients for each party
+        List<double[]> republicanPoints = dataPoints.stream()
+                .filter(d -> "republican".equals(d.dominantParty()))
+                .map(d -> new double[] {d.equipmentQuality(), d.rejectedBallotPercentage()})
+                .toList();
+
+        List<double[]> democraticPoints = dataPoints.stream()
+                .filter(d -> "democratic".equals(d.dominantParty()))
+                .map(d -> new double[] {d.equipmentQuality(), d.rejectedBallotPercentage()})
+                .toList();
+
+        RegressionCoefficientsDTO repCoeffs = calculateQuadraticRegression(republicanPoints);
+        RegressionCoefficientsDTO demCoeffs = calculateQuadraticRegression(democraticPoints);
+
+        return new EquipmentQualityChartResponse(
+                dataPoints.stream()
+                        .sorted(Comparator.comparing(EquipmentQualityChartDTO::equipmentQuality))
+                        .toList(),
+                new EquipmentQualityChartResponse.RegressionCoefficients(repCoeffs, demCoeffs));
+    }
+
+    /**
+     * Calculate average quality scores for each equipment type category.
+     */
+    private Map<String, Double> calculateEquipmentTypeQualityScores(List<EquipmentData> equipmentData) {
+        Map<String, List<Double>> typeScores = new HashMap<>();
+
+        for (EquipmentData eq : equipmentData) {
+            if (eq.qualityScore() == null || eq.equipmentType() == null) {
+                continue;
+            }
+
+            String type = eq.equipmentType().toLowerCase();
+            String category;
+
+            if (type.contains("dre") || type.contains("direct")) {
+                category = "dre";
+            } else if (type.contains("bmd") || type.contains("ballot marking")) {
+                category = "bmd";
+            } else if (type.contains("scanner") || type.contains("optical")) {
+                category = "scanner";
+            } else {
+                category = "other";
+            }
+
+            typeScores
+                    .computeIfAbsent(category, k -> new java.util.ArrayList<>())
+                    .add(eq.qualityScore());
+        }
+
+        Map<String, Double> avgScores = new HashMap<>();
+        for (var entry : typeScores.entrySet()) {
+            double avg = entry.getValue().stream()
+                    .mapToDouble(Double::doubleValue)
+                    .average()
+                    .orElse(0.5);
+            avgScores.put(entry.getKey(), avg);
+        }
+
+        // Default scores if no data
+        avgScores.putIfAbsent("dre", 0.6);
+        avgScores.putIfAbsent("bmd", 0.8);
+        avgScores.putIfAbsent("scanner", 0.75);
+        avgScores.putIfAbsent("other", 0.7);
+
+        return avgScores;
+    }
+
+    /**
+     * Calculate weighted equipment quality score for a county based on its
+     * equipment counts. Returns score on 0-1 scale.
+     */
+    private Double calculateCountyEquipmentQuality(Equipment eq, Map<String, Double> typeScores) {
+        int dreNoVvpat = nz(eq.dreNoVVPAT());
+        int dreWithVvpat = nz(eq.dreWithVVPAT());
+        int bmd = nz(eq.ballotMarkingDevice());
+        int scanner = nz(eq.scanner());
+
+        int total = dreNoVvpat + dreWithVvpat + bmd + scanner;
+        if (total == 0) {
+            return null;
+        }
+
+        // DRE without VVPAT has lower quality (security concern)
+        double dreNoVvpatQuality = typeScores.getOrDefault("dre", 0.6) * 0.7; // Penalty for no VVPAT
+        double dreWithVvpatQuality = typeScores.getOrDefault("dre", 0.6);
+        double bmdQuality = typeScores.getOrDefault("bmd", 0.8);
+        double scannerQuality = typeScores.getOrDefault("scanner", 0.75);
+
+        double weightedSum = dreNoVvpat * dreNoVvpatQuality
+                + dreWithVvpat * dreWithVvpatQuality
+                + bmd * bmdQuality
+                + scanner * scannerQuality;
+
+        // Calculate base quality (weighted average on 0-1 scale)
+        double baseQuality = weightedSum / total;
+
+        // Add equipment diversity factor: counties with more diverse equipment mixes
+        // get a slight bonus, while counties with single-type equipment get a penalty
+        int typeCount = 0;
+        if (dreNoVvpat > 0) typeCount++;
+        if (dreWithVvpat > 0) typeCount++;
+        if (bmd > 0) typeCount++;
+        if (scanner > 0) typeCount++;
+
+        // Diversity adjustment: -0.05 for single type, 0 for 2 types, +0.05 for 3+
+        double diversityAdjustment = (typeCount - 2) * 0.05;
+
+        // Apply adjustment but clamp to 0-1 range
+        double finalQuality = Math.max(0.0, Math.min(1.0, baseQuality + diversityAdjustment));
+
+        return finalQuality;
+    }
+
+    /**
+     * Sum all mail ballot rejection counts.
+     */
+    private Integer sumMailRejected(MailBallotsRejectedReason mbr) {
+        if (mbr == null) {
+            return 0;
+        }
+        return nz(mbr.late())
+                + nz(mbr.missingVoterSignature())
+                + nz(mbr.missingWitnessSignature())
+                + nz(mbr.nonMatchingVoterSignature())
+                + nz(mbr.unofficialEnvelope())
+                + nz(mbr.ballotMissingFromEnvelope())
+                + nz(mbr.noSecrecyEnvelope())
+                + nz(mbr.multipleBallotsInOneEnvelope())
+                + nz(mbr.envelopeNotSealed())
+                + nz(mbr.noPostmark())
+                + nz(mbr.noResidentAddressOnEnvelope())
+                + nz(mbr.voterDeceased())
+                + nz(mbr.voterAlreadyVoted())
+                + nz(mbr.missingDocumentation())
+                + nz(mbr.voterNotEligible())
+                + nz(mbr.noBallotApplication());
+    }
+
+    /**
+     * Calculate quadratic regression coefficients (y = ax² + bx + c) using least
+     * squares.
+     */
+    private RegressionCoefficientsDTO calculateQuadraticRegression(List<double[]> points) {
+        if (points.size() < 3) {
+            // Not enough points for quadratic regression, return flat line
+            return new RegressionCoefficientsDTO(0.0, 0.0, points.isEmpty() ? 0.0 : points.get(0)[1]);
+        }
+
+        int n = points.size();
+
+        // Compute sums for normal equations
+        double sumX = 0, sumX2 = 0, sumX3 = 0, sumX4 = 0;
+        double sumY = 0, sumXY = 0, sumX2Y = 0;
+
+        for (double[] point : points) {
+            double x = point[0];
+            double y = point[1];
+            double x2 = x * x;
+
+            sumX += x;
+            sumX2 += x2;
+            sumX3 += x2 * x;
+            sumX4 += x2 * x2;
+            sumY += y;
+            sumXY += x * y;
+            sumX2Y += x2 * y;
+        }
+
+        // Solve the system of normal equations using Cramer's rule
+        // | n sumX sumX2 | | c | | sumY |
+        // | sumX sumX2 sumX3 | | b | = | sumXY |
+        // | sumX2 sumX3 sumX4 | | a | | sumX2Y |
+
+        double[][] matrix = {{n, sumX, sumX2}, {sumX, sumX2, sumX3}, {sumX2, sumX3, sumX4}};
+
+        double[] rhs = {sumY, sumXY, sumX2Y};
+
+        double[] coeffs = solveLinearSystem(matrix, rhs);
+
+        if (coeffs == null) {
+            // Fallback to linear regression if matrix is singular
+            double avgX = sumX / n;
+            double avgY = sumY / n;
+            double b = (sumXY - n * avgX * avgY) / (sumX2 - n * avgX * avgX);
+            double c = avgY - b * avgX;
+            return new RegressionCoefficientsDTO(0.0, b, c);
+        }
+
+        return new RegressionCoefficientsDTO(coeffs[2], coeffs[1], coeffs[0]);
+    }
+
+    /**
+     * Solve a 3x3 linear system using Cramer's rule.
+     */
+    private double[] solveLinearSystem(double[][] m, double[] rhs) {
+        double det = m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+                - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
+                + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+
+        if (Math.abs(det) < 1e-10) {
+            return null; // Matrix is singular
+        }
+
+        double detC = rhs[0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+                - m[0][1] * (rhs[1] * m[2][2] - m[1][2] * rhs[2])
+                + m[0][2] * (rhs[1] * m[2][1] - m[1][1] * rhs[2]);
+
+        double detB = m[0][0] * (rhs[1] * m[2][2] - m[1][2] * rhs[2])
+                - rhs[0] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
+                + m[0][2] * (m[1][0] * rhs[2] - rhs[1] * m[2][0]);
+
+        double detA = m[0][0] * (m[1][1] * rhs[2] - rhs[1] * m[2][1])
+                - m[0][1] * (m[1][0] * rhs[2] - rhs[1] * m[2][0])
+                + rhs[0] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+
+        return new double[] {detC / det, detB / det, detA / det};
     }
 }

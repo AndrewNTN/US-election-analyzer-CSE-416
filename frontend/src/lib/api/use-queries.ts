@@ -47,6 +47,8 @@ import {
   type EquipmentSummaryResponse,
   getStateEquipmentSummary,
   type StateEquipmentSummaryResponse,
+  getEquipmentQualityChart,
+  type EquipmentQualityChartResponse,
 } from "@/lib/api/voting-requests";
 
 import {
@@ -435,4 +437,20 @@ export const useStateEquipmentSummaryQuery = (
       return getStateEquipmentSummary(stateFips);
     },
     enabled: Boolean(stateFips) && options?.enabled !== false,
+  });
+
+export const useEquipmentQualityChartQuery = (
+  fipsPrefix: string | null | undefined,
+): UseQueryResult<EquipmentQualityChartResponse, Error> =>
+  useQuery({
+    queryKey: ["equipment-quality-chart", fipsPrefix ?? "no-fips"],
+    queryFn: async () => {
+      if (!fipsPrefix) {
+        throw new Error(
+          "Missing FIPS prefix for equipment quality chart query",
+        );
+      }
+      return getEquipmentQualityChart(fipsPrefix);
+    },
+    enabled: Boolean(fipsPrefix),
   });

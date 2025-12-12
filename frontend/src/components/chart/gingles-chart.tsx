@@ -80,6 +80,16 @@ export function GinglesChart({ data }: GinglesChartProps) {
     };
   }, [data.regressionCurves, selectedDemographic]);
 
+  // Calculate max X value from data for dynamic X-axis scaling
+  const maxXValue = useMemo(() => {
+    const allXValues = data.precincts
+      .map((p) => p[selectedDemographic] ?? 0)
+      .filter((x) => x > 0);
+    const maxFromData = Math.max(...allXValues, 0);
+    // Round up to nearest 5 for tighter fit with clean axis labels
+    return Math.ceil(maxFromData / 5) * 5;
+  }, [data.precincts, selectedDemographic]);
+
   const chartData = {
     datasets: [
       {
@@ -139,7 +149,7 @@ export function GinglesChart({ data }: GinglesChartProps) {
       x: {
         type: "linear" as const,
         min: 0,
-        max: 100,
+        max: maxXValue,
         title: {
           display: true,
           text: `${demographicLabels[selectedDemographic]} Population %`,

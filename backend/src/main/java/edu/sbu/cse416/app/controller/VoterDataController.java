@@ -5,6 +5,7 @@ import edu.sbu.cse416.app.dto.activevoters.ActiveVotersTableResponse;
 import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
 import edu.sbu.cse416.app.dto.dropbox.DropBoxVotingData;
 import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonResponse;
+import edu.sbu.cse416.app.dto.equipment.EquipmentQualityChartResponse;
 import edu.sbu.cse416.app.dto.equipment.EquipmentSummaryResponse;
 import edu.sbu.cse416.app.dto.equipment.StateEquipmentSummaryResponse;
 import edu.sbu.cse416.app.dto.gingles.GinglesChartResponse;
@@ -257,6 +258,17 @@ public class VoterDataController {
     @GetMapping("/state-equipment-summary/{stateFips}")
     public ResponseEntity<StateEquipmentSummaryResponse> getStateEquipmentSummary(@PathVariable String stateFips) {
         var response = voterDataService.getStateEquipmentSummary(stateFips);
+        return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
+    }
+
+    /**
+     * Get equipment quality vs rejected ballots data for bubble chart.
+     * Returns county-level data with regression coefficients for each party.
+     * GET /equipment-quality-chart/{fipsPrefix}
+     */
+    @GetMapping("/equipment-quality-chart/{fipsPrefix}")
+    public ResponseEntity<EquipmentQualityChartResponse> getEquipmentQualityChart(@PathVariable String fipsPrefix) {
+        var response = voterDataService.getEquipmentQualityVsRejectedBallots(fipsPrefix);
         return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 }
