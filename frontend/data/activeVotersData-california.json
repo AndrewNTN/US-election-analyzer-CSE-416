@@ -1,0 +1,138 @@
+[
+  {
+    "eavsRegion": "Los Angeles County",
+    "activeVoters": 5234567,
+    "totalVoters": 5789012,
+    "inactiveVoters": 554445,
+    "cvap2023": 6845000,
+    "registrationRate": 84.6,
+    "notes": "Largest county by population, high urban density"
+  },
+  {
+    "eavsRegion": "San Diego County",
+    "activeVoters": 1823456,
+    "totalVoters": 2012345,
+    "inactiveVoters": 188889,
+    "cvap2023": 2456000,
+    "registrationRate": 81.9,
+    "notes": "Diverse demographic with military presence"
+  },
+  {
+    "eavsRegion": "Orange County",
+    "activeVoters": 1645234,
+    "totalVoters": 1823456,
+    "inactiveVoters": 178222,
+    "cvap2023": 2234000,
+    "registrationRate": 81.6,
+    "notes": "Suburban area with high voter engagement"
+  },
+  {
+    "eavsRegion": "Riverside County",
+    "activeVoters": 1234567,
+    "totalVoters": 1389876,
+    "inactiveVoters": 155309,
+    "cvap2023": 1678000,
+    "registrationRate": 82.8,
+    "notes": "Fast-growing inland region"
+  },
+  {
+    "eavsRegion": "San Bernardino County",
+    "activeVoters": 1012345,
+    "totalVoters": 1134567,
+    "inactiveVoters": 122222,
+    "cvap2023": 1423000,
+    "registrationRate": 79.7,
+    "notes": "Largest county by area, varied population density"
+  },
+  {
+    "eavsRegion": "Santa Clara County",
+    "activeVoters": 987654,
+    "totalVoters": 1098765,
+    "inactiveVoters": 111111,
+    "cvap2023": 1289000,
+    "registrationRate": 85.2,
+    "notes": "Silicon Valley, high tech workforce"
+  },
+  {
+    "eavsRegion": "Alameda County",
+    "activeVoters": 876543,
+    "totalVoters": 978654,
+    "inactiveVoters": 102111,
+    "cvap2023": 1145000,
+    "registrationRate": 85.5,
+    "notes": "Bay Area county with Oakland and Berkeley"
+  },
+  {
+    "eavsRegion": "Sacramento County",
+    "activeVoters": 765432,
+    "totalVoters": 856789,
+    "inactiveVoters": 91357,
+    "cvap2023": 1023000,
+    "registrationRate": 83.8,
+    "notes": "State capital region"
+  },
+  {
+    "eavsRegion": "Contra Costa County",
+    "activeVoters": 623456,
+    "totalVoters": 698765,
+    "inactiveVoters": 75309,
+    "cvap2023": 812000,
+    "registrationRate": 86.1,
+    "notes": "East Bay suburban communities"
+  },
+  {
+    "eavsRegion": "Fresno County",
+    "activeVoters": 456789,
+    "totalVoters": 512345,
+    "inactiveVoters": 55556,
+    "cvap2023": 623000,
+    "registrationRate": 82.2,
+    "notes": "Central Valley agricultural region"
+  },
+  {
+    "eavsRegion": "Kern County",
+    "activeVoters": 389012,
+    "totalVoters": 434567,
+    "inactiveVoters": 45555,
+    "cvap2023": 534000,
+    "registrationRate": 81.4,
+    "notes": "Oil industry and agriculture hub"
+  },
+  {
+    "eavsRegion": "San Francisco County",
+    "activeVoters": 523456,
+    "totalVoters": 578901,
+    "inactiveVoters": 55445,
+    "cvap2023": 678000,
+    "registrationRate": 85.4,
+    "notes": "Dense urban city-county"
+  },
+  {
+    "eavsRegion": "Ventura County",
+    "activeVoters": 456123,
+    "totalVoters": 512789,
+    "inactiveVoters": 56666,
+    "cvap2023": 612000,
+    "registrationRate": 83.8,
+    "notes": "Coastal county north of Los Angeles"
+  },
+  {
+    "eavsRegion": "San Mateo County",
+    "activeVoters": 423456,
+    "totalVoters": 478901,
+    "inactiveVoters": 55445,
+    "cvap2023": 556000,
+    "registrationRate": 86.1,
+    "notes": "Peninsula region, high income area"
+  },
+  {
+    "eavsRegion": "Stanislaus County",
+    "activeVoters": 267890,
+    "totalVoters": 301234,
+    "inactiveVoters": 33344,
+    "cvap2023": 367000,
+    "registrationRate": 82.1,
+    "notes": "Central Valley region"
+  }
+]
+

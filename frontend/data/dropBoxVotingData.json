@@ -1,0 +1,270 @@
+{
+  "florida": [
+    {
+      "eavsRegion": "Miami-Dade County",
+      "totalDropBoxVotes": 445680,
+      "republicanVotes": 245324,
+      "democraticVotes": 178005,
+      "otherVotes": 22351,
+      "totalVotes": 445680,
+      "republicanPercentage": 55.0,
+      "dropBoxPercentage": 16.8,
+      "dominantParty": "republican"
+    },
+    {
+      "eavsRegion": "Broward County",
+      "totalDropBoxVotes": 298450,
+      "republicanVotes": 119380,
+      "democraticVotes": 164448,
+      "otherVotes": 14622,
+      "totalVotes": 298450,
+      "republicanPercentage": 40.0,
+      "dropBoxPercentage": 19.2,
+      "dominantParty": "democratic"
+    },
+    {
+      "eavsRegion": "Palm Beach County",
+      "totalDropBoxVotes": 267890,
+      "republicanVotes": 120551,
+      "democraticVotes": 133945,
+      "otherVotes": 13394,
+      "totalVotes": 267890,
+      "republicanPercentage": 45.0,
+      "dropBoxPercentage": 18.5,
+      "dominantParty": "democratic"
+    },
+    {
+      "eavsRegion": "Hillsborough County",
+      "totalDropBoxVotes": 234560,
+      "republicanVotes": 129408,
+      "democraticVotes": 93824,
+      "otherVotes": 11328,
+      "totalVotes": 234560,
+      "republicanPercentage": 55.2,
+      "dropBoxPercentage": 17.3,
+      "dominantParty": "republican"
+    },
+    {
+      "eavsRegion": "Orange County",
+      "totalDropBoxVotes": 198670,
+      "republicanVotes": 99335,
+      "democraticVotes": 89402,
+      "otherVotes": 9933,
+      "totalVotes": 198670,
+      "republicanPercentage": 50.0,
+      "dropBoxPercentage": 15.9,
+      "dominantParty": "republican"
+    },
+    {
+      "eavsRegion": "Pinellas County",
+      "totalDropBoxVotes": 187340,
+      "republicanVotes": 103037,
+      "democraticVotes": 74936,
+      "otherVotes": 9367,
+      "totalVotes": 187340,
+      "republicanPercentage": 55.0,
+      "dropBoxPercentage": 19.8,
+      "dominantParty": "republican"
+    },
+    {
+      "eavsRegion": "Duval County",
+      "totalDropBoxVotes": 156780,
+      "republicanVotes": 94068,
+      "democraticVotes": 54937,
+      "otherVotes": 7775,
+      "totalVotes": 156780,
+      "republicanPercentage": 60.0,
+      "dropBoxPercentage": 16.4,
+      "dominantParty": "republican"
+    },
+    {
+      "eavsRegion": "Lee County",
+      "totalDropBoxVotes": 145230,
+      "republicanVotes": 94650,
+      "democraticVotes": 43569,
+      "otherVotes": 7011,
+      "totalVotes": 145230,
+      "republicanPercentage": 65.2,
+      "dropBoxPercentage": 18.7,
+      "dominantParty": "republican"
+    },
+    {
+      "eavsRegion": "Polk County",
+      "totalDropBoxVotes": 123450,
+      "republicanVotes": 80245,
+      "democraticVotes": 37035,
+      "otherVotes": 6170,
+      "totalVotes": 123450,
+      "republicanPercentage": 65.0,
+      "dropBoxPercentage": 17.2,
+      "dominantParty": "republican"
+    },
+    {
+      "eavsRegion": "Brevard County",
+      "totalDropBoxVotes": 112560,
+      "republicanVotes": 73064,
+      "democraticVotes": 33768,
+      "otherVotes": 5728,
+      "totalVotes": 112560,
+      "republicanPercentage": 64.9,
+      "dropBoxPercentage": 16.8,
+      "dominantParty": "republican"
+    },
+    {
+      "eavsRegion": "Volusia County",
+      "totalDropBoxVotes": 98450,
+      "republicanVotes": 59070,
+      "democraticVotes": 34503,
+      "otherVotes": 4877,
+      "totalVotes": 98450,
+      "republicanPercentage": 60.0,
+      "dropBoxPercentage": 15.4,
+      "dominantParty": "republican"
+    },
+    {
+      "eavsRegion": "Sarasota County",
+      "totalDropBoxVotes": 89340,
+      "republicanVotes": 58071,
+      "democraticVotes": 26802,
+      "otherVotes": 4467,
+      "totalVotes": 89340,
+      "republicanPercentage": 65.0,
+      "dropBoxPercentage": 19.3,
+      "dominantParty": "republican"
+    }
+  ],
+  "california": [
+    {
+      "eavsRegion": "Los Angeles County",
+      "totalDropBoxVotes": 523450,
+      "republicanVotes": 187242,
+      "democraticVotes": 298156,
+      "otherVotes": 38052,
+      "totalVotes": 523450,
+      "republicanPercentage": 35.8,
+      "dropBoxPercentage": 18.5,
+      "dominantParty": "democratic"
+    },
+    {
+      "eavsRegion": "San Diego County",
+      "totalDropBoxVotes": 298340,
+      "republicanVotes": 134253,
+      "democraticVotes": 149187,
+      "otherVotes": 14900,
+      "totalVotes": 298340,
+      "republicanPercentage": 45.0,
+      "dropBoxPercentage": 22.3,
+      "dominantParty": "democratic"
+    },
+    {
+      "eavsRegion": "Orange County",
+      "totalDropBoxVotes": 256780,
+      "republicanVotes": 141379,
+      "democraticVotes": 102712,
+      "otherVotes": 12689,
+      "totalVotes": 256780,
+      "republicanPercentage": 55.1,
+      "dropBoxPercentage": 20.8,
+      "dominantParty": "republican"
+    },
+    {
+      "eavsRegion": "San Bernardino County",
+      "totalDropBoxVotes": 178920,
+      "republicanVotes": 87582,
+      "democraticVotes": 80402,
+      "otherVotes": 10936,
+      "totalVotes": 178920,
+      "republicanPercentage": 49.0,
+      "dropBoxPercentage": 16.2,
+      "dominantParty": "republican"
+    },
+    {
+      "eavsRegion": "Riverside County",
+      "totalDropBoxVotes": 195640,
+      "republicanVotes": 102234,
+      "democraticVotes": 82903,
+      "otherVotes": 10503,
+      "totalVotes": 195640,
+      "republicanPercentage": 52.3,
+      "dropBoxPercentage": 17.5,
+      "dominantParty": "republican"
+    },
+    {
+      "eavsRegion": "Alameda County",
+      "totalDropBoxVotes": 312560,
+      "republicanVotes": 62512,
+      "democraticVotes": 234420,
+      "otherVotes": 15628,
+      "totalVotes": 312560,
+      "republicanPercentage": 20.0,
+      "dropBoxPercentage": 24.6,
+      "dominantParty": "democratic"
+    },
+    {
+      "eavsRegion": "Sacramento County",
+      "totalDropBoxVotes": 187430,
+      "republicanVotes": 74972,
+      "democraticVotes": 99880,
+      "otherVotes": 12578,
+      "totalVotes": 187430,
+      "republicanPercentage": 40.0,
+      "dropBoxPercentage": 19.8,
+      "dominantParty": "democratic"
+    },
+    {
+      "eavsRegion": "Contra Costa County",
+      "totalDropBoxVotes": 168920,
+      "republicanVotes": 50676,
+      "democraticVotes": 110459,
+      "otherVotes": 7785,
+      "totalVotes": 168920,
+      "republicanPercentage": 30.0,
+      "dropBoxPercentage": 21.4,
+      "dominantParty": "democratic"
+    },
+    {
+      "eavsRegion": "Fresno County",
+      "totalDropBoxVotes": 98450,
+      "republicanVotes": 53893,
+      "democraticVotes": 39380,
+      "otherVotes": 5177,
+      "totalVotes": 98450,
+      "republicanPercentage": 54.7,
+      "dropBoxPercentage": 14.2,
+      "dominantParty": "republican"
+    },
+    {
+      "eavsRegion": "San Francisco County",
+      "totalDropBoxVotes": 245680,
+      "republicanVotes": 24568,
+      "democraticVotes": 208828,
+      "otherVotes": 12284,
+      "totalVotes": 245680,
+      "republicanPercentage": 10.0,
+      "dropBoxPercentage": 28.3,
+      "dominantParty": "democratic"
+    },
+    {
+      "eavsRegion": "Ventura County",
+      "totalDropBoxVotes": 123450,
+      "republicanVotes": 55553,
+      "democraticVotes": 61725,
+      "otherVotes": 6172,
+      "totalVotes": 123450,
+      "republicanPercentage": 45.0,
+      "dropBoxPercentage": 18.9,
+      "dominantParty": "democratic"
+    },
+    {
+      "eavsRegion": "San Mateo County",
+      "totalDropBoxVotes": 156780,
+      "republicanVotes": 31356,
+      "democraticVotes": 117585,
+      "otherVotes": 7839,
+      "totalVotes": 156780,
+      "republicanPercentage": 20.0,
+      "dropBoxPercentage": 23.7,
+      "dominantParty": "democratic"
+    }
+  ]
+}
