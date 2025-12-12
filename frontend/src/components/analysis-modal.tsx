@@ -8,7 +8,6 @@ import {
 import { VotingEquipmentTable } from "@/components/table/voting-equipment-table.tsx";
 import type { VotingEquipment } from "@/lib/api/voting-requests";
 import { EquipmentSummaryTable } from "@/components/table/equipment-summary-table";
-import type { EquipmentSummary } from "@/components/table/equipment-summary-columns.tsx";
 import { StateComparisonTable } from "@/components/table/state-comparison-table.tsx";
 import { OptInOptOutTable } from "@/components/table/opt-in-opt-out-table.tsx";
 import { EarlyVotingTable } from "@/components/table/early-voting-table.tsx";
@@ -17,13 +16,10 @@ import {
   useStateComparisonQuery,
   useEarlyVotingComparisonQuery,
   useOptInOptOutComparisonQuery,
+  useEquipmentSummaryQuery,
 } from "@/lib/api/use-queries.ts";
-import equipmentSummaryDataJson from "../../data/equipmentSummary.json" with { type: "json" };
 
 import type { AnalysisItem } from "./analysis-drawer";
-
-const equipmentSummaryData: EquipmentSummary[] =
-  equipmentSummaryDataJson as EquipmentSummary[];
 
 export const AnalysisOption = {
   US_VOTING_EQUIPMENT: "US Voting Equipment",
@@ -75,6 +71,11 @@ export default function AnalysisModal({
     enabled: selectedAnalysis?.title === AnalysisOption.OPT_IN_VS_OPT_OUT,
   });
 
+  const { data: equipmentSummaryData, isLoading: isEquipmentSummaryLoading } =
+    useEquipmentSummaryQuery({
+      enabled: selectedAnalysis?.title === AnalysisOption.EQUIPMENT_SUMMARY,
+    });
+
   const votingEquipmentData: VotingEquipment[] =
     votingEquipmentTableData?.data || [];
 
@@ -93,7 +94,19 @@ export default function AnalysisModal({
           />
         );
       case AnalysisOption.EQUIPMENT_SUMMARY:
-        return <EquipmentSummaryTable data={equipmentSummaryData} />;
+        return isEquipmentSummaryLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">
+              Loading equipment summary...
+            </p>
+          </div>
+        ) : equipmentSummaryData ? (
+          <EquipmentSummaryTable data={equipmentSummaryData.data} />
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">No equipment data available</p>
+          </div>
+        );
       case AnalysisOption.REPUBLICAN_VS_DEMOCRATIC:
         return isStateComparisonLoading ? (
           <div className="flex items-center justify-center h-full">

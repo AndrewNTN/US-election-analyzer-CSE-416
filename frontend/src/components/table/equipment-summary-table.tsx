@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Info } from "lucide-react";
 import {
   getCoreRowModel,
   getPaginationRowModel,
@@ -62,6 +63,14 @@ export function EquipmentSummaryTable({ data }: EquipmentSummaryTableProps) {
           />
         )}
       />
+      <div className="mt-3 space-y-1.5 rounded-md border border-dashed border-muted-foreground/30 bg-muted/40 p-2.5 text-xs text-muted-foreground">
+        <div className="flex items-start gap-2">
+          <span className="mt-0.5 text-primary">
+            <Info className="h-3.5 w-3.5" strokeWidth={2.25} />
+          </span>
+          <p>Hover over truncated columns to view the full details.</p>
+        </div>
+      </div>
     </div>
   );
 }

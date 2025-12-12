@@ -43,6 +43,10 @@ import {
   type GinglesChartResponse,
   getCountyEquipmentTypes,
   type CountyEquipmentTypeResponse,
+  getEquipmentSummary,
+  type EquipmentSummaryResponse,
+  getStateEquipmentSummary,
+  type StateEquipmentSummaryResponse,
 } from "@/lib/api/voting-requests";
 
 import {
@@ -405,4 +409,30 @@ export const useCountyEquipmentTypesQuery = (
       return getCountyEquipmentTypes(fipsPrefix);
     },
     enabled: Boolean(fipsPrefix),
+  });
+
+export const useEquipmentSummaryQuery = (options?: {
+  enabled?: boolean;
+}): UseQueryResult<EquipmentSummaryResponse, Error> =>
+  useQuery({
+    queryKey: ["equipment-summary"],
+    queryFn: async () => {
+      return getEquipmentSummary();
+    },
+    ...options,
+  });
+
+export const useStateEquipmentSummaryQuery = (
+  stateFips: string | null | undefined,
+  options?: { enabled?: boolean },
+): UseQueryResult<StateEquipmentSummaryResponse, Error> =>
+  useQuery({
+    queryKey: ["state-equipment-summary", stateFips ?? "no-fips"],
+    queryFn: async () => {
+      if (!stateFips) {
+        throw new Error("Missing state FIPS for state equipment summary query");
+      }
+      return getStateEquipmentSummary(stateFips);
+    },
+    enabled: Boolean(stateFips) && options?.enabled !== false,
   });

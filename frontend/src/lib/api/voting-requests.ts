@@ -211,6 +211,54 @@ export const getVotingEquipmentChart = async (
 ): Promise<VotingEquipmentChartResponse> =>
   fetchJson(`/voting-equipment/chart/${fipsPrefix}`);
 
+// Equipment Summary types and functions
+export interface EquipmentSummary {
+  make: string;
+  model: string;
+  quantity: number | null;
+  age: number | null;
+  operatingSystem: string | null;
+  certification: string | null;
+  scanRate: string | null;
+  errorRate: number | null;
+  reliability: number | null;
+  quality: number | null;
+}
+
+export interface EquipmentSummaryResponse {
+  data: EquipmentSummary[];
+  metricLabels: Record<string, string>;
+}
+
+export const getEquipmentSummary =
+  async (): Promise<EquipmentSummaryResponse> =>
+    fetchJson(`/equipment-summary`);
+
+export interface StateEquipmentSummary {
+  make: string;
+  model: string;
+  quantity: number | null;
+  equipmentType: string | null;
+  description: string | null;
+  age: number | null;
+  operatingSystem: string | null;
+  certification: string | null;
+  scanRate: string | null;
+  errorRate: number | null;
+  reliability: number | null;
+  discontinued: boolean | null;
+}
+
+export interface StateEquipmentSummaryResponse {
+  data: StateEquipmentSummary[];
+  metricLabels: Record<string, string>;
+}
+
+export const getStateEquipmentSummary = async (
+  stateFips: string,
+): Promise<StateEquipmentSummaryResponse> =>
+  fetchJson(`/state-equipment-summary/${stateFips}`);
+
 export interface CvapRegistrationRateResponse {
   registrationRate: number;
   label: string;

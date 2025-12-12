@@ -5,6 +5,8 @@ import edu.sbu.cse416.app.dto.activevoters.ActiveVotersTableResponse;
 import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
 import edu.sbu.cse416.app.dto.dropbox.DropBoxVotingData;
 import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonResponse;
+import edu.sbu.cse416.app.dto.equipment.EquipmentSummaryResponse;
+import edu.sbu.cse416.app.dto.equipment.StateEquipmentSummaryResponse;
 import edu.sbu.cse416.app.dto.gingles.GinglesChartResponse;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedChartResponse;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedTableResponse;
@@ -235,6 +237,26 @@ public class VoterDataController {
     @GetMapping("/gingles-chart/{fipsPrefix}")
     public ResponseEntity<GinglesChartResponse> getGinglesChart(@PathVariable String fipsPrefix) {
         var response = voterDataService.getGinglesChartData(fipsPrefix);
+        return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
+    }
+
+    /**
+     * Get equipment summary data for national overview.
+     * GET /equipment-summary
+     */
+    @GetMapping("/equipment-summary")
+    public ResponseEntity<EquipmentSummaryResponse> getEquipmentSummary() {
+        var response = voterDataService.getEquipmentSummary();
+        return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
+    }
+
+    /**
+     * Get state-level equipment summary data.
+     * GET /state-equipment-summary/{stateFips}
+     */
+    @GetMapping("/state-equipment-summary/{stateFips}")
+    public ResponseEntity<StateEquipmentSummaryResponse> getStateEquipmentSummary(@PathVariable String stateFips) {
+        var response = voterDataService.getStateEquipmentSummary(stateFips);
         return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
     }
 }

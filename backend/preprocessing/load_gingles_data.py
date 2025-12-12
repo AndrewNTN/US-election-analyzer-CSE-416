@@ -238,6 +238,17 @@ def compute_regression_curves(precincts: list, demographic_key: str) -> dict:
 def main():
     logger.info("Starting Gingles Chart data load with MAUP...")
     
+    # Check if data already exists - skip if so
+    client = MongoClient('mongodb://localhost:27017')
+    db = client['cse416']
+    collection = db['gingles_chart_data']
+    
+    existing_count = collection.count_documents({'stateFips': '12'})
+    if existing_count > 0:
+        logger.info(f"Gingles chart data already exists ({existing_count} documents). Skipping.")
+        client.close()
+        return
+    
     # Load shapefiles
     logger.info(f"Loading block groups from {BLOCK_GROUP_SHP}")
     block_groups = gpd.read_file(BLOCK_GROUP_SHP)

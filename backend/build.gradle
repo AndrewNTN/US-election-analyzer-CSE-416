@@ -199,6 +199,20 @@ task runGinglesPreprocessing(type: Exec) {
     }
 }
 
+task runEquipmentPreprocessing(type: Exec) {
+    description = 'Run Python preprocessing script to load Equipment data into MongoDB'
+    group = 'application'
+
+    workingDir file('preprocessing')
+    commandLine 'python', 'load_equipment_data.py'
+
+    doLast {
+        println '================================================'
+        println 'Equipment data preprocessing completed successfully!'
+        println '================================================'
+    }
+}
+
 // Make bootRun depend on the Python preprocessing tasks
 runCountiesPreprocessing.dependsOn installPythonDependencies
 runStatesPreprocessing.dependsOn runCountiesPreprocessing
@@ -208,4 +222,5 @@ runEavsPreprocessing.dependsOn runCvapPreprocessing
 runFLCountyVoteSplitsPreprocessing.dependsOn runEavsPreprocessing
 runCACountyVoteSplitsPreprocessing.dependsOn runFLCountyVoteSplitsPreprocessing
 runGinglesPreprocessing.dependsOn runCACountyVoteSplitsPreprocessing
-bootRun.dependsOn runGinglesPreprocessing
+runEquipmentPreprocessing.dependsOn runGinglesPreprocessing
+bootRun.dependsOn runEquipmentPreprocessing

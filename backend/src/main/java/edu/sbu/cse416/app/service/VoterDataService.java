@@ -6,6 +6,10 @@ import edu.sbu.cse416.app.dto.cvap.CvapRegistrationRateResponse;
 import edu.sbu.cse416.app.dto.dropbox.DropBoxVotingData;
 import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonResponse;
 import edu.sbu.cse416.app.dto.earlyvoting.EarlyVotingComparisonRow;
+import edu.sbu.cse416.app.dto.equipment.EquipmentSummaryDTO;
+import edu.sbu.cse416.app.dto.equipment.EquipmentSummaryResponse;
+import edu.sbu.cse416.app.dto.equipment.StateEquipmentSummaryDTO;
+import edu.sbu.cse416.app.dto.equipment.StateEquipmentSummaryResponse;
 import edu.sbu.cse416.app.dto.gingles.GinglesChartResponse;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedChartResponse;
 import edu.sbu.cse416.app.dto.mailballots.MailBallotsRejectedTableResponse;
@@ -28,6 +32,7 @@ import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentTableResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentYearlyDTO;
 import edu.sbu.cse416.app.model.CountyVoteSplit;
 import edu.sbu.cse416.app.model.CvapData;
+import edu.sbu.cse416.app.model.EquipmentData;
 import edu.sbu.cse416.app.model.FelonyVoting;
 import edu.sbu.cse416.app.model.GinglesChartData;
 import edu.sbu.cse416.app.model.eavs.*;
@@ -35,6 +40,7 @@ import edu.sbu.cse416.app.model.registration.Voter;
 import edu.sbu.cse416.app.repository.CountyVoteSplitRepository;
 import edu.sbu.cse416.app.repository.CvapDataRepository;
 import edu.sbu.cse416.app.repository.EavsDataRepository;
+import edu.sbu.cse416.app.repository.EquipmentDataRepository;
 import edu.sbu.cse416.app.repository.FelonyVotingRepository;
 import edu.sbu.cse416.app.repository.GinglesChartDataRepository;
 import edu.sbu.cse416.app.repository.StateVoterRegistrationRepository;
@@ -73,6 +79,7 @@ public class VoterDataService {
     private final VoterRepository voterRepo;
     private final CountyVoteSplitRepository countyVoteSplitRepo;
     private final GinglesChartDataRepository ginglesChartDataRepo;
+    private final EquipmentDataRepository equipmentDataRepo;
 
     public VoterDataService(
             EavsDataRepository repo,
@@ -81,7 +88,8 @@ public class VoterDataService {
             FelonyVotingRepository felonyVotingRepo,
             VoterRepository voterRepo,
             CountyVoteSplitRepository countyVoteSplitRepo,
-            GinglesChartDataRepository ginglesChartDataRepo) {
+            GinglesChartDataRepository ginglesChartDataRepo,
+            EquipmentDataRepository equipmentDataRepo) {
         this.repo = repo;
         this.voterRegRepo = voterRegRepo;
         this.cvapRepo = cvapRepo;
@@ -89,6 +97,7 @@ public class VoterDataService {
         this.voterRepo = voterRepo;
         this.countyVoteSplitRepo = countyVoteSplitRepo;
         this.ginglesChartDataRepo = ginglesChartDataRepo;
+        this.equipmentDataRepo = equipmentDataRepo;
     }
 
     /**
@@ -1079,5 +1088,66 @@ public class VoterDataService {
         } else {
             return "mixed";
         }
+    }
+
+    /**
+     * Get equipment summary data for the national summary table (modal view).
+     * Returns all equipment with quality scores.
+     */
+    @Cacheable(value = "equipmentSummary")
+    public EquipmentSummaryResponse getEquipmentSummary() {
+        List<EquipmentData> data = equipmentDataRepo.findAll();
+
+        List<EquipmentSummaryDTO> summaryData = data.stream()
+                .map(eq -> new EquipmentSummaryDTO(
+                        eq.manufacturer(),
+                        eq.modelName(),
+                        null, // quantity is null per user request
+                        eq.ageYears(),
+                        eq.operatingSystem(),
+                        eq.certificationLevel(),
+                        eq.scanRate(),
+                        eq.errorRate(),
+                        eq.reliability(),
+                        eq.qualityScore()))
+                .sorted(Comparator.comparing(
+                        EquipmentSummaryDTO::quality, Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
+
+        return new EquipmentSummaryResponse(summaryData, EquipmentSummaryResponse.getDefaultMetricLabels());
+    }
+
+    /**
+     * Get state-level equipment summary data.
+     * Returns equipment for the specified state or general equipment if state has
+     * no specific data.
+     */
+    @Cacheable(value = "stateEquipmentSummary", key = "#stateFips")
+    public StateEquipmentSummaryResponse getStateEquipmentSummary(String stateFips) {
+        // First try to get state-specific equipment
+        List<EquipmentData> stateData = equipmentDataRepo.findByStateFips(stateFips);
+
+        // If no state-specific data, fall back to general equipment
+        List<EquipmentData> data = stateData.isEmpty() ? equipmentDataRepo.findGeneralEquipment() : stateData;
+
+        List<StateEquipmentSummaryDTO> summaryData = data.stream()
+                .map(eq -> new StateEquipmentSummaryDTO(
+                        eq.manufacturer(),
+                        eq.modelName(),
+                        null, // quantity is null per user request
+                        eq.equipmentType(),
+                        eq.notes(),
+                        eq.ageYears(),
+                        eq.operatingSystem(),
+                        eq.certificationLevel(),
+                        eq.scanRate(),
+                        eq.errorRate(),
+                        eq.reliability(),
+                        eq.discontinued()))
+                .sorted(Comparator.comparing(
+                        StateEquipmentSummaryDTO::reliability, Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
+
+        return new StateEquipmentSummaryResponse(summaryData, StateEquipmentSummaryResponse.getDefaultMetricLabels());
     }
 }

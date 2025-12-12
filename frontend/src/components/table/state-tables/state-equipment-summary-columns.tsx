@@ -4,16 +4,16 @@ import { TableTooltip } from "@/components/table/table-tooltip";
 export type StateEquipmentSummary = {
   make: string;
   model: string;
-  quantity: number;
-  equipmentType: string;
-  description: string;
-  age: number;
-  operatingSystem: string;
-  certification: string;
-  scanRate: number;
-  errorRate: number;
-  reliability: number;
-  discontinued: boolean;
+  quantity: number | null;
+  equipmentType: string | null;
+  description: string | null;
+  age: number | null;
+  operatingSystem: string | null;
+  certification: string | null;
+  scanRate: string | null;
+  errorRate: number | null;
+  reliability: number | null;
+  discontinued: boolean | null;
 };
 
 export const stateEquipmentSummaryColumns: ColumnDef<StateEquipmentSummary>[] =
@@ -30,7 +30,7 @@ export const stateEquipmentSummaryColumns: ColumnDef<StateEquipmentSummary>[] =
             <div
               className={`font-medium text-xs max-w-[75px] truncate cursor-help ${discontinued ? "text-red-600" : ""}`}
             >
-              {make}
+              {make ?? "-"}
             </div>
           </TableTooltip>
         );
@@ -48,7 +48,7 @@ export const stateEquipmentSummaryColumns: ColumnDef<StateEquipmentSummary>[] =
             <div
               className={`font-medium text-xs max-w-[75px] truncate cursor-help ${discontinued ? "text-red-600" : ""}`}
             >
-              {model}
+              {model ?? "-"}
             </div>
           </TableTooltip>
         );
@@ -58,7 +58,7 @@ export const stateEquipmentSummaryColumns: ColumnDef<StateEquipmentSummary>[] =
       accessorKey: "equipmentType",
       header: () => <div className="whitespace-nowrap">Type</div>,
       cell: ({ row }) => (
-        <div className="text-xs">{row.getValue("equipmentType")}</div>
+        <div className="text-xs">{row.getValue("equipmentType") ?? "-"}</div>
       ),
     },
     {
@@ -67,9 +67,11 @@ export const stateEquipmentSummaryColumns: ColumnDef<StateEquipmentSummary>[] =
         <div className="text-right whitespace-nowrap">Quantity</div>
       ),
       cell: ({ row }) => {
-        const value = row.getValue("quantity") as number;
+        const value = row.getValue("quantity") as number | null;
         return (
-          <div className="text-right text-xs">{value.toLocaleString()}</div>
+          <div className="text-right text-xs">
+            {value?.toLocaleString() ?? "-"}
+          </div>
         );
       },
     },
@@ -79,22 +81,22 @@ export const stateEquipmentSummaryColumns: ColumnDef<StateEquipmentSummary>[] =
         <div className="text-right whitespace-nowrap">Age (Yrs)</div>
       ),
       cell: ({ row }) => {
-        const value = row.getValue("age") as number;
-        return <div className="text-right text-xs">{value}</div>;
+        const value = row.getValue("age") as number | null;
+        return <div className="text-right text-xs">{value ?? "-"}</div>;
       },
     },
     {
       accessorKey: "operatingSystem",
       header: () => <div className="whitespace-nowrap">OS</div>,
       cell: ({ row }) => (
-        <div className="text-xs">{row.getValue("operatingSystem")}</div>
+        <div className="text-xs">{row.getValue("operatingSystem") ?? "-"}</div>
       ),
     },
     {
       accessorKey: "certification",
       header: () => <div className="whitespace-nowrap">Certification</div>,
       cell: ({ row }) => (
-        <div className="text-xs">{row.getValue("certification")}</div>
+        <div className="text-xs">{row.getValue("certification") ?? "-"}</div>
       ),
     },
     {
@@ -103,8 +105,8 @@ export const stateEquipmentSummaryColumns: ColumnDef<StateEquipmentSummary>[] =
         <div className="text-right whitespace-nowrap">Scan Rate</div>
       ),
       cell: ({ row }) => {
-        const value = row.getValue("scanRate") as number;
-        return <div className="text-right text-xs">{value.toFixed(1)}%</div>;
+        const value = row.getValue("scanRate") as string | null;
+        return <div className="text-right text-xs">{value ?? "-"}</div>;
       },
     },
     {
@@ -113,8 +115,10 @@ export const stateEquipmentSummaryColumns: ColumnDef<StateEquipmentSummary>[] =
         <div className="text-right whitespace-nowrap">Error Rate</div>
       ),
       cell: ({ row }) => {
-        const value = row.getValue("errorRate") as number;
-        return <div className="text-right text-xs">{value.toFixed(2)}%</div>;
+        const value = row.getValue("errorRate") as number | null;
+        return (
+          <div className="text-right text-xs">{value?.toFixed(2) ?? "-"}%</div>
+        );
       },
     },
     {
@@ -123,22 +127,26 @@ export const stateEquipmentSummaryColumns: ColumnDef<StateEquipmentSummary>[] =
         <div className="text-right whitespace-nowrap">Reliability</div>
       ),
       cell: ({ row }) => {
-        const value = row.getValue("reliability") as number;
-        return <div className="text-right text-xs">{value.toFixed(1)}%</div>;
+        const value = row.getValue("reliability") as number | null;
+        return (
+          <div className="text-right text-xs">{value?.toFixed(1) ?? "-"}%</div>
+        );
       },
     },
     {
       accessorKey: "description",
       header: () => <div className="whitespace-nowrap">Description</div>,
       cell: ({ row }) => {
-        const description = row.getValue("description") as string;
+        const description = row.getValue("description") as string | null;
 
-        return (
+        return description ? (
           <TableTooltip content={description}>
             <div className="max-w-[50px] text-xs text-muted-foreground cursor-help truncate">
               {description}
             </div>
           </TableTooltip>
+        ) : (
+          <div className="max-w-[50px] text-xs text-muted-foreground">-</div>
         );
       },
     },
