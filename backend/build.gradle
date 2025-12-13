@@ -49,12 +49,12 @@ task installPythonDependencies(type: Exec) {
     description = 'Install required Python packages for preprocessing'
     group = 'application'
 
-    commandLine 'python', '-m', 'pip', 'install', 'geopandas', 'pymongo', 'shapely', 'openpyxl', 'requests', 'python-dotenv', 'scipy', 'numpy', 'maup'
+    commandLine 'python', '-m', 'pip', 'install', 'geopandas', 'pymongo', 'shapely', 'openpyxl', 'requests', 'python-dotenv', 'scipy', 'numpy', 'maup', 'pymc', 'arviz', 'pyei'
 
     doFirst {
         println '================================================'
         println 'Installing Python dependencies...'
-        println 'Packages: geopandas, pymongo, shapely'
+        println 'Packages: geopandas, pymongo, shapely, pymc, arviz, pyei'
         println '================================================'
     }
 
@@ -213,6 +213,34 @@ task runEquipmentPreprocessing(type: Exec) {
     }
 }
 
+task runEIEquipmentPreprocessing(type: Exec) {
+    description = 'Run Python preprocessing script for EI Equipment analysis'
+    group = 'application'
+
+    workingDir file('preprocessing')
+    commandLine 'python', 'ei_vot_equipment.py'
+
+    doLast {
+        println '================================================'
+        println 'EI Equipment preprocessing completed successfully!'
+        println '================================================'
+    }
+}
+
+task runEIRejectedBallotsPreprocessing(type: Exec) {
+    description = 'Run Python preprocessing script for EI Rejected Ballots analysis'
+    group = 'application'
+
+    workingDir file('preprocessing')
+    commandLine 'python', 'ei_rej_ballots.py'
+
+    doLast {
+        println '================================================'
+        println 'EI Rejected Ballots preprocessing completed successfully!'
+        println '================================================'
+    }
+}
+
 // Make bootRun depend on the Python preprocessing tasks
 runCountiesPreprocessing.dependsOn installPythonDependencies
 runStatesPreprocessing.dependsOn runCountiesPreprocessing
@@ -223,4 +251,6 @@ runFLCountyVoteSplitsPreprocessing.dependsOn runEavsPreprocessing
 runCACountyVoteSplitsPreprocessing.dependsOn runFLCountyVoteSplitsPreprocessing
 runGinglesPreprocessing.dependsOn runCACountyVoteSplitsPreprocessing
 runEquipmentPreprocessing.dependsOn runGinglesPreprocessing
-bootRun.dependsOn runEquipmentPreprocessing
+runEIEquipmentPreprocessing.dependsOn runEquipmentPreprocessing
+runEIRejectedBallotsPreprocessing.dependsOn runEIEquipmentPreprocessing
+bootRun.dependsOn runEIRejectedBallotsPreprocessing

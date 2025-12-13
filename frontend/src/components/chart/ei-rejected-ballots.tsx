@@ -1,6 +1,6 @@
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip, Legend,
-  ResponsiveContainer, CartesianGrid, LabelList
+  LineChart, Line, XAxis, YAxis, Tooltip,
+  ResponsiveContainer, CartesianGrid
 } from "recharts";
 import { useMemo, useState, useEffect } from "react";
 
@@ -19,11 +19,11 @@ type Row = {
 } & Partial<Record<DemographicKey, number>>;
 
 const META: Record<DemographicKey, { label: string; color: string; dash?: string }> = {
-  white:   { label: "White",    color: "#6E56CF" },
-  black:   { label: "Black",    color: "#1EA7FD", dash: "4 2" },
-  hispanic:{ label: "Hispanic", color: "#E54D2E" },
-  asian:   { label: "Asian",    color: "#2EB67D", dash: "2 2" },
-  other:   { label: "Other",    color: "#8E8E93", dash: "6 3" },
+  white: { label: "White", color: "#6E56CF" },
+  black: { label: "Black", color: "#1EA7FD" },
+  hispanic: { label: "Hispanic", color: "#E54D2E" },
+  asian: { label: "Asian", color: "#2EB67D" },
+  other: { label: "Other", color: "#8E8E93" },
 };
 
 export default function RejectedBallotsPDF({
@@ -53,7 +53,7 @@ export default function RejectedBallotsPDF({
   const resolvedXKey: "rate" | "ratePct" = useMemo(() => {
     if (xKey) return xKey;
     const hasRate = normalized.some((d) => typeof d.rate === "number");
-    const hasPct  = normalized.some((d) => typeof d.ratePct === "number");
+    const hasPct = normalized.some((d) => typeof d.ratePct === "number");
     return hasRate ? "rate" : hasPct ? "ratePct" : "ratePct";
   }, [xKey, normalized]);
 
@@ -80,12 +80,46 @@ export default function RejectedBallotsPDF({
         maxY = Math.max(maxY, r[g] ?? 0);
       }
     }
-    return [0, Math.max(0.01, Number(maxY.toFixed(3)))];
+    // Add 10% padding to top for better visualization
+    return [0, maxY * 1.1];
   }, [normalized, availableGroups, shown]);
 
-  // 6) Formatters
+  // 6) x-domain based on density distribution
+  const xDomain = useMemo<[number, number]>(() => {
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let hasData = false;
+
+    normalized.forEach((row) => {
+      const x = row[resolvedXKey];
+      if (typeof x !== "number") return;
+
+      // Check if any VISIBLE group has significant density at this x
+      // Threshold 0.01 ensures we don't zoom in on noise
+      const hasDensity = availableGroups.some(
+        (g) => shown.has(g) && (row[g] ?? 0) > 0.01
+      );
+
+      if (hasDensity) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        hasData = true;
+      }
+    });
+
+    if (!hasData) {
+      return resolvedXKey === "rate" ? [0, 0.1] : [0, 10];
+    }
+
+    // Round to whole numbers to prevent duplicate tick labels
+    const roundedMin = Math.floor(minX);
+    const roundedMax = Math.ceil(maxX);
+    return [Math.max(0, roundedMin), roundedMax];
+  }, [normalized, availableGroups, shown, resolvedXKey]);
+
+  // 7) Formatters
   const xTick = (v: number) =>
-    resolvedXKey === "rate" ? `${(v * 100).toFixed(0)}%` : `${v}%`;
+    resolvedXKey === "rate" ? `${(v * 100).toFixed(0)}%` : `${v.toFixed(0)}%`;
 
   const toggle = (g: DemographicKey) =>
     setShown((s) => {
@@ -95,39 +129,42 @@ export default function RejectedBallotsPDF({
     });
 
   return (
-    <div className="space-y-2">
-      {/* Checkbox legend with color chips */}
-      <div className="flex flex-wrap gap-3">
+    <div className="space-y-8">
+      {/* Checkbox legend with color chips - styled to match app */}
+      <div className="flex flex-wrap items-center gap-4 px-2">
         {availableGroups.map((g) => (
-          <label key={g} className="inline-flex items-center gap-2 cursor-pointer">
-            <span
-              className="inline-block h-3 w-3 rounded-sm"
-              style={{
-                background: META[g].color,
-                outline: META[g].dash ? "1px dashed currentColor" : undefined,
-              }}
-            />
+          <label key={g} className="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:text-gray-900">
             <input
               type="checkbox"
               checked={shown.has(g)}
               onChange={() => toggle(g)}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
-            <span className="capitalize">{META[g].label}</span>
+            <span
+              className="inline-block h-3 w-3 rounded-full"
+              style={{ backgroundColor: META[g].color }}
+            />
+            <span className="font-medium">{META[g].label}</span>
           </label>
         ))}
       </div>
 
-      <ResponsiveContainer width="100%" height={500}>
-        <LineChart data={normalized} margin={{ top: 10, right: 28, bottom: 10, left: 10 }}>
+      <ResponsiveContainer width="100%" height={480}>
+        <LineChart data={normalized} margin={{ top: 10, right: 70, bottom: 40, left: 10 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey={resolvedXKey}
+            type="number"
+            domain={xDomain}
+            allowDataOverflow={true}
+            allowDuplicatedCategory={false}
             tickFormatter={xTick}
-            label={{ value: xLabel, position: "insideBottom", offset: 0 }}
+            label={{ value: xLabel, position: "insideBottom", offset: -15, style: { fontSize: 14, fontWeight: 500 } }}
           />
           <YAxis
             domain={yDomain}
-            label={{ value: yLabel, angle: -90, position: "insideLeft" }}
+            tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v >= 1 ? v.toFixed(0) : v.toFixed(2)}
+            label={{ value: yLabel, angle: -90, position: "center", dx: -25, style: { fontSize: 14, fontWeight: 500 } }}
           />
           <Tooltip
             formatter={(v: number, k) => [
@@ -139,10 +176,6 @@ export default function RejectedBallotsPDF({
                 ? `${(label * 100).toFixed(1)}%`
                 : `${typeof label === "number" ? label.toFixed(1) : label}%`
             }
-          />
-          <Legend
-            formatter={(k: string) => META[k as DemographicKey]?.label ?? k}
-            wrapperStyle={{ opacity: 0.75 }}
           />
 
           {availableGroups
@@ -165,20 +198,7 @@ export default function RejectedBallotsPDF({
                   isAnimationActive={false}
                   onMouseEnter={() => setHovered(g)}
                   onMouseLeave={() => setHovered(null)}
-                >
-                  {/* Inline end label on the last point */}
-                  <LabelList
-                    content={(props: any) => {
-                      const { x, y, index, value } = props;
-                      if (index !== normalized.length - 1 || value == null) return null;
-                      return (
-                        <text x={x + 6} y={y} dy={4} fontSize={12} fill={m.color}>
-                          {m.label}
-                        </text>
-                      );
-                    }}
-                  />
-                </Line>
+                />
               );
             })}
         </LineChart>

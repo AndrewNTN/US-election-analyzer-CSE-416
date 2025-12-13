@@ -22,8 +22,11 @@ import edu.sbu.cse416.app.dto.voterregistration.VoterRegistrationTableResponse;
 import edu.sbu.cse416.app.dto.votingequipment.CountyEquipmentTypeResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentChartResponse;
 import edu.sbu.cse416.app.dto.votingequipment.VotingEquipmentTableResponse;
+import edu.sbu.cse416.app.model.EIData;
+import edu.sbu.cse416.app.service.EIDataService;
 import edu.sbu.cse416.app.service.VoterDataService;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -35,9 +38,12 @@ import org.springframework.web.bind.annotation.*;
 public class VoterDataController {
 
     private final VoterDataService voterDataService;
+    private final EIDataService eiDataService;
 
-    public VoterDataController(VoterDataService voterDataService) {
+    @Autowired
+    public VoterDataController(VoterDataService voterDataService, EIDataService eiDataService) {
         this.voterDataService = voterDataService;
+        this.eiDataService = eiDataService;
     }
 
     /**
@@ -270,5 +276,25 @@ public class VoterDataController {
     public ResponseEntity<EquipmentQualityChartResponse> getEquipmentQualityChart(@PathVariable String fipsPrefix) {
         var response = voterDataService.getEquipmentQualityVsRejectedBallots(fipsPrefix);
         return (response == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(response);
+    }
+
+    /**
+     * Get EI Equipment Quality data.
+     * GET /ei/equipment/{stateFips}
+     */
+    @GetMapping("/ei/equipment/{stateFips}")
+    public ResponseEntity<EIData> getEIEquipmentData(@PathVariable String stateFips) {
+        var data = eiDataService.getEIData("equipment_quality", stateFips);
+        return (data == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(data);
+    }
+
+    /**
+     * Get EI Rejected Ballots data.
+     * GET /ei/rejected-ballots/{stateFips}
+     */
+    @GetMapping("/ei/rejected-ballots/{stateFips}")
+    public ResponseEntity<EIData> getEIRejectedBallotsData(@PathVariable String stateFips) {
+        var data = eiDataService.getEIData("rejected_ballots", stateFips);
+        return (data == null) ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(data);
     }
 }

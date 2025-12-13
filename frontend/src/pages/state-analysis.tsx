@@ -33,6 +33,8 @@ import { EquipmentQualityView } from "@/components/analysis-views/EquipmentQuali
 import { PollbookDeletionsView } from "@/components/analysis-views/PollbookDeletionsView";
 import { MailBallotsRejectedView } from "@/components/analysis-views/MailBallotsRejectedView";
 import { GinglesChartView } from "@/components/analysis-views/GinglesChartView";
+import { EIEquipmentView } from "@/components/analysis-views/EIEquipmentView";
+import { EIRejectedBallotsView } from "@/components/analysis-views/EIRejectedBallotsView";
 
 const AnalysisType = {
   PROVISIONAL_BALLOT: "prov-ballot-bchart",
@@ -45,6 +47,8 @@ const AnalysisType = {
   EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS:
     "equipment-quality-vs-rejected-ballots",
   GINGLES_CHART: "gingles-chart",
+  EI_EQUIPMENT: "ei-equipment",
+  EI_REJECTED_BALLOTS: "ei-rejected-ballots",
 } as const;
 
 type AnalysisTypeValue = (typeof AnalysisType)[keyof typeof AnalysisType];
@@ -60,6 +64,8 @@ const analysisTypeLabels: Record<AnalysisTypeValue, string> = {
   [AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS]:
     "Equipment vs Rejected Ballots",
   [AnalysisType.GINGLES_CHART]: "Gingles Chart",
+  [AnalysisType.EI_EQUIPMENT]: "EI: Equipment Quality",
+  [AnalysisType.EI_REJECTED_BALLOTS]: "EI: Rejected Ballots",
 };
 
 const analysisToChoroplethMap: Record<
@@ -81,6 +87,8 @@ const analysisToChoroplethMap: Record<
   [AnalysisType.EQUIPMENT_QUALITY_VS_REJECTED_BALLOTS]:
     STATE_CHOROPLETH_OPTIONS.OFF,
   [AnalysisType.GINGLES_CHART]: STATE_CHOROPLETH_OPTIONS.OFF,
+  [AnalysisType.EI_EQUIPMENT]: STATE_CHOROPLETH_OPTIONS.OFF,
+  [AnalysisType.EI_REJECTED_BALLOTS]: STATE_CHOROPLETH_OPTIONS.OFF,
 };
 
 interface StateAnalysisProps {
@@ -248,13 +256,12 @@ export default function StateAnalysis({
                 EAVS Data Quality Score
               </span>
               <span
-                className={`text-sm font-bold ${
-                  dataQualityScore > 0.9
+                className={`text-sm font-bold ${dataQualityScore > 0.9
                     ? "text-green-600"
                     : dataQualityScore > 0.7
                       ? "text-yellow-600"
                       : "text-red-600"
-                }`}
+                  }`}
               >
                 {dataQualityScore?.toFixed(2)}
               </span>
@@ -341,6 +348,10 @@ export default function StateAnalysis({
                 <MailBallotsRejectedView stateFipsPrefix={stateFipsPrefix} />
               ) : selectedDataset === AnalysisType.GINGLES_CHART ? (
                 <GinglesChartView stateFipsPrefix={stateFipsPrefix} />
+              ) : selectedDataset === AnalysisType.EI_EQUIPMENT ? (
+                <EIEquipmentView stateFipsPrefix={stateFipsPrefix} />
+              ) : selectedDataset === AnalysisType.EI_REJECTED_BALLOTS ? (
+                <EIRejectedBallotsView stateFipsPrefix={stateFipsPrefix} />
               ) : (
                 <p className="text-xs text-muted-foreground text-center">
                   {analysisTypeLabels[selectedDataset]} visualization will be
