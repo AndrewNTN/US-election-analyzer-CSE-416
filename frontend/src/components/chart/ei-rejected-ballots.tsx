@@ -1,6 +1,11 @@
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip,
-  ResponsiveContainer, CartesianGrid
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
 } from "recharts";
 import { useMemo, useState, useEffect } from "react";
 
@@ -13,12 +18,15 @@ type DemographicKey = "white" | "black" | "hispanic" | "asian" | "other";
  * - Each demographic key maps to a density/relative probability value for that bucket.
  */
 type Row = {
-  q?: number;        // legacy, 0..100
-  rate?: number;     // 0..1
-  ratePct?: number;  // 0..100
+  q?: number; // legacy, 0..100
+  rate?: number; // 0..1
+  ratePct?: number; // 0..100
 } & Partial<Record<DemographicKey, number>>;
 
-const META: Record<DemographicKey, { label: string; color: string; dash?: string }> = {
+const META: Record<
+  DemographicKey,
+  { label: string; color: string; dash?: string }
+> = {
   white: { label: "White", color: "#6E56CF" },
   black: { label: "Black", color: "#1EA7FD" },
   hispanic: { label: "Hispanic", color: "#E54D2E" },
@@ -42,7 +50,7 @@ export default function RejectedBallotsPDF({
   // 1) Normalize data: if q present and no explicit x, map q -> ratePct
   const normalized = useMemo<Row[]>(() => {
     return data.map((d) => {
-      if ((d.rate == null && d.ratePct == null) && typeof d.q === "number") {
+      if (d.rate == null && d.ratePct == null && typeof d.q === "number") {
         return { ...d, ratePct: d.q };
       }
       return d;
@@ -59,17 +67,18 @@ export default function RejectedBallotsPDF({
 
   // 3) Only include groups that actually have numeric data
   const availableGroups = useMemo<DemographicKey[]>(
-    () => groups.filter((g) => normalized.some((r) => typeof r[g] === "number")),
-    [groups, normalized]
+    () =>
+      groups.filter((g) => normalized.some((r) => typeof r[g] === "number")),
+    [groups, normalized],
   );
 
   // 4) Legend visibility state; sync when availableGroups change
-  const [shown, setShown] = useState<Set<DemographicKey>>(new Set(availableGroups));
+  const [shown, setShown] = useState<Set<DemographicKey>>(
+    new Set(availableGroups),
+  );
   useEffect(() => {
     setShown(new Set(availableGroups));
   }, [availableGroups]);
-
-  const [hovered, setHovered] = useState<DemographicKey | null>(null);
 
   // 5) y-domain based on currently visible series
   const yDomain = useMemo<[number, number]>(() => {
@@ -97,7 +106,7 @@ export default function RejectedBallotsPDF({
       // Check if any VISIBLE group has significant density at this x
       // Threshold 0.01 ensures we don't zoom in on noise
       const hasDensity = availableGroups.some(
-        (g) => shown.has(g) && (row[g] ?? 0) > 0.01
+        (g) => shown.has(g) && (row[g] ?? 0) > 0.01,
       );
 
       if (hasDensity) {
@@ -124,7 +133,11 @@ export default function RejectedBallotsPDF({
   const toggle = (g: DemographicKey) =>
     setShown((s) => {
       const n = new Set(s);
-      n.has(g) ? n.delete(g) : n.add(g);
+      if (n.has(g)) {
+        n.delete(g);
+      } else {
+        n.add(g);
+      }
       return n;
     });
 
@@ -133,7 +146,10 @@ export default function RejectedBallotsPDF({
       {/* Checkbox legend with color chips - styled to match app */}
       <div className="flex flex-wrap items-center gap-4 px-2">
         {availableGroups.map((g) => (
-          <label key={g} className="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:text-gray-900">
+          <label
+            key={g}
+            className="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:text-gray-900"
+          >
             <input
               type="checkbox"
               checked={shown.has(g)}
@@ -150,7 +166,10 @@ export default function RejectedBallotsPDF({
       </div>
 
       <ResponsiveContainer width="100%" height={480}>
-        <LineChart data={normalized} margin={{ top: 10, right: 70, bottom: 40, left: 10 }}>
+        <LineChart
+          data={normalized}
+          margin={{ top: 10, right: 70, bottom: 40, left: 10 }}
+        >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey={resolvedXKey}
@@ -159,12 +178,29 @@ export default function RejectedBallotsPDF({
             allowDataOverflow={true}
             allowDuplicatedCategory={false}
             tickFormatter={xTick}
-            label={{ value: xLabel, position: "insideBottom", offset: -15, style: { fontSize: 14, fontWeight: 500 } }}
+            label={{
+              value: xLabel,
+              position: "insideBottom",
+              offset: -15,
+              style: { fontSize: 14, fontWeight: 500 },
+            }}
           />
           <YAxis
             domain={yDomain}
-            tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v >= 1 ? v.toFixed(0) : v.toFixed(2)}
-            label={{ value: yLabel, angle: -90, position: "center", dx: -25, style: { fontSize: 14, fontWeight: 500 } }}
+            tickFormatter={(v: number) =>
+              v >= 1000
+                ? `${(v / 1000).toFixed(0)}k`
+                : v >= 1
+                  ? v.toFixed(0)
+                  : v.toFixed(2)
+            }
+            label={{
+              value: yLabel,
+              angle: -90,
+              position: "center",
+              dx: -25,
+              style: { fontSize: 14, fontWeight: 500 },
+            }}
           />
           <Tooltip
             formatter={(v: number, k) => [
@@ -182,7 +218,6 @@ export default function RejectedBallotsPDF({
             .filter((g) => shown.has(g))
             .map((g) => {
               const m = META[g];
-              const faded = hovered && hovered !== g;
               return (
                 <Line
                   key={g}
@@ -191,13 +226,10 @@ export default function RejectedBallotsPDF({
                   dataKey={g}
                   dot={false}
                   stroke={m.color}
-                  strokeWidth={faded ? 2 : 3}
-                  strokeOpacity={faded ? 0.25 : 1}
+                  strokeWidth={2}
                   strokeDasharray={m.dash}
                   activeDot={{ r: 5 }}
                   isAnimationActive={false}
-                  onMouseEnter={() => setHovered(g)}
-                  onMouseLeave={() => setHovered(null)}
                 />
               );
             })}

@@ -256,12 +256,13 @@ export default function StateAnalysis({
                 EAVS Data Quality Score
               </span>
               <span
-                className={`text-sm font-bold ${dataQualityScore > 0.9
+                className={`text-sm font-bold ${
+                  dataQualityScore > 0.9
                     ? "text-green-600"
                     : dataQualityScore > 0.7
                       ? "text-yellow-600"
                       : "text-red-600"
-                  }`}
+                }`}
               >
                 {dataQualityScore?.toFixed(2)}
               </span>
