@@ -1,39 +1,20 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { IconChartBar } from "@tabler/icons-react";
 
 import BaseMap from "@/components/map/base-map.tsx";
 import ChoroplethLayer from "@/components/map/choropleth-layer.tsx";
 import OutlineLayer from "@/components/map/outline-layer.tsx";
 import AnalysisDrawer from "@/components/analysis-drawer.tsx";
-import { ChoroplethLegend } from "@/components/map/choropleth-legend";
 import { Button } from "@/components/ui/button.tsx";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select.tsx";
 import { useStatesGeoJsonQuery } from "@/lib/api/use-queries.ts";
 
-import {
-  SPLASH_CHOROPLETH_OPTIONS,
-  SPLASH_CHOROPLETH_LABELS,
-  equipmentAgeScale,
-  type SplashChoroplethOption,
-} from "@/lib/choropleth.ts";
+import { SPLASH_CHOROPLETH_OPTIONS } from "@/lib/choropleth.ts";
 
 import { MapLoading } from "@/components/ui/map-loading";
 import { MapError } from "@/components/ui/map-error";
 
 export default function SplashPage() {
   const [open, setOpen] = useState(false);
-  const [choroplethOption, setChoroplethOption] =
-    useState<SplashChoroplethOption>(SPLASH_CHOROPLETH_OPTIONS.OFF);
-
-  const handleChoroplethChange = (value: string) => {
-    setChoroplethOption(value as SplashChoroplethOption);
-  };
 
   const {
     data: statesData,
@@ -46,13 +27,6 @@ export default function SplashPage() {
     type: "FeatureCollection",
     features: [],
   };
-
-  const dynamicScale = useMemo(() => {
-    if (choroplethOption === SPLASH_CHOROPLETH_OPTIONS.EQUIPMENT_AGE) {
-      return equipmentAgeScale;
-    }
-    return null;
-  }, [choroplethOption]);
 
   if (isLoading) {
     return (
@@ -80,27 +54,6 @@ export default function SplashPage() {
               <Button variant="outline" onClick={() => setOpen(true)}>
                 <IconChartBar /> More Analysis
               </Button>
-
-              <div className="flex items-center space-x-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Choropleth:
-                </label>
-                <Select
-                  value={choroplethOption}
-                  onValueChange={handleChoroplethChange}
-                >
-                  <SelectTrigger className="w-48 bg-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(SPLASH_CHOROPLETH_OPTIONS).map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {SPLASH_CHOROPLETH_LABELS[option]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           </div>
         </div>
@@ -113,21 +66,11 @@ export default function SplashPage() {
         <BaseMap style={{ width: "100%", height: "100vh", zIndex: 0 }}>
           <ChoroplethLayer
             data={safeStatesData}
-            choroplethOption={choroplethOption}
-            colorScale={dynamicScale}
+            choroplethOption={SPLASH_CHOROPLETH_OPTIONS.OFF}
+            colorScale={null}
           />
           <OutlineLayer data={safeStatesData} />
         </BaseMap>
-
-        {/* Choropleth Legend */}
-        {choroplethOption && choroplethOption !== "off" && (
-          <div className="absolute bottom-32 left-4 z-10 max-w-xs">
-            <ChoroplethLegend
-              choroplethOption={choroplethOption}
-              colorScale={dynamicScale}
-            />
-          </div>
-        )}
       </div>
     </div>
   );
