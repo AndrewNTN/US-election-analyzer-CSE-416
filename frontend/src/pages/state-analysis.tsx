@@ -137,6 +137,9 @@ export default function StateAnalysis({
     navigate({ to: "/" });
   };
 
+  // Florida FIPS code - preclearance state for EI analysis
+  const FLORIDA_FIPS = "12";
+
   const availableAnalysisOptions = useMemo<AnalysisTypeValue[]>(
     () =>
       Object.values(AnalysisType).filter((option) => {
@@ -146,9 +149,16 @@ export default function StateAnalysis({
         if (option === AnalysisType.GINGLES_CHART) {
           return hasGinglesChart(normalizedStateKey);
         }
+        // Only show EI tabs for Florida (preclearance state)
+        if (
+          option === AnalysisType.EI_EQUIPMENT ||
+          option === AnalysisType.EI_REJECTED_BALLOTS
+        ) {
+          return stateFips === FLORIDA_FIPS;
+        }
         return true;
       }),
-    [normalizedStateKey],
+    [normalizedStateKey, stateFips],
   );
 
   function formatStateName(stateName: string): string {
@@ -256,13 +266,12 @@ export default function StateAnalysis({
                 EAVS Data Quality Score
               </span>
               <span
-                className={`text-sm font-bold ${
-                  dataQualityScore > 0.9
+                className={`text-sm font-bold ${dataQualityScore > 0.9
                     ? "text-green-600"
                     : dataQualityScore > 0.7
                       ? "text-yellow-600"
                       : "text-red-600"
-                }`}
+                  }`}
               >
                 {dataQualityScore?.toFixed(2)}
               </span>
